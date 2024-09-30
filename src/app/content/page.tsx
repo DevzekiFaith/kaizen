@@ -9,9 +9,10 @@ import TimeTracker from "@/components/Time-Tracker/Time-Tracker";
 import NavBar from "@/components/NavBar/NavBar";
 
 type FormValues = {
-  date: string; // Added line
+  date: string;
   title: string;
-  content: string; // Added line
+  content: string;
+  goal: string;
 };
 
 const MainPage = () => {
@@ -65,8 +66,22 @@ const MainPage = () => {
                 {...register("date", { required: true })}
               />
               {errors.date?.type === "required" && (
-                <p className="text-red-500" role="alert">
+                <p className="text-red-500 text-[10px]" role="alert">
                   date is required
+                </p>
+              )}
+            </span>
+            <span className="flex justify-start items-center mb-[1rem] gap-[1rem]">
+              <label className="text-slate-600 text-[12px]">Goal</label>
+              <input
+                className="text-slate-800 text-[12px] p-[8px] rounded-full accent-orange-500"
+                type="checkbox"
+                placeholder="goals"
+                {...register("goal", { required: true })}
+              />
+              {errors.goal?.type === "required" && (
+                <p className="text-red-500 text-[10px]" role="alert">
+                  goal is required
                 </p>
               )}
             </span>
@@ -76,11 +91,11 @@ const MainPage = () => {
               <input
                 className="text-slate-800 text-[12px] p-[8px] rounded-2xl"
                 type="text"
-                placeholder="title"
+                placeholder="title of goal"
                 {...register("title", { required: true })}
               />
               {errors.title?.type === "required" && (
-                <p className="text-red-500" role="alert">
+                <p className="text-red-500 text-[10px]" role="alert">
                   title is required
                 </p>
               )}
@@ -102,7 +117,7 @@ const MainPage = () => {
                 {...register("content", { required: true })}
               ></textarea>
               {errors.content?.type === "required" && (
-                <p className="text-red-500" role="alert">
+                <p className="text-red-500 text-[10px]" role="alert">
                   Content is required
                 </p>
               )}

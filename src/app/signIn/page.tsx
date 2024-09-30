@@ -5,6 +5,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { useForm, SubmitHandler } from "react-hook-form";
 import { GoogleAuthProvider, signInWithPopup } from "firebase/auth";
+import { getAuth, signInWithEmailAndPassword } from "firebase/auth"; // {{ edit_1
 import { auth } from "@/firebase/firebaseConfig";
 import { useRouter } from "next/navigation";
 
@@ -28,11 +29,20 @@ const SignIn = () => {
     formState: { errors },
   } = useForm<FormValues>(); // Ensure useForm is correctly imported
 
-  const onSubmit: SubmitHandler<FormValues> = (data) => {
-    console.log(data);
-    reset();
-    alert("just Dropped my Schedule for the Day! SUPER-EXCITED"); // Moved reset inside onSubmit
+  const onSubmit: SubmitHandler<FormValues> = async (data) => {
+    try {
+      const { email, password } = data;
+      const auth = getAuth(); // Initialize auth
+      await signInWithEmailAndPassword(auth, email, password); // Updated to use the correct method
+      reset();
+      alert("Successfully signed in!"); // Updated alert message
+      router.push("/content");
+    } catch (error) {
+      console.error("Error signing in:", error);
+      alert("Failed to sign in. Please check your credentials."); // {{ edit_2
+    }
   };
+
   return (
     <div>
       <div className="flex justify-center xl:flex-row flex-col items-center gap-[4rem] w-full p-[1rem]">
@@ -61,7 +71,7 @@ const SignIn = () => {
                   <label className="text-slate-200 mb-[1rem]">Email</label>
                   <input
                     className="w-[24rem] h-[2.5rem] text-slate-500 bg-slate-800 rounded-3xl px-6 text-[12px] "
-                    type="text"
+                    type="email"
                     placeholder="Enter your email"
                     {...register("email", { required: true })} // {{ edit_1
                   />

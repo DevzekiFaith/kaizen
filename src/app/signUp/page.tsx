@@ -6,7 +6,12 @@ import { useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { useForm, SubmitHandler } from "react-hook-form";
-import { GoogleAuthProvider, signInWithPopup } from "firebase/auth";
+import {
+  GoogleAuthProvider,
+  signInWithPopup,
+  createUserWithEmailAndPassword,
+  signInWithEmailAndPassword,
+} from "firebase/auth";
 import { auth } from "@/firebase/firebaseConfig";
 import { useRouter } from "next/navigation";
 
@@ -30,16 +35,25 @@ const SignUp = () => {
     formState: { errors },
   } = useForm<FormValues>();
 
-  const onSubmit: SubmitHandler<FormValues> = (data) => {
-    console.log(data);
-    reset();
-    alert("just Dropped my Schedule for the Day! SUPER-EXCITED"); // Moved reset inside onSubmit
+  const onSubmit: SubmitHandler<FormValues> = async (data) => {
+    try {
+      // Sign up the user with email and password
+      await createUserWithEmailAndPassword(auth, data.email, data.password);
+      console.log("User signed up:", data);
+      reset();
+      alert("just Dropped my Schedule for the Day! SUPER-EXCITED");
+      router.push("/signIn"); // Navigate to sign-in page after sign-up
+    } catch (error) {
+      console.error("Error signing up:", error);
+      alert("Error signing up: " + (error as Error).message);
+    }
   };
-  const [isSignIn, setIsSignIn] = useState(false); // State to toggle between Sign In and Sign Up
 
   const handleSignInClick = () => {
     setIsSignIn(true); // Set state to show Sign In component
   };
+
+  const [isSignIn, setIsSignIn] = useState(false); // State to toggle between Sign In and Sign Up
 
   return (
     <div>
@@ -87,7 +101,8 @@ const SignUp = () => {
                       className="w-[24rem] h-[2.5rem] text-slate-300 bg-slate-800 rounded-3xl px-6 text-[12px] mb-1"
                       type="text"
                       placeholder="Enter your name"
-                      {...register("name", { required: true })}
+                      // value={name}
+                      {...register("name", { required: true })} // Keep this line
                     />
                     {errors.name?.type === "required" && (
                       <p className="text-red-500 mb-[1rem]" role="alert">
@@ -99,8 +114,9 @@ const SignUp = () => {
                     <label className="text-slate-200 mb-[1rem]">Email</label>
                     <input
                       className="w-[24rem] h-[2.5rem] text-slate-500 bg-slate-800 rounded-3xl px-6 text-[12px]"
-                      type="text"
+                      type="email"
                       placeholder="Enter your email"
+                      // value={email}
                       {...register("email", { required: true })}
                     />
                     {errors.email?.type === "required" && (
@@ -117,6 +133,7 @@ const SignUp = () => {
                       className="w-[24rem] h-[2.5rem] text-slate-300 bg-slate-800 rounded-3xl px-6 text-[12px]"
                       type="password"
                       placeholder="Create your password"
+                      // value={password}
                       {...register("password", { required: true })}
                     />
                     {errors.password?.type === "required" && (
