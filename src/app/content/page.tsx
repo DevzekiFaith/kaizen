@@ -7,6 +7,7 @@ import { useForm, SubmitHandler } from "react-hook-form"; // Correct for v7+
 import Image from "next/image";
 import TimeTracker from "@/components/Time-Tracker/Time-Tracker";
 import NavBar from "@/components/NavBar/NavBar";
+import { FaArrowUpRightFromSquare } from "react-icons/fa6"; // {{ edit_1
 
 type FormValues = {
   date: string;
@@ -123,11 +124,11 @@ const MainPage = () => {
               )}
             </span>
           </div>
-          <button
+          <button 
             type="submit"
-            className="bg-orange-500 p-[3px] mt-[2rem] xl:w-[24rem] rounded-full h-[2.5rem] font-extrabold w-[16rem] text-slate-300"
+            className="flex  justify-center gap-[1.5rem]  items-center bg-transparent border border-slate-800 p-[3px] mt-[2rem] xl:w-[24rem] rounded-full h-[2.5rem] font-extrabold w-[16rem] text-orange-500 hover:translate-x-5"
           >
-            Lets Go!
+            Let's Go! <FaArrowUpRightFromSquare className="text-slate-800 translate-x-3 cursor-pointer hover:translate-x-6" />
           </button>
           <div className="border-4 border-slate-700 border-l-slate-500w-[200px] mt-[2rem] rounded-2xl">
             <h5 className="w-[300px] p-[8px] dark:text-slate-800 text-slate-600 text-[12px]">

@@ -5,9 +5,16 @@ import Image from "next/image";
 import Link from "next/link";
 import { useForm, SubmitHandler } from "react-hook-form";
 import { GoogleAuthProvider, signInWithPopup } from "firebase/auth";
-import { getAuth, signInWithEmailAndPassword } from "firebase/auth"; // {{ edit_1
+import {
+  getAuth,
+  signInWithEmailAndPassword,
+  onAuthStateChanged,
+} from "firebase/auth"; // Ensure this import is present
 import { auth } from "@/firebase/firebaseConfig";
 import { useRouter } from "next/navigation";
+import { ToastContainer, Zoom, toast } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
+import { useEffect } from "react"; // {{ edit_1
 
 type FormValues = {
   email: string;
@@ -15,6 +22,7 @@ type FormValues = {
 };
 
 const SignIn = () => {
+  const notify = () => toast("So good to be here!");
   const router = useRouter();
   const HandleGoogle = async () => {
     const provider = await new GoogleAuthProvider();
@@ -42,6 +50,31 @@ const SignIn = () => {
       alert("Failed to sign in. Please check your credentials."); // {{ edit_2
     }
   };
+
+  useEffect(() => {
+    // {{ edit_2
+    const auth = getAuth(); // Initialize auth
+    const unsubscribe = onAuthStateChanged(auth, (user) => {
+      if (user) {
+        console.log("User is signed in:", user);
+      } else {
+        console.log("No user is signed in.");
+      }
+    });
+    return () => unsubscribe(); // Cleanup subscription on unmount
+  }, []); // Empty dependency array to run only on mount
+
+  toast.success("🦄 Wow! Succesfully Signed In", {
+    position: "top-center",
+    autoClose: 5000,
+    hideProgressBar: false,
+    closeOnClick: true,
+    pauseOnHover: true,
+    draggable: true,
+    progress: undefined,
+    theme: "dark",
+    transition: Zoom,
+  });
 
   return (
     <div>
@@ -105,7 +138,10 @@ const SignIn = () => {
                 </h6>
               </span>
               <div>
-                <button className="bg-orange-600 w-[24rem] h-[2.5rem] mt-[1.2rem] rounded-3xl text-slate-300 font-bold">
+                <button
+                  onClick={notify}
+                  className="bg-orange-600 w-[24rem] h-[2.5rem] mt-[1.2rem] rounded-3xl text-slate-300 font-bold"
+                >
                   Sign In
                 </button>
               </div>
@@ -133,13 +169,31 @@ const SignIn = () => {
           <div className="flex justify-center items-center gap-[6px] bg-transparent border-2 border-white w-[24rem] h-[2.5rem] rounded-3xl mt-[1.2rem] ml-[3rem]">
             <Image src="/Frame.png" width={20} height={20} alt="origin" />
             <button
-              onClick={HandleGoogle}
+              onClick={() => {
+                HandleGoogle();
+                notify();
+              }}
               className="text-slate-400 text-[12px]"
             >
               Continue with Google
             </button>
           </div>
         </div>
+
+        <ToastContainer
+          position="top-center"
+          limit={1}
+          autoClose={5000}
+          hideProgressBar={false}
+          newestOnTop={false}
+          closeOnClick
+          rtl={false}
+          pauseOnFocusLoss
+          draggable
+          pauseOnHover
+          theme="dark"
+          transition={Zoom} // Changed to use curly braces
+        />
       </div>
     </div>
   );

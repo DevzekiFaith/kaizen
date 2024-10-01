@@ -10,10 +10,31 @@ import {
   GoogleAuthProvider,
   signInWithPopup,
   createUserWithEmailAndPassword,
-  signInWithEmailAndPassword,
 } from "firebase/auth";
 import { auth } from "@/firebase/firebaseConfig";
 import { useRouter } from "next/navigation";
+import { db } from "@/firebase/firebaseConfig";
+import { collection, addDoc } from "firebase/firestore";
+import { onAuthStateChanged } from "firebase/auth";
+import { FirebaseError } from "firebase/app";
+import { ToastContainer, Zoom, toast } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
+import { useEffect } from "react"; // {{ edit_1
+
+async function addDataToFireStore(name: string, email: string) {
+  try {
+    const docRef = await addDoc(collection(db, "users"), {
+      name,
+      email,
+    });
+    console.log("Document written with ID: ", docRef.id);
+    return true;
+  } catch (error) {
+    console.error("Error adding document: ", error);
+    alert("Failed to create user data. Please check your permissions.");
+    return false;
+  }
+}
 
 type FormValues = {
   name: string;
@@ -22,6 +43,7 @@ type FormValues = {
 };
 
 const SignUp = () => {
+  const notify = () => toast("Wow so easy!");
   const router = useRouter();
   const HandleGoogle = async () => {
     const provider = await new GoogleAuthProvider();
@@ -37,15 +59,21 @@ const SignUp = () => {
 
   const onSubmit: SubmitHandler<FormValues> = async (data) => {
     try {
-      // Sign up the user with email and password
       await createUserWithEmailAndPassword(auth, data.email, data.password);
       console.log("User signed up:", data);
       reset();
-      alert("just Dropped my Schedule for the Day! SUPER-EXCITED");
-      router.push("/signIn"); // Navigate to sign-in page after sign-up
+      alert("Account created successfully!");
+      router.push("/signIn");
+
+      const success = await addDataToFireStore(data.name, data.email);
+      if (!success) {
+        console.error("Failed to add user data to Firestore.");
+      }
     } catch (error) {
       console.error("Error signing up:", error);
-      alert("Error signing up: " + (error as Error).message);
+      const errorMessage =
+        (error as FirebaseError).message || "An unknown error occurred.";
+      alert("Error signing up: " + errorMessage);
     }
   };
 
@@ -54,6 +82,29 @@ const SignUp = () => {
   };
 
   const [isSignIn, setIsSignIn] = useState(false); // State to toggle between Sign In and Sign Up
+
+  useEffect(() => { // {{ edit_2
+    const unsubscribe = onAuthStateChanged(auth, (user) => {
+      if (user) {
+        console.log("User is signed in:", user);
+      } else {
+        console.log("No user is signed in.");
+      }
+    });
+    return () => unsubscribe(); // Cleanup subscription on unmount
+  }, []); // Empty dependency array to run only on mount
+
+  toast.success("🦄 Wow! Succesfully Signed Up", {
+    position: "top-center",
+    autoClose: 5000,
+    hideProgressBar: false,
+    closeOnClick: true,
+    pauseOnHover: true,
+    draggable: true,
+    progress: undefined,
+    theme: "dark",
+    transition: Zoom,
+  });
 
   return (
     <div>
@@ -100,6 +151,7 @@ const SignUp = () => {
                     <input
                       className="w-[24rem] h-[2.5rem] text-slate-300 bg-slate-800 rounded-3xl px-6 text-[12px] mb-1"
                       type="text"
+                      id="name"
                       placeholder="Enter your name"
                       // value={name}
                       {...register("name", { required: true })} // Keep this line
@@ -115,6 +167,7 @@ const SignUp = () => {
                     <input
                       className="w-[24rem] h-[2.5rem] text-slate-500 bg-slate-800 rounded-3xl px-6 text-[12px]"
                       type="email"
+                      id="email"
                       placeholder="Enter your email"
                       // value={email}
                       {...register("email", { required: true })}
@@ -132,6 +185,7 @@ const SignUp = () => {
                     <input
                       className="w-[24rem] h-[2.5rem] text-slate-300 bg-slate-800 rounded-3xl px-6 text-[12px]"
                       type="password"
+                      id="password"
                       placeholder="Create your password"
                       // value={password}
                       {...register("password", { required: true })}
@@ -150,7 +204,10 @@ const SignUp = () => {
                   </h6>
                 </span>
                 <div>
-                  <button className="bg-orange-600 w-[24rem] h-[2.5rem] mt-[1.2rem] rounded-3xl text-slate-300 font-bold">
+                  <button
+                    onClick={notify}
+                    className="bg-orange-600 w-[24rem] h-[2.5rem] mt-[1.2rem] rounded-3xl text-slate-300 font-bold"
+                  >
                     Sign Up
                   </button>
                 </div>
@@ -179,7 +236,10 @@ const SignUp = () => {
           <div className="flex justify-center items-center gap-[6px] bg-transparent border-2 border-white w-[24rem] h-[2.5rem] rounded-3xl mt-[1.2rem] ml-[3rem]">
             <Image src="/Frame.png" width={20} height={20} alt="origin" />
             <button
-              onClick={HandleGoogle}
+              onClick={() => {
+                HandleGoogle();
+                notify();
+              }}
               type="submit"
               className="text-slate-400 text-[12px]"
             >
@@ -187,6 +247,20 @@ const SignUp = () => {
             </button>
           </div>
         </div>
+        <ToastContainer
+          position="top-center"
+          limit={1}
+          autoClose={5000}
+          hideProgressBar={false}
+          newestOnTop={false}
+          closeOnClick
+          rtl={false}
+          pauseOnFocusLoss
+          draggable
+          pauseOnHover
+          theme="dark"
+          transition={Zoom} // Changed to use curly braces
+        />
       </div>
     </div>
   );
