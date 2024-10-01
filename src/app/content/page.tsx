@@ -75,7 +75,7 @@ const MainPage = () => {
             <span className="flex justify-start items-center mb-[1rem] gap-[1rem]">
               <label className="text-slate-600 text-[12px]">Goal</label>
               <input
-                className="text-slate-800 text-[12px] p-[8px] rounded-full accent-orange-500"
+                className="text-white text-[12px] p-[8px] rounded-full accent-orange-500"
                 type="checkbox"
                 placeholder="goals"
                 {...register("goal", { required: true })}
@@ -85,6 +85,7 @@ const MainPage = () => {
                   goal is required
                 </p>
               )}
+              <h6 className="text-slate-400 text-[12px]">Mark your goal for your daily attraction!</h6>
             </span>
 
             <span className="flex flex-col mb-[1.5rem] ">
