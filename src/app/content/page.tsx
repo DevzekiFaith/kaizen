@@ -62,7 +62,7 @@ const MainPage = () => {
         <form onSubmit={handleSubmit(onSubmit)}>
           <div>
             <span className="flex flex-col mb-[1.5rem] ">
-              <label className="text-slate-500 text-[12px] p-[12px]">
+              <label className="text-slate-500 text-[12px]">
                 Date
               </label>
               <input
@@ -78,7 +78,7 @@ const MainPage = () => {
               )}
             </span>
             <span className="flex justify-start items-center mb-[1rem] gap-[1rem]">
-              <label className="text-slate-600 text-[12px]" htmlFor="goal">
+              <label className="text-slate-600 text-[12px]">
                 Goal
               </label>{" "}
               {/* Added htmlFor */}

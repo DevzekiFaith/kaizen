@@ -31,7 +31,7 @@ export default function NavBar() {
       <div className="flex justify-between items-center p-[2rem]">
         <div>
           <Link href="/">
-            <h1 className="text-extrabold text-orange-500">REFLECTIFY</h1>
+            <h1 className="text-extrabold text-orange-950">REFLECTIFY</h1>
           </Link>
         </div>
         <div className="xl:block hidden">
