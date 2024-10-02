@@ -1,6 +1,6 @@
 "use client";
 
-import React from "react";
+import React, { useState } from "react"; // Import useState for animation state
 import Link from "next/link";
 import Image from "next/image";
 import { FaAlignJustify } from "react-icons/fa";
@@ -9,7 +9,6 @@ import { ModeToggle } from "../Toggle/ModeToggle";
 import { UserButton } from "@clerk/nextjs";
 import { SignedIn } from "@clerk/clerk-react";
 import ImageUpload from "../ImageUpload/ImageUpload";
-// import { useState } from "react";
 
 const navLinks = [
   { name: "home", path: "/" },
@@ -17,13 +16,22 @@ const navLinks = [
   { name: "weekly Summary", path: "/weeklySummary" },
 ];
 
-export default function NavBar() {
-  // Get the current path from the router
-  const currentPath = usePathname();
+interface NavBarProps {
+  onToggleModal: () => void; // Prop to handle modal toggle
+}
 
-  // Function to check if a given path is the current path
+const NavBar: React.FC<NavBarProps> = ({ onToggleModal }) => {
+  const currentPath = usePathname();
+  const [isAnimating, setIsAnimating] = useState(false); // State for animation
+
   const isActive = (path: string): boolean => {
     return currentPath === path;
+  };
+
+  const handleToggle = () => {
+    setIsAnimating(true); // Set animation state
+    onToggleModal(); // Call the toggle modal function
+    setTimeout(() => setIsAnimating(false), 300); // Reset animation state after 300ms
   };
 
   return (
@@ -35,43 +43,41 @@ export default function NavBar() {
           </Link>
         </div>
         <div className="xl:block hidden">
-          <React.Fragment>
-            <ul className="flex justify-center items-center gap-2">
-              {navLinks.map((pages, index) => (
-                <li key={index}>
-                  <Link
-                    href={pages.path}
-                    className={
-                      isActive(pages.path)
-                        ? "bg-orange-500 text-white p-[8px] rounded-2xl text-[12px] "
-                        : "text-slate-500 hover:text-slate-800"
-                    }
-                  >
-                    {pages.name}
-                  </Link>
-                </li>
-              ))}
-            </ul>
-          </React.Fragment>
+          <ul className="flex justify-center items-center gap-2">
+            {navLinks.map((pages, index) => (
+              <li key={index}>
+                <Link
+                  href={pages.path}
+                  className={
+                    isActive(pages.path)
+                      ? "bg-orange-500 text-white p-[8px] rounded-2xl text-[12px] border border-white"
+                      : "text-slate-500 hover:text-slate-800"
+                  }
+                >
+                  {pages.name}
+                </Link>
+              </li>
+            ))}
+          </ul>
         </div>
-        {/* <SignedIn>
-          <UserButton showName />
-        </SignedIn>  */}
 
         <div className="flex justify-center items-center gap-2">
           <Link href="/signIn">
-            <button className="mr-[1rem] border-1 bg-orange-500 p-[6px] w-[4rem] rounded-full text-bold text-slate-300">
-              {" "}
+            <button className="mr-[1rem] border-1 bg-orange-500 p-[6px] w-[4rem] rounded-full font-bold text-slate-300 xl:block hidden">
               logout
             </button>
           </Link>
 
-          <div className="rounded-full w-[2.5rem] h-[2.5rem] bg-gray-400">
+          <div className="rounded-full w-[2.5rem] h-[2.5rem] bg-gray-400 hidden xl:block">
             <ImageUpload />
           </div>
-          <div className="xl:hidden block">
-            <FaAlignJustify className="text-white text-[1.5rem]" />
-          </div>
+          <button
+            onClick={handleToggle} // Use handleToggle for animation
+            className={`xl:hidden block transition-transform duration-300 ${isAnimating ? "rotate-180" : ""}`} // Add animation classes
+            aria-label="Toggle menu"
+          >
+            <FaAlignJustify className="text-orange-500 text-[1.5rem]" />
+          </button>
           <div>
             <ModeToggle />
           </div>
@@ -79,4 +85,6 @@ export default function NavBar() {
       </div>
     </div>
   );
-}
+};
+
+export default NavBar;

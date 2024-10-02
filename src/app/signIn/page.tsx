@@ -1,6 +1,6 @@
 "use client";
 
-import React from "react";
+import React, { useEffect, useState } from "react"; // Import useState
 import Image from "next/image";
 import Link from "next/link";
 import { useForm, SubmitHandler } from "react-hook-form";
@@ -14,7 +14,7 @@ import { auth } from "@/firebase/firebaseConfig";
 import { useRouter } from "next/navigation";
 import { ToastContainer, Zoom, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
-import { useEffect } from "react"; // {{ edit_1
+import { Eye, EyeOff } from "lucide-react"; // Import eye icons
 
 type FormValues = {
   email: string;
@@ -24,6 +24,8 @@ type FormValues = {
 const SignIn = () => {
   const notify = () => toast("So good to be here!");
   const router = useRouter();
+  const [showPassword, setShowPassword] = useState(false); // State for password visibility
+
   const HandleGoogle = async () => {
     const provider = await new GoogleAuthProvider();
     await signInWithPopup(auth, provider);
@@ -47,12 +49,11 @@ const SignIn = () => {
       router.push("/content");
     } catch (error) {
       console.error("Error signing in:", error);
-      alert("Failed to sign in. Please check your credentials."); // {{ edit_2
+      alert("Failed to sign in. Please check your credentials.");
     }
   };
 
   useEffect(() => {
-    // {{ edit_2
     const auth = getAuth(); // Initialize auth
     const unsubscribe = onAuthStateChanged(auth, (user) => {
       if (user) {
@@ -64,7 +65,7 @@ const SignIn = () => {
     return () => unsubscribe(); // Cleanup subscription on unmount
   }, []); // Empty dependency array to run only on mount
 
-  toast.success("🦄 Wow! Succesfully Signed In", {
+  toast.success("🦄 Wow! Successfully Signed In", {
     position: "top-center",
     autoClose: 1000,
     hideProgressBar: false,
@@ -75,6 +76,10 @@ const SignIn = () => {
     theme: "dark",
     transition: Zoom,
   });
+
+  const togglePasswordVisibility = () => {
+    setShowPassword((prev) => !prev);
+  };
 
   return (
     <div>
@@ -106,7 +111,7 @@ const SignIn = () => {
                     className="w-[24rem] h-[2.5rem] text-slate-500 bg-slate-800 rounded-3xl px-6 text-[12px] "
                     type="email"
                     placeholder="Enter your email"
-                    {...register("email", { required: true })} // {{ edit_1
+                    {...register("email", { required: true })}
                   />
                   {errors.email?.type === "required" && (
                     <p className="text-red-500" role="alert">
@@ -118,12 +123,26 @@ const SignIn = () => {
                   <label className="text-slate-200 mb-[.9rem] mt-[.9rem]">
                     Password
                   </label>
-                  <input
-                    className="w-[24rem] h-[2.5rem] text-slate-300 bg-slate-800 rounded-3xl px-6 text-[12px]"
-                    type="password" // Changed to lowercase
-                    placeholder="Enter your password" // Added
-                    {...register("password", { required: true })}
-                  />
+                  <div className="relative">
+                    <input
+                      className="w-[24rem] h-[2.5rem] text-slate-300 bg-slate-800 rounded-3xl px-6 text-[12px]"
+                      type={showPassword ? "text" : "password"} // Toggle between text and password
+                      placeholder="Enter your password"
+                      {...register("password", { required: true })}
+                    />
+                    <button
+                      type="button"
+                      onClick={togglePasswordVisibility}
+                      className="absolute top-2 right-0 "
+                      aria-label={showPassword ? "Hide password" : "Show password"}
+                    >
+                      {showPassword ? (
+                        <EyeOff className="h-6 w-6  text-slate-400" />
+                      ) : (
+                        <Eye className="h-6 w-6 text-slate-400" />
+                      )}
+                    </button>
+                  </div>
                   {errors.password?.type === "required" && (
                     <p className="text-red-500" role="alert">
                       Password is required
@@ -192,7 +211,7 @@ const SignIn = () => {
           draggable
           pauseOnHover
           theme="dark"
-          transition={Zoom} // Changed to use curly braces
+          transition={Zoom}
         />
       </div>
     </div>

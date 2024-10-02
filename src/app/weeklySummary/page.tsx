@@ -10,4 +10,4 @@ const WeeklySummaryPage = () => {
   );
 };
 
-export default WeeklySummaryPage ;
+export default WeeklySummaryPage;

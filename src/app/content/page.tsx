@@ -2,13 +2,13 @@
 // import React from 'react'
 
 import React, { useState } from "react";
-import Categories from "@/components/categories/Categories";
 import { useForm, SubmitHandler } from "react-hook-form"; // Correct for v7+
 import Image from "next/image";
 import TimeTracker from "@/components/Time-Tracker/Time-Tracker";
 import NavBar from "@/components/NavBar/NavBar";
 import { FaArrowUpRightFromSquare } from "react-icons/fa6";
-import { useRouter } from "next/router"; // Import useRouter for navigation
+import { useRouter } from "next/router";
+import Modal from "@/components/Modal/Modal"; // Import useRouter for navigation
 
 type FormValues = {
   date: string;
@@ -18,6 +18,12 @@ type FormValues = {
 };
 
 const MainPage = () => {
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [isDarkTheme, setIsDarkTheme] = useState(false);
+
+  const toggleModal = () => setIsModalOpen(!isModalOpen);
+  const toggleTheme = () => setIsDarkTheme(!isDarkTheme);
+
   const {
     register,
     handleSubmit,
@@ -33,11 +39,14 @@ const MainPage = () => {
   return (
     <main>
       <div>
-        <NavBar />
+        <NavBar onToggleModal={toggleModal} />
+      </div>
+      <div>
+        <Modal isOpen={isModalOpen} onClose={toggleModal} toggleTheme={toggleTheme} />
       </div>
       <div className="flex justify-center items-center flex-col xl:flex-row gap-[4rem] pt-[10rem]">
         <div>
-          <div className="border-4 border-slate-700 border-l-indigo-500 rounded-xl p-[1rem]">
+          <div className="border-4 border-slate-700 rounded-xl p-[1rem]">
             {" "}
             {/* Fixed typo here */}
             <h1 className="p-[4px] xl:w-[400px] dark:text-slate-800 text-slate-600 text-[12px]">
@@ -62,9 +71,7 @@ const MainPage = () => {
         <form onSubmit={handleSubmit(onSubmit)}>
           <div>
             <span className="flex flex-col mb-[1.5rem] ">
-              <label className="text-slate-500 text-[12px]">
-                Date
-              </label>
+              <label className="text-slate-500 text-[12px]">Date</label>
               <input
                 className="text-slate-800 text-[12px] p-[8px] rounded-2xl"
                 type="datetime-local"
@@ -78,9 +85,7 @@ const MainPage = () => {
               )}
             </span>
             <span className="flex justify-start items-center mb-[1rem] gap-[1rem]">
-              <label className="text-slate-600 text-[12px]">
-                Goal
-              </label>{" "}
+              <label className="text-slate-600 text-[12px]">Goal</label>{" "}
               {/* Added htmlFor */}
               <input
                 id="goal" // Added id for accessibility
@@ -116,7 +121,28 @@ const MainPage = () => {
             <span className="flex flex-col mb-[1.5rem] ">
               <label htmlFor="">Category</label>
               <div>
-                <Categories />
+                <div>
+                  <div>
+                    <div>
+                      <div className="mb-[1rem]">
+                        <label className="text-slate-400 text-[12px]">
+                          Activity
+                        </label>
+                      </div>
+                      <select
+                        className="bg-slate-500 text-[12px] p-[8px] rounded-2xl xl:w-[24rem] w-[18rem] h-[2.5rem]"
+                        id="Activities"
+                        name="Progress Work"
+                        title="Progress Work"
+                      >
+                        <option value="Eating">Eating</option>
+                        <option value="Exercise">Exercise</option>
+                        <option value="Reading">Reading</option>
+                        <option value="free Time">Free Time</option>
+                      </select>
+                    </div>
+                  </div>
+                </div>
               </div>
               <div className="mt-[1rem]">
                 <TimeTracker />
