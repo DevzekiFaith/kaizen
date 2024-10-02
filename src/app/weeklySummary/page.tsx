@@ -1,13 +1,13 @@
 import React from "react";
 
-const page = () => {
+const WeeklySummaryPage = () => {
   return (
     <div>
-      <div>
-        <h1>This is the Weekly Journal Page</h1>
+      <div className="">
+        <h1 className="text-slate-300">This is the Weekly Journal Page</h1>
       </div>
     </div>
   );
 };
 
-export default page;
+export default WeeklySummaryPage ;

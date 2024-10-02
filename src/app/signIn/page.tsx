@@ -66,7 +66,7 @@ const SignIn = () => {
 
   toast.success("🦄 Wow! Succesfully Signed In", {
     position: "top-center",
-    autoClose: 5000,
+    autoClose: 1000,
     hideProgressBar: false,
     closeOnClick: true,
     pauseOnHover: true,
@@ -183,7 +183,7 @@ const SignIn = () => {
         <ToastContainer
           position="top-center"
           limit={1}
-          autoClose={5000}
+          autoClose={1000}
           hideProgressBar={false}
           newestOnTop={false}
           closeOnClick

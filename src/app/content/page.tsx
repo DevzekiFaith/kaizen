@@ -1,13 +1,14 @@
 "use client";
 // import React from 'react'
 
-import React from "react";
+import React, { useState } from "react";
 import Categories from "@/components/categories/Categories";
 import { useForm, SubmitHandler } from "react-hook-form"; // Correct for v7+
 import Image from "next/image";
 import TimeTracker from "@/components/Time-Tracker/Time-Tracker";
 import NavBar from "@/components/NavBar/NavBar";
-import { FaArrowUpRightFromSquare } from "react-icons/fa6"; // {{ edit_1
+import { FaArrowUpRightFromSquare } from "react-icons/fa6";
+import { useRouter } from "next/router"; // Import useRouter for navigation
 
 type FormValues = {
   date: string;
@@ -36,7 +37,9 @@ const MainPage = () => {
       </div>
       <div className="flex justify-center items-center flex-col xl:flex-row gap-[4rem] pt-[10rem]">
         <div>
-          <div className=" border-4 border-slate-700 border-l-indigo-500rounded-xl rounded-2xl p-[1rem]">
+          <div className="border-4 border-slate-700 border-l-indigo-500 rounded-xl p-[1rem]">
+            {" "}
+            {/* Fixed typo here */}
             <h1 className="p-[4px] xl:w-[400px] dark:text-slate-800 text-slate-600 text-[12px]">
               Lorem ipsum dolor sit amet consectetur adipisicing elit.
               Perferendis nihil odio voluptatum, mollitia temporibus
@@ -59,7 +62,9 @@ const MainPage = () => {
         <form onSubmit={handleSubmit(onSubmit)}>
           <div>
             <span className="flex flex-col mb-[1.5rem] ">
-              <label htmlFor="">Date</label>
+              <label className="text-slate-500 text-[12px] p-[12px]">
+                Date
+              </label>
               <input
                 className="text-slate-800 text-[12px] p-[8px] rounded-2xl"
                 type="datetime-local"
@@ -73,8 +78,12 @@ const MainPage = () => {
               )}
             </span>
             <span className="flex justify-start items-center mb-[1rem] gap-[1rem]">
-              <label className="text-slate-600 text-[12px]">Goal</label>
+              <label className="text-slate-600 text-[12px]" htmlFor="goal">
+                Goal
+              </label>{" "}
+              {/* Added htmlFor */}
               <input
+                id="goal" // Added id for accessibility
                 className="text-white text-[12px] p-[8px] rounded-full accent-orange-500"
                 type="checkbox"
                 placeholder="goals"
@@ -85,11 +94,13 @@ const MainPage = () => {
                   goal is required
                 </p>
               )}
-              <h6 className="text-slate-400 text-[12px]">Mark your goal for your daily attraction!</h6>
+              <h6 className="text-slate-400 text-[12px]">
+                Mark your goal for your daily attraction!
+              </h6>
             </span>
 
             <span className="flex flex-col mb-[1.5rem] ">
-              <label htmlFor="">Title</label>
+              <label className="text-slate-500 text-[12px]">Title</label>
               <input
                 className="text-slate-800 text-[12px] p-[8px] rounded-2xl"
                 type="text"
@@ -125,11 +136,12 @@ const MainPage = () => {
               )}
             </span>
           </div>
-          <button 
+          <button
             type="submit"
             className="flex  justify-center gap-[1.5rem]  items-center bg-transparent border border-slate-800 p-[3px] mt-[2rem] xl:w-[24rem] rounded-full h-[2.5rem] font-extrabold w-[16rem] text-orange-500 hover:translate-x-5"
           >
-            Let's Go! <FaArrowUpRightFromSquare className="text-slate-800 translate-x-3 cursor-pointer hover:translate-x-6" />
+            Let's Go!{" "}
+            <FaArrowUpRightFromSquare className="text-slate-800 translate-x-3 cursor-pointer hover:translate-x-6" />
           </button>
           <div className="border-4 border-slate-700 border-l-slate-500w-[200px] mt-[2rem] rounded-2xl">
             <h5 className="w-[300px] p-[8px] dark:text-slate-800 text-slate-600 text-[12px]">

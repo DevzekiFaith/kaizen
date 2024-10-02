@@ -83,7 +83,8 @@ const SignUp = () => {
 
   const [isSignIn, setIsSignIn] = useState(false); // State to toggle between Sign In and Sign Up
 
-  useEffect(() => { // {{ edit_2
+  useEffect(() => {
+    // {{ edit_2
     const unsubscribe = onAuthStateChanged(auth, (user) => {
       if (user) {
         console.log("User is signed in:", user);
@@ -96,7 +97,7 @@ const SignUp = () => {
 
   toast.success("🦄 Wow! Succesfully Signed Up", {
     position: "top-center",
-    autoClose: 5000,
+    autoClose: 1000,
     hideProgressBar: false,
     closeOnClick: true,
     pauseOnHover: true,
@@ -250,7 +251,7 @@ const SignUp = () => {
         <ToastContainer
           position="top-center"
           limit={1}
-          autoClose={5000}
+          autoClose={1000}
           hideProgressBar={false}
           newestOnTop={false}
           closeOnClick

@@ -5,6 +5,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { IoIosArrowDroprightCircle } from "react-icons/io";
 import { IoIosArrowDropleftCircle } from "react-icons/io";
+// import ImageUpload from "@/components/ImageUpload/ImageUpload";
 // import { useRouter } from "next/navigation";
 
 const images = ["/cover32.jpg", "/cover28.jpg", "/cover31.jpg"];
@@ -92,12 +93,8 @@ const Home = () => {
           </div>
         </Link>
       </div>
-      {/* <div className="mt-10">
-        <Link href="/logout">
-          <button className="bg-orange-600 text-white font-bold py-2 px-6 rounded-lg shadow hover:bg-orange-500 transition">
-            Logout
-          </button>
-        </Link>
+      {/* <div>
+        <ImageUpload />
       </div> */}
     </div>
   );

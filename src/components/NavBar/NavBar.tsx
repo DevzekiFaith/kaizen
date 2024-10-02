@@ -8,6 +8,7 @@ import { usePathname } from "next/navigation";
 import { ModeToggle } from "../Toggle/ModeToggle";
 import { UserButton } from "@clerk/nextjs";
 import { SignedIn } from "@clerk/clerk-react";
+import ImageUpload from "../ImageUpload/ImageUpload";
 // import { useState } from "react";
 
 const navLinks = [
@@ -65,14 +66,8 @@ export default function NavBar() {
             </button>
           </Link>
 
-          <div className="rounded-full">
-            <Image
-              className="rounded-full w-[32px]"
-              src="/Profile01.jpg"
-              width={50}
-              height={50}
-              alt="Profile"
-            />
+          <div className="rounded-full w-[2.5rem] h-[2.5rem] bg-gray-400">
+            <ImageUpload />
           </div>
           <div className="xl:hidden block">
             <FaAlignJustify className="text-white text-[1.5rem]" />
