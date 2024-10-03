@@ -19,7 +19,7 @@ const Modal: React.FC<ModalProps> = ({ isOpen, onClose }) => {
   return (
     <div>
       <div
-        className={`fixed inset-0 bg-black bg-opacity-60  transition-opacity ${
+        className={`fixed inset-0 bg-black bg-opacity-70  transition-opacity ${
           isOpen ? "opacity-100" : "opacity-0 pointer-events-none"
         }`}
       >
@@ -43,17 +43,17 @@ const Modal: React.FC<ModalProps> = ({ isOpen, onClose }) => {
               </Link>
             </li>
             <li>
-              <Link href="/dailyJournal" className={`block ${isActive("/dailyJournal") ? "text-orange-500" : "text-slate-700"} hover:text-orange-500`}>
+              <Link href="/dailyJournal" className={`block ${isActive("/dailyJournal") ? "text-orange-500" : "text-slate-400"} hover:text-orange-500`}>
                 Daily Journal
               </Link>
             </li>
             <li>
-              <Link href="/weeklyJournal" className={`block ${isActive("/weeklyJournal") ? "text-orange-500" : "text-slate-700"} hover:text-orange-500`}>
+              <Link href="/weeklyJournal" className={`block ${isActive("/weeklyJournal") ? "text-orange-500" : "text-slate-400"} hover:text-orange-500`}>
                 Weekly Journal
               </Link>
             </li>
             <li>
-              <Link href="/profile" className={`block ${isActive("/profile") ? "text-orange-500" : "text-slate-700"} hover:text-orange-500`}>
+              <Link href="/profile" className={`block ${isActive("/profile") ? "text-orange-500" : "text-slate-400"} hover:text-orange-500`}>
                 Profile
               </Link>
             </li>

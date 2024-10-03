@@ -7,7 +7,7 @@ import Image from "next/image";
 import TimeTracker from "@/components/Time-Tracker/Time-Tracker";
 import NavBar from "@/components/NavBar/NavBar";
 import { FaArrowUpRightFromSquare } from "react-icons/fa6";
-import { useRouter } from "next/router";
+import { useRouter } from "next/navigation";
 import Modal from "@/components/Modal/Modal"; // Import useRouter for navigation
 
 type FormValues = {
@@ -18,6 +18,7 @@ type FormValues = {
 };
 
 const MainPage = () => {
+  const router = useRouter();
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isDarkTheme, setIsDarkTheme] = useState(false);
 
@@ -34,7 +35,10 @@ const MainPage = () => {
   const onSubmit: SubmitHandler<FormValues> = (data) => {
     console.log(data);
     reset();
-    alert("just Dropped my Schedule for the Day! SUPER-EXCITED"); // Moved reset inside onSubmit
+    alert("just Dropped my Schedule for the Day! SUPER-EXCITED");
+    // Moved reset inside onSubmit
+    const queryString = new URLSearchParams(data).toString();
+    router.push(`/dailyJournal?${queryString}`);
   };
   return (
     <main>
@@ -42,7 +46,11 @@ const MainPage = () => {
         <NavBar onToggleModal={toggleModal} />
       </div>
       <div>
-        <Modal isOpen={isModalOpen} onClose={toggleModal} toggleTheme={toggleTheme} />
+        <Modal
+          isOpen={isModalOpen}
+          onClose={toggleModal}
+          toggleTheme={toggleTheme}
+        />
       </div>
       <div className="flex justify-center items-center flex-col xl:flex-row gap-[4rem] pt-[10rem]">
         <div>
@@ -107,7 +115,7 @@ const MainPage = () => {
             <span className="flex flex-col mb-[1.5rem] ">
               <label className="text-slate-500 text-[12px]">Title</label>
               <input
-                className="text-slate-800 text-[12px] p-[8px] rounded-2xl"
+                className="text-slate-400 text-[12px] p-[8px] rounded-2xl"
                 type="text"
                 placeholder="title of goal"
                 {...register("title", { required: true })}

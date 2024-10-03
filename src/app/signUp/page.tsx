@@ -1,8 +1,7 @@
 "use client";
 
 // import { UploadIcon } from '@radix-ui/react-icons'
-import React from "react";
-import { useState } from "react";
+import React, { useState, useEffect } from "react"; // Import useState and useEffect
 import Image from "next/image";
 import Link from "next/link";
 import { useForm, SubmitHandler } from "react-hook-form";
@@ -19,7 +18,6 @@ import { onAuthStateChanged } from "firebase/auth";
 import { FirebaseError } from "firebase/app";
 import { ToastContainer, Zoom, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
-import { useEffect } from "react"; // {{ edit_1
 
 async function addDataToFireStore(name: string, email: string) {
   try {
@@ -45,11 +43,14 @@ type FormValues = {
 const SignUp = () => {
   const notify = () => toast("Wow so easy!");
   const router = useRouter();
+  const [showPassword, setShowPassword] = useState(false); // State for password visibility
+
   const HandleGoogle = async () => {
     const provider = await new GoogleAuthProvider();
     await signInWithPopup(auth, provider);
     router.push("/signIn");
   };
+
   const {
     register,
     handleSubmit,
@@ -77,14 +78,7 @@ const SignUp = () => {
     }
   };
 
-  const handleSignInClick = () => {
-    setIsSignIn(true); // Set state to show Sign In component
-  };
-
-  const [isSignIn, setIsSignIn] = useState(false); // State to toggle between Sign In and Sign Up
-
   useEffect(() => {
-    // {{ edit_2
     const unsubscribe = onAuthStateChanged(auth, (user) => {
       if (user) {
         console.log("User is signed in:", user);
@@ -95,7 +89,7 @@ const SignUp = () => {
     return () => unsubscribe(); // Cleanup subscription on unmount
   }, []); // Empty dependency array to run only on mount
 
-  toast.success("🦄 Wow! Succesfully Signed Up", {
+  toast.success("🦄 Wow! Successfully Signed Up", {
     position: "top-center",
     autoClose: 1000,
     hideProgressBar: false,
@@ -106,6 +100,10 @@ const SignUp = () => {
     theme: "dark",
     transition: Zoom,
   });
+
+  const togglePasswordVisibility = () => {
+    setShowPassword((prev) => !prev);
+  };
 
   return (
     <div>
@@ -130,109 +128,110 @@ const SignUp = () => {
               <h5 className="text-slate-700 text-[16px] w-[26rem] ml-[3rem] pt-[4px] mb-[-2rem]">
                 Create your Account
               </h5>
-              {/* <button
-              onClick={handleSignInClick}
-              className="bg-transparent border-2 border-slate-600 p-[4px] rounded-2xl w-[7rem] text-slate-400 text-[16px]"
-            >
-              Sign In
-            </button> */}
             </div>
-            {isSignIn ? (
-              <SignIn />
-            ) : (
-              <form
-                onSubmit={handleSubmit(onSubmit)}
-                className="w-[26rem] p-[2.8rem]"
-              >
-                <div className="flex flex-col">
-                  <span className="flex flex-col">
-                    <label className="text-slate-200 mb-[.9rem] mt-[.9rem]">
-                      Name
-                    </label>
-                    <input
-                      className="w-[24rem] h-[2.5rem] text-slate-300 bg-slate-800 rounded-3xl px-6 text-[12px] mb-1"
-                      type="text"
-                      id="name"
-                      placeholder="Enter your name"
-                      // value={name}
-                      {...register("name", { required: true })} // Keep this line
-                    />
-                    {errors.name?.type === "required" && (
-                      <p className="text-red-500 mb-[1rem]" role="alert">
-                        Name is required
-                      </p>
-                    )}
-                  </span>
-                  <span className="flex flex-col">
-                    <label className="text-slate-200 mb-[1rem]">Email</label>
-                    <input
-                      className="w-[24rem] h-[2.5rem] text-slate-500 bg-slate-800 rounded-3xl px-6 text-[12px]"
-                      type="email"
-                      id="email"
-                      placeholder="Enter your email"
-                      // value={email}
-                      {...register("email", { required: true })}
-                    />
-                    {errors.email?.type === "required" && (
-                      <p className="text-red-500" role="alert">
-                        email is required
-                      </p>
-                    )}
-                  </span>
-                  <span className="flex flex-col">
-                    <label className="text-slate-200 mb-[.9rem] mt-[.9rem]">
-                      Password
-                    </label>
+            <form
+              onSubmit={handleSubmit(onSubmit)}
+              className="w-[26rem] p-[2.8rem]"
+            >
+              <div className="flex flex-col">
+                <span className="flex flex-col">
+                  <label className="text-slate-200 mb-[.9rem] mt-[.9rem]">
+                    Name
+                  </label>
+                  <input
+                    className="w-[24rem] h-[2.5rem] text-slate-300 bg-slate-800 rounded-3xl px-6 text-[12px] mb-1"
+                    type="text"
+                    id="name"
+                    placeholder="Enter your name"
+                    {...register("name", { required: true })}
+                  />
+                  {errors.name?.type === "required" && (
+                    <p className="text-red-500 mb-[1rem]" role="alert">
+                      Name is required
+                    </p>
+                  )}
+                </span>
+                <span className="flex flex-col">
+                  <label className="text-slate-200 mb-[1rem]">Email</label>
+                  <input
+                    className="w-[24rem] h-[2.5rem] text-slate-500 bg-slate-800 rounded-3xl px-6 text-[12px]"
+                    type="email"
+                    id="email"
+                    placeholder="Enter your email"
+                    {...register("email", { required: true })}
+                  />
+                  {errors.email?.type === "required" && (
+                    <p className="text-red-500" role="alert">
+                      email is required
+                    </p>
+                  )}
+                </span>
+                <span className="flex flex-col">
+                  <label className="text-slate-200 mb-[.9rem] mt-[.9rem]">
+                    Password
+                  </label>
+                  <div className="relative">
                     <input
                       className="w-[24rem] h-[2.5rem] text-slate-300 bg-slate-800 rounded-3xl px-6 text-[12px]"
-                      type="password"
+                      type={showPassword ? "text" : "password"} // Toggle between text and password
                       id="password"
                       placeholder="Create your password"
-                      // value={password}
                       {...register("password", { required: true })}
                     />
-                    {errors.password?.type === "required" && (
-                      <p className="text-red-500" role="alert">
-                        password is required
-                      </p>
-                    )}
-                  </span>
-                </div>
-                <span className="mt-[1rem]">
-                  <h6 className="text-slate-400 text-[10px] text-center pt-[12px] ml-[3rem]">
-                    By signing up, you accept our{" "}
-                    <span className="text-green-700">Terms and Conditions</span>
-                  </h6>
+                    <button
+                      type="button"
+                      onClick={togglePasswordVisibility}
+                      className="absolute right-2 top-2"
+                      aria-label={showPassword ? "Hide password" : "Show password"}
+                    >
+                      {showPassword ? (
+                        <span className="text-slate-300 w-[18px] h-[18px]">👁️</span> // Open eye icon
+                      ) : (
+                        <span className="text-slate-300 w-[28px] h-[28px]">👁️‍🗨️</span> // Closed eye icon
+                      )}
+                    </button>
+                  </div>
+                  {errors.password?.type === "required" && (
+                    <p className="text-red-500" role="alert">
+                      password is required
+                    </p>
+                  )}
                 </span>
-                <div>
-                  <button
-                    onClick={notify}
-                    className="bg-orange-600 w-[24rem] h-[2.5rem] mt-[1.2rem] rounded-3xl text-slate-300 font-bold"
-                  >
-                    Sign Up
-                  </button>
-                </div>
-                <div className=" ml-[3rem] mt-[1.5rem]">
-                  <h6 className="text-slate-600 text-center text-[12px]">
-                    Already have an account?{" "}
-                    <Link href="/signIn">
-                      <span className="cursor-pointer text-green-500">
-                        Sign In
-                      </span>
-                    </Link>
-                  </h6>
-                </div>
-                <div className="flex justify-center items-align mt-[1.5rem] ml-[3rem]">
-                  <span>
-                    <hr className="bg-slate-400 w-[6rem] mt-[9px] mr-3" />
-                  </span>
-                  <h1 className="text-slate-400">OR</h1>
-                  <span>
-                    <hr className="bg-slate-400 w-[6rem] mt-[9px] ml-3" />
-                  </span>
-                </div>
-              </form>
-            )}
+              </div>
+              <span className="mt-[1rem]">
+                <h6 className="text-slate-400 text-[10px] text-center pt-[12px] ml-[3rem]">
+                  By signing up, you accept our{" "}
+                  <span className="text-green-700">Terms and Conditions</span>
+                </h6>
+              </span>
+              <div>
+                <button
+                  onClick={notify}
+                  className="bg-orange-600 w-[24rem] h-[2.5rem] mt-[1.2rem] rounded-3xl text-slate-300 font-bold"
+                >
+                  Sign Up
+                </button>
+              </div>
+              <div className=" ml-[3rem] mt-[1.5rem]">
+                <h6 className="text-slate-600 text-center text-[12px]">
+                  Already have an account?{" "}
+                  <Link href="/signIn">
+                    <span className="cursor-pointer text-green-500">
+                      Sign In
+                    </span>
+                  </Link>
+                </h6>
+              </div>
+              <div className="flex justify-center items-align mt-[1.5rem] ml-[3rem]">
+                <span>
+                  <hr className="bg-slate-400 w-[6rem] mt-[9px] mr-3" />
+                </span>
+                <h1 className="text-slate-400">OR</h1>
+                <span>
+                  <hr className="bg-slate-400 w-[6rem] mt-[9px] ml-3" />
+                </span>
+              </div>
+            </form>
           </div>
           <div className="flex justify-center items-center gap-[6px] bg-transparent border-2 border-white w-[24rem] h-[2.5rem] rounded-3xl mt-[1.2rem] ml-[3rem]">
             <Image src="/Frame.png" width={20} height={20} alt="origin" />
@@ -260,7 +259,7 @@ const SignUp = () => {
           draggable
           pauseOnHover
           theme="dark"
-          transition={Zoom} // Changed to use curly braces
+          transition={Zoom}
         />
       </div>
     </div>
