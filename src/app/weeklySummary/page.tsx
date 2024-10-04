@@ -1,40 +1,72 @@
-"use client"; // This ensures client-side rendering
+"use client"; // Ensure client-side rendering
 
-import React, { useEffect, useState } from "react";
-import { useSearchParams } from "next/navigation";
+import React, { useState, useEffect } from "react";
 import NavBar from "@/components/NavBar/NavBar";
-import Modal from "@/components/Modal/Modal"; // Import the Modal component
+import Modal from "@/components/Modal/Modal";
+
+interface JournalEntry {
+  date: string;
+  title: string;
+  content: string;
+  goal: string;
+}
 
 const WeeklySummaryPage: React.FC = () => {
-  const searchParams = useSearchParams();
-  const [summaryData, setSummaryData] = useState<{ content?: string }>({});
-  const [isModalOpen, setIsModalOpen] = useState(false); // State to manage modal visibility
+  const [journalEntries, setJournalEntries] = useState<JournalEntry[]>([]);
+  const [isModalOpen, setIsModalOpen] = useState(false);
 
   useEffect(() => {
-    // Get the 'content' from the URL's search parameters
-    const content = searchParams.get("content");
-    if (content) {
-      setSummaryData({ content });
-    }
-  }, [searchParams]);
+    const storedEntries = JSON.parse(localStorage.getItem("journalEntries") || "[]");
+    
+    const startOfWeek = new Date();
+    startOfWeek.setDate(startOfWeek.getDate() - startOfWeek.getDay()); // Sunday
+
+    const weekEntries = storedEntries.filter((entry: JournalEntry) => {
+      const entryDate = new Date(entry.date);
+      return entryDate >= startOfWeek;
+    });
+
+    setJournalEntries(weekEntries);
+  }, []);
 
   const handleToggleModal = () => {
-    setIsModalOpen((prev) => !prev); // Toggle modal visibility
-  };
-
-  const handleToggleTheme = () => {
-    // Define your theme toggle logic here
+    setIsModalOpen((prev) => !prev); // Toggle modal
   };
 
   return (
-    <div className="bg-black min-h-screen"> {/* Added background color for better visibility */}
+    <div className="bg-black min-h-screen">
       <NavBar onToggleModal={handleToggleModal} />
-      <Modal isOpen={isModalOpen} onClose={handleToggleModal} toggleTheme={handleToggleTheme} />
+      <Modal isOpen={isModalOpen} onClose={handleToggleModal}>
+        {/* Modal Content */}
+        <h2>Weekly Summary Settings</h2>
+        <p>This is where you can adjust settings or preferences.</p>
+      </Modal>
       <div className="container mx-auto p-8 pt-[5rem]">
         <h1 className="text-2xl font-bold mb-6 text-white">Weekly Summary</h1>
-        <p className="text-slate-300 font-bold"> {/* Changed text color for better contrast */}
-          <strong>Content:</strong> {summaryData.content || "No content available."} {/* Added fallback text */}
-        </p>
+        <div className="grid grid-cols-1 gap-4">
+          {journalEntries.length > 0 ? (
+            journalEntries.map((entry, index) => (
+              <div key={index} className="bg-white p-4 rounded shadow-md">
+                <p className="text-slate-300 font-bold">
+                  <strong>Date:</strong> {entry.date}
+                </p>
+                <p className="text-slate-300 font-bold">
+                  <strong>Title:</strong> {entry.title}
+                </p>
+                <p className="text-slate-300 font-bold">
+                  <strong>Content:</strong> {entry.content}
+                </p>
+                <p className="text-slate-300 font-bold">
+                  <strong>Goal:</strong> {entry.goal}
+                </p>
+              </div>
+            ))
+          ) : (
+            <p className="text-slate-300 font-bold">
+              No entries available for the week.
+            </p>
+          )}
+        </div>
       </div>
     </div>
   );

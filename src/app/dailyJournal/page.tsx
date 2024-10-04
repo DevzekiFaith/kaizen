@@ -4,10 +4,13 @@ import React, { useEffect, useState } from "react";
 import { useSearchParams } from "next/navigation";
 import NavBar from "@/components/NavBar/NavBar";
 import Modal from "@/components/Modal/Modal"; // Import the Modal component
+import Image from "next/image";
 
 const DailyJournal: React.FC = () => {
   const searchParams = useSearchParams();
-  const [journalData, setJournalData] = useState<Array<{ date?: string; title?: string; content?: string; goal?: string }>>([]); // Change to an array to hold multiple entries
+  const [journalData, setJournalData] = useState<
+    Array<{ date?: string; title?: string; content?: string; goal?: string }>
+  >([]); // Change to an array to hold multiple entries
   const [isModalOpen, setModalOpen] = useState(false); // State for modal visibility
 
   useEffect(() => {
@@ -24,7 +27,10 @@ const DailyJournal: React.FC = () => {
     const now = new Date();
     const oneWeek = 7 * 24 * 60 * 60 * 1000; // One week in milliseconds
 
-    if (!lastNotificationDate || now.getTime() - new Date(lastNotificationDate).getTime() > oneWeek) {
+    if (
+      !lastNotificationDate ||
+      now.getTime() - new Date(lastNotificationDate).getTime() > oneWeek
+    ) {
       // Request permission for notifications
       if (Notification.permission !== "denied") {
         Notification.requestPermission().then((permission) => {
@@ -68,14 +74,24 @@ const DailyJournal: React.FC = () => {
     // Add your theme toggle logic here
   };
 
-  const handleSaveData = (data: { date?: string; title?: string; content?: string; goal?: string }) => {
-    const existingData = JSON.parse(localStorage.getItem("dailyJournalData") || "[]"); // Retrieve existing data
+  const handleSaveData = (data: {
+    date?: string;
+    title?: string;
+    content?: string;
+    goal?: string;
+  }) => {
+    const existingData = JSON.parse(
+      localStorage.getItem("dailyJournalData") || "[]"
+    ); // Retrieve existing data
     // Ensure existingData is an array
     const updatedData = Array.isArray(existingData) ? existingData : [];
 
     // Check for duplicates
     const isDuplicate = updatedData.some(
-      (entry) => entry.date === data.date && entry.title === data.title && entry.content === data.content
+      (entry) =>
+        entry.date === data.date &&
+        entry.title === data.title &&
+        entry.content === data.content
     );
 
     if (!isDuplicate) {
@@ -98,50 +114,62 @@ const DailyJournal: React.FC = () => {
   };
 
   return (
-    <div className="w-[24rem]">
+    <div className="w-full">
       <NavBar onToggleModal={handleToggleModal} />
-      <Modal isOpen={isModalOpen} onClose={handleCloseModal} toggleTheme={handleToggleTheme}>
+      <Modal
+        isOpen={isModalOpen}
+        onClose={handleCloseModal}
+        toggleTheme={handleToggleTheme}
+      >
         <h2>Journal Entry</h2>
         {/* Add your modal content here */}
         <p>This is where you can add more details or a form.</p>
       </Modal>
-      <div className="mx-auto pt-[6rem] p-[1rem]">
-        <h1 className="text-2xl font-bold mb-6 text-white">Daily Journal</h1>
-        <div className="mb-[18px]">
-          <h6 className="text-slate-400 text-[12px]">
-            Daily Journaling empowers your mind for continuation
-          </h6>
+      <div className="flex xl:flex-row flex-col justify-center items-center w-full gap-[2rem] p-[2rem]">
+        <div className="w-full">
+          <Image className="w-[34rem] h-screen" src="/cover26.jpg" width={300} height={300} alt="dark-cover" />
         </div>
-        <div className="grid grid-cols-1 gap-4">
-          {journalData.map((entry, index) => (
-            <div key={index} className="bg-slate-900 shadow-2xl p-4 rounded transform transition-transform duration-300 hover:scale-105">
-              <p className="text-slate-400 text-[13px]">
-                <strong>Date:</strong> {entry.date}
-              </p>
-              <p className="text-slate-400 text-[16px]">
-                <strong>Title:</strong> {entry.title}
-              </p>
-              <p className="text-slate-400 text-[13px]">
-                <strong>Content:</strong> {entry.content}
-              </p>
-              <p className="text-slate-400 text-[13px]">
-                <strong>Goal:</strong> {entry.goal}
-              </p>
-              <button
-                onClick={() => handleDeleteData(index)} // Call delete function with the current index
-                className="mt-2 bg-orange-500 text-white text-[12px] py-1 px-2 rounded-3xl shadow-xl shadow-slate-800"
+        <div className="mx-auto pt-[6rem] p-[1rem] w-full">
+          <h1 className="text-2xl font-bold mb-6 text-white">Daily Journal</h1>
+          <div className="mb-[18px]">
+            <h6 className="text-slate-400 text-[12px]">
+              Daily Journaling empowers your mind for continuation
+            </h6>
+          </div>
+          <div className="grid grid-cols-1 gap-4">
+            {journalData.map((entry, index) => (
+              <div
+                key={index}
+                className="bg-slate-950 shadow-2xl p-4 rounded transform transition-transform duration-300 hover:scale-105"
               >
-                Delete Entry
-              </button>
-            </div>
-          ))}
+                <p className="text-slate-400 text-[13px]">
+                  <strong>Date:</strong> {entry.date}
+                </p>
+                <p className="text-slate-400 text-[16px]">
+                  <strong>Title:</strong> {entry.title}
+                </p>
+                <p className="text-slate-400 text-[13px]">
+                  <strong>Content:</strong> {entry.content}
+                </p>
+                <p className="text-slate-400 text-[13px]">
+                  <strong>Goal:</strong> {entry.goal}
+                </p>
+                <button
+                  onClick={() => handleDeleteData(index)} // Call delete function with the current index
+                  className="mt-2 bg-orange-500 text-white text-[12px] py-1 px-2 rounded-3xl shadow-xl shadow-slate-800"
+                >
+                  Delete Entry
+                </button>
+              </div>
+            ))}
+          </div>
+          <button
+            onClick={handleDeleteAllEntries}
+            className="mt-4 bg-[#1a0804] text-white py-2 px-4 rounded"
+          >
+            Delete All Entries
+          </button>
         </div>
-        <button
-          onClick={handleDeleteAllEntries}
-          className="mt-4 bg-red-500 text-white py-2 px-4 rounded"
-        >
-          Delete All Entries
-        </button>
       </div>
     </div>
   );
