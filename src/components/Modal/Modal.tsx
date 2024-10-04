@@ -38,22 +38,46 @@ const Modal: React.FC<ModalProps> = ({ isOpen, onClose }) => {
           <h2 className="text-lg font-bold mb-4">Menu</h2>
           <ul className="flex flex-col space-y-2">
             <li>
-              <Link href="/" className={`block ${isActive("/") ? "text-orange-500" : "text-slate-400"} hover:text-orange-500`}>
+              <Link
+                href="/"
+                className={`block ${
+                  isActive("/") ? "text-orange-500" : "text-slate-400"
+                } hover:text-orange-500`}
+              >
                 Home
               </Link>
             </li>
             <li>
-              <Link href="/dailyJournal" className={`block ${isActive("/dailyJournal") ? "text-orange-500" : "text-slate-400"} hover:text-orange-500`}>
+              <Link
+                href="/dailyJournal"
+                className={`block ${
+                  isActive("/dailyJournal")
+                    ? "text-orange-500"
+                    : "text-slate-400"
+                } hover:text-orange-500`}
+              >
                 Daily Journal
               </Link>
             </li>
             <li>
-              <Link href="/weeklyJournal" className={`block ${isActive("/weeklyJournal") ? "text-orange-500" : "text-slate-400"} hover:text-orange-500`}>
+              <Link
+                href="/weeklySummary"
+                className={`block ${
+                  isActive("/weeklySummary")
+                    ? "text-orange-500"
+                    : "text-slate-400"
+                } hover:text-orange-500`}
+              >
                 Weekly Journal
               </Link>
             </li>
             <li>
-              <Link href="/profile" className={`block ${isActive("/profile") ? "text-orange-500" : "text-slate-400"} hover:text-orange-500`}>
+              <Link
+                href="/profile"
+                className={`block ${
+                  isActive("/profile") ? "text-orange-500" : "text-slate-400"
+                } hover:text-orange-500`}
+              >
                 Profile
               </Link>
             </li>
