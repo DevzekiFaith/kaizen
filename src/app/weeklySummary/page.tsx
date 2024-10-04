@@ -19,7 +19,7 @@ const WeeklySummaryPage: React.FC = () => {
   }, [searchParams]);
 
   const handleToggleModal = () => {
-    setIsModalOpen(!isModalOpen); // Toggle modal visibility
+    setIsModalOpen((prev) => !prev); // Toggle modal visibility
   };
 
   const handleToggleTheme = () => {
@@ -27,13 +27,13 @@ const WeeklySummaryPage: React.FC = () => {
   };
 
   return (
-    <div>
+    <div className="bg-black min-h-screen"> {/* Added background color for better visibility */}
       <NavBar onToggleModal={handleToggleModal} />
       <Modal isOpen={isModalOpen} onClose={handleToggleModal} toggleTheme={handleToggleTheme} />
-      <div className="container mx-auto p-8">
+      <div className="container mx-auto p-8 pt-[5rem]">
         <h1 className="text-2xl font-bold mb-6 text-white">Weekly Summary</h1>
-        <p className="text-slate-600 font-bold">
-          <strong>Content:</strong> {summaryData.content}
+        <p className="text-slate-300 font-bold"> {/* Changed text color for better contrast */}
+          <strong>Content:</strong> {summaryData.content || "No content available."} {/* Added fallback text */}
         </p>
       </div>
     </div>

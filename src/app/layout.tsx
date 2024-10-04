@@ -3,7 +3,6 @@ import localFont from "next/font/local";
 import { ThemeProvider } from "@/components/Theme-Provider/Theme-Provider";
 import {
   ClerkProvider,
-  SignIn,
   SignInButton,
   SignedIn,
   SignedOut,
@@ -16,6 +15,7 @@ const geistSans = localFont({
   variable: "--font-geist-sans",
   weight: "100 900",
 });
+
 const geistMono = localFont({
   src: "./fonts/GeistMonoVF.woff",
   variable: "--font-geist-mono",
@@ -29,25 +29,20 @@ export const metadata: Metadata = {
 
 export default function RootLayout({
   children,
-}: Readonly<{
-  children: React.ReactNode;
-}>) {
+}: {
+  children: React.ReactNode; // Simplified type definition
+}) {
   return (
     <ClerkProvider>
-      <html lang="en">
+      <html lang="en" className={`${geistSans.variable} ${geistMono.variable}`}>
         <body>
-          <SignedOut>
-            {/* <SignIn routing="hash"/> */}
-            <SignInButton />
-          </SignedOut>
-          <SignedIn>
-            <UserButton showName />
-          </SignedIn>
-          <ThemeProvider
-            attribute="className"
-            defaultTheme="system"
-            enableSystem
-          >
+          <ThemeProvider attribute="className" defaultTheme="system" enableSystem>
+            <SignedOut>
+              <SignInButton />
+            </SignedOut>
+            <SignedIn>
+              <UserButton showName />
+            </SignedIn>
             {children}
           </ThemeProvider>
         </body>

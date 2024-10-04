@@ -58,12 +58,16 @@ const MainPage = () => {
             {" "}
             {/* Fixed typo here */}
             <h1 className="p-[4px] xl:w-[400px] dark:text-slate-800 text-slate-600 text-[12px]">
-              Lorem ipsum dolor sit amet consectetur adipisicing elit.
-              Perferendis nihil odio voluptatum, mollitia temporibus
-              dignissimos, neque maiores quaerat asperiores rem voluptatem ea
-              fugit blanditiis optio officiis placeat! Error laudantium qui ipsa
-              non aliquid quis maxime accusamus sint voluptatem deserunt
-              quibusdam consequatur autem
+              Journaling your daily progress helps you see how far you've come
+              and what you still need to work on. It allows you to break down
+              big tasks into smaller, more manageable steps. By writing down
+              your thoughts, goals, and achievements each day, you stay more
+              organized and focused.
+
+              It's also a great way to stay motivated. When you look back at
+              what you've achieved, it can boost your confidence and push you to
+              do even better. Plus, it helps build good habits that are key to
+              reaching your goals.
             </h1>
           </div>
           <div className="p-[1.5rem] ml-[1.5rem]">
@@ -178,9 +182,8 @@ const MainPage = () => {
             <FaArrowUpRightFromSquare className="text-slate-800 translate-x-3 cursor-pointer hover:translate-x-6" />
           </button>
           <div className="border-4 border-slate-700 border-l-slate-500w-[200px] mt-[2rem] rounded-2xl">
-            <h5 className="w-[300px] p-[8px] dark:text-slate-800 text-slate-600 text-[12px]">
-              Lorem ipsum dolor sit amet consectetur adipisicing elit. Error
-              amet iure accusamus ipsa corrupti. Quasi voluptates consectetur.
+            <h5 className="w-[300px] p-[8px] dark:text-slate-800 text-slate-600 text-[12px] text-center xl:ml-[3rem]">
+            Over time, journaling not only helps with productivity but also allows you to recognize your own growth. When you look back, you can see how far you’ve come, and that reflection can serve as inspiration to keep pushing forward.
             </h5>
           </div>
         </form>

@@ -5,10 +5,10 @@ import { usePathname } from "next/navigation"; // Import usePathname
 interface ModalProps {
   isOpen: boolean;
   onClose: () => void;
-  toggleTheme: () => void;
+  toggleTheme: () => void; // Ensure this prop is used if needed
 }
 
-const Modal: React.FC<ModalProps> = ({ isOpen, onClose }) => {
+const Modal: React.FC<ModalProps> = ({ isOpen, onClose, toggleTheme }) => { // Added toggleTheme to props
   const currentPath = usePathname(); // Get the current path
 
   // Function to check if a given path is the current path
@@ -17,9 +17,9 @@ const Modal: React.FC<ModalProps> = ({ isOpen, onClose }) => {
   };
 
   return (
-    <div>
+    <div className="">
       <div
-        className={`fixed inset-0 bg-black bg-opacity-70  transition-opacity ${
+        className={`fixed inset-0 bg-black bg-opacity-70 z-50  transition-opacity ${
           isOpen ? "opacity-100" : "opacity-0 pointer-events-none"
         }`}
       >

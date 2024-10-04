@@ -2,13 +2,11 @@
 
 import React, { useState } from "react"; // Import useState for animation state
 import Link from "next/link";
-import Image from "next/image";
 import { FaAlignJustify } from "react-icons/fa";
 import { usePathname } from "next/navigation";
 import { ModeToggle } from "../Toggle/ModeToggle";
-import { UserButton } from "@clerk/nextjs";
-import { SignedIn } from "@clerk/clerk-react";
 import ImageUpload from "../ImageUpload/ImageUpload";
+import { logout } from "../../../utils/auth";
 
 const navLinks = [
   { name: "home", path: "/" },
@@ -35,7 +33,7 @@ const NavBar: React.FC<NavBarProps> = ({ onToggleModal }) => {
   };
 
   return (
-    <div className="fixed w-full bg-black mt-[-1.5rem]">
+    <div className="fixed w-full bg-black mt-[-2rem] z-[100]">
       <div className="flex justify-between items-center p-[2rem]">
         <div>
           <Link href="/">
@@ -62,18 +60,21 @@ const NavBar: React.FC<NavBarProps> = ({ onToggleModal }) => {
         </div>
 
         <div className="flex justify-center items-center gap-2">
-          <Link href="/signIn">
-            <button className="mr-[1rem] border-1 bg-orange-500 p-[6px] w-[4rem] rounded-full font-bold text-slate-300 xl:block hidden">
-              logout
-            </button>
-          </Link>
+          <button
+            onClick={logout} // Use the logout function directly
+            className="mr-[1rem] border-1 bg-orange-500 p-[6px] w-[4rem] rounded-full font-bold text-slate-300 xl:block hidden"
+          >
+            logout
+          </button>
 
           <div className="rounded-full w-[2.5rem] h-[2.5rem] bg-gray-400 hidden xl:block">
             <ImageUpload />
           </div>
           <button
             onClick={handleToggle} // Use handleToggle for animation
-            className={`xl:hidden block transition-transform duration-300 ${isAnimating ? "rotate-180" : ""}`} // Add animation classes
+            className={`xl:hidden block transition-transform duration-300 ${
+              isAnimating ? "rotate-180" : ""
+            }`} // Add animation classes
             aria-label="Toggle menu"
           >
             <FaAlignJustify className="text-orange-500 text-[1.5rem]" />

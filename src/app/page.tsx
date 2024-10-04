@@ -3,8 +3,7 @@
 import React, { useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
-import { IoIosArrowDroprightCircle } from "react-icons/io";
-import { IoIosArrowDropleftCircle } from "react-icons/io";
+import { IoIosArrowDroprightCircle, IoIosArrowDropleftCircle } from "react-icons/io";
 // import ImageUpload from "@/components/ImageUpload/ImageUpload";
 // import { useRouter } from "next/navigation";
 
