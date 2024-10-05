@@ -39,10 +39,10 @@ const NavBar: React.FC<NavBarProps> = ({ onToggleModal }) => {
         <div>
           <Link href="/">
             <Image
-              className="w-[3rem] h-[3rem]"
-              src="/ref.logo.png"
-              width={50}
-              height={50}
+              className="w-[3.5rem] h-[3.5rem]"
+              src="/ref2.logo.png"
+              width={150}
+              height={150}
               alt="p-work"
             />
           </Link>

@@ -62,7 +62,7 @@ const DailyJournal: React.FC = () => {
       };
       handleSaveData(newJournalData); // Save new data using the updated function
     }
-  }, [searchParams]);
+  }, [journalData.length, searchParams]);
 
   const handleToggleModal = () => {
     setModalOpen((prev) => !prev); // Toggle modal visibility
@@ -170,7 +170,6 @@ const DailyJournal: React.FC = () => {
         </div>
       </div>
     </div>
-
   );};
 
 export default DailyJournal;

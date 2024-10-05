@@ -16,8 +16,10 @@ const WeeklySummaryPage: React.FC = () => {
   const [isModalOpen, setIsModalOpen] = useState(false);
 
   useEffect(() => {
-    const storedEntries = JSON.parse(localStorage.getItem("journalEntries") || "[]");
-    
+    const storedEntries = JSON.parse(
+      localStorage.getItem("journalEntries") || "[]"
+    );
+
     const startOfWeek = new Date();
     startOfWeek.setDate(startOfWeek.getDate() - startOfWeek.getDay()); // Sunday
 
@@ -37,9 +39,12 @@ const WeeklySummaryPage: React.FC = () => {
     <div className="bg-black min-h-screen">
       <NavBar onToggleModal={handleToggleModal} />
       <Modal isOpen={isModalOpen} onClose={handleToggleModal}>
-        {/* Modal Content */}
-        <h2>Weekly Summary Settings</h2>
-        <p>This is where you can adjust settings or preferences.</p>
+        {() => (
+          <>
+            <h2>Weekly Summary Settings</h2>
+            <p>This is where you can adjust settings or preferences.</p>
+          </>
+        )}
       </Modal>
       <div className="container mx-auto p-8 pt-[5rem]">
         <h1 className="text-2xl font-bold mb-6 text-white">Weekly Summary</h1>
@@ -70,6 +75,5 @@ const WeeklySummaryPage: React.FC = () => {
       </div>
     </div>
   );
-};
 
-export default WeeklySummaryPage;
+};export default WeeklySummaryPage;
