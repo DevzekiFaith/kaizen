@@ -166,7 +166,7 @@ const SignIn = () => {
               </div>
               <div className=" mt-[1.5rem]">
                 <h6 className="text-slate-600 text-center ml-[3rem] text-[12px]">
-                  Don't have an account?{" "}
+                  Do not have an account?{" "}
                   <Link href="/signUp">
                     <span className="cursor-pointer text-green-500">
                       Sign Up
