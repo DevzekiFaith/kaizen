@@ -6,6 +6,8 @@ import NavBar from "@/components/NavBar/NavBar";
 import Modal from "@/components/Modal/Modal"; // Import the Modal component
 import Image from "next/image";
 
+
+
 const DailyJournal: React.FC = () => {
   const searchParams = useSearchParams();
   const [journalData, setJournalData] = useState<

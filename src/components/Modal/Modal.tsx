@@ -8,7 +8,7 @@ interface ModalProps {
   toggleTheme: () => void; // Ensure this prop is used if needed
 }
 
-const Modal: React.FC<ModalProps> = ({ isOpen, onClose, toggleTheme }) => { // Added toggleTheme to props
+const Modal: React.FC<ModalProps> = ({ isOpen, onClose}) => { // Added toggleTheme to props
   const currentPath = usePathname(); // Get the current path
 
   // Function to check if a given path is the current path

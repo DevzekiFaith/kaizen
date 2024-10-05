@@ -58,14 +58,14 @@ const MainPage = () => {
             {" "}
             {/* Fixed typo here */}
             <h1 className="p-[4px] xl:w-[400px] dark:text-slate-800 text-slate-600 text-[12px]">
-              Journaling your daily progress helps you see how far you've come
+              Journaling your daily progress helps you see how far you have come
               and what you still need to work on. It allows you to break down
               big tasks into smaller, more manageable steps. By writing down
               your thoughts, goals, and achievements each day, you stay more
               organized and focused.
 
-              It's also a great way to stay motivated. When you look back at
-              what you've achieved, it can boost your confidence and push you to
+              It is also a great way to stay motivated. When you look back at
+              what you have achieved, it can boost your confidence and push you to
               do even better. Plus, it helps build good habits that are key to
               reaching your goals.
             </h1>
@@ -178,7 +178,7 @@ const MainPage = () => {
             type="submit"
             className="flex  justify-center gap-[1.5rem]  items-center bg-transparent border border-slate-800 p-[3px] mt-[2rem] xl:w-[24rem] rounded-full h-[2.5rem] font-extrabold w-[16rem] text-orange-500 hover:translate-x-5"
           >
-            Let's Go!{" "}
+            Lets Go!{" "}
             <FaArrowUpRightFromSquare className="text-slate-800 translate-x-3 cursor-pointer hover:translate-x-6" />
           </button>
           <div className="border-4 border-slate-700 border-l-slate-500w-[200px] mt-[2rem] rounded-2xl">
