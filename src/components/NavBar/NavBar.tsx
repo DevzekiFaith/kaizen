@@ -7,6 +7,7 @@ import { usePathname } from "next/navigation";
 import { ModeToggle } from "../Toggle/ModeToggle";
 import ImageUpload from "../ImageUpload/ImageUpload";
 import { logout } from "../../../utils/auth";
+import Image from "next/image";
 
 const navLinks = [
   { name: "home", path: "/" },
@@ -37,7 +38,13 @@ const NavBar: React.FC<NavBarProps> = ({ onToggleModal }) => {
       <div className="flex justify-between items-center p-[2rem]">
         <div>
           <Link href="/">
-            <h1 className="text-extrabold text-orange-950">REFLECTIFY</h1>
+            <Image
+              className="w-[3rem] h-[3rem]"
+              src="/ref.logo.png"
+              width={50}
+              height={50}
+              alt="p-work"
+            />
           </Link>
         </div>
         <div className="xl:block hidden">

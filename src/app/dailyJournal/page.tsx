@@ -122,11 +122,7 @@ const DailyJournal: React.FC = () => {
         isOpen={isModalOpen}
         onClose={handleCloseModal}
         toggleTheme={handleToggleTheme}
-      >
-        <h2>Journal Entry</h2>
-        {/* Add your modal content here */}
-        <p>This is where you can add more details or a form.</p>
-      </Modal>
+      />
       <div className="flex xl:flex-row flex-col justify-center items-center w-full gap-[2rem] p-[2rem]">
         <div className="w-full">
           <Image className="w-[34rem] h-screen" src="/cover26.jpg" width={300} height={300} alt="dark-cover" />
@@ -157,7 +153,7 @@ const DailyJournal: React.FC = () => {
                   <strong>Goal:</strong> {entry.goal}
                 </p>
                 <button
-                  onClick={() => handleDeleteData(index)} // Call delete function with the current index
+                  onClick={() => handleDeleteData(index)}
                   className="mt-2 bg-orange-500 text-white text-[12px] py-1 px-2 rounded-3xl shadow-xl shadow-slate-800"
                 >
                   Delete Entry
@@ -174,7 +170,7 @@ const DailyJournal: React.FC = () => {
         </div>
       </div>
     </div>
-  );
-};
+
+  );};
 
 export default DailyJournal;
