@@ -33,7 +33,7 @@ export default function RootLayout({
   children: React.ReactNode; // Simplified type definition
 }) {
   return (
-    <ClerkProvider>
+    <ClerkProvider publishableKey={process.env.NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY}>
       <html lang="en" className={`${geistSans.variable} ${geistMono.variable}`}>
         <body>
           <ThemeProvider attribute="className" defaultTheme="system" enableSystem>
@@ -49,4 +49,5 @@ export default function RootLayout({
       </html>
     </ClerkProvider>
   );
+
 }

@@ -52,7 +52,7 @@ const Home = () => {
         </button>
       </div>
 
-      <p className="text-[12px] mb-10 text-center max-w-md text-slate-600">
+      <p className="text-[12px] mb-10 text-center  text-slate-600 w-[400px]">
         Explore your daily reflections and insights. Connect with your thoughts
         and share your journey.
       </p>
