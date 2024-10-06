@@ -63,9 +63,7 @@ const Home = () => {
               Daily Journal
             </h2>
             <p>
-              Access your daily reflections and insights Lorem ipsum dolor, sit
-              amet consectetur adipisicing elit. Voluptatibus tempore tenetur
-              perspiciatis.
+            Access your daily reflections and insights, track your progress over time, and gain deeper clarity on your goals with personalized summaries, actionable takeaways, and motivational prompts. Stay inspired by reviewing past achievements, and receive tailored guidance to keep you on the path of continuous growth. This holistic approach to journaling will empower you to make informed decisions, enhance self-awareness, and embrace each day with renewed purpose and focus
             </p>
           </div>
         </Link>
@@ -75,9 +73,7 @@ const Home = () => {
               Weekly Summary
             </h2>
             <p>
-              View and edit your personal information Lorem ipsum dolor, sit
-              amet consectetur adipisicing elit. Voluptatibus tempore tenetur
-              perspiciatis.
+            View and edit your personal information to keep your profile up to date, ensuring your preferences, achievements, and milestones are accurately reflected. Customize your settings, update your goals, and manage your privacy with ease, allowing you to maintain full control over your personal data and tailor your experience to your needs
             </p>
           </div>
         </Link>
@@ -85,9 +81,7 @@ const Home = () => {
           <div className="bg-slate-950 text-slate-600 rounded-lg shadow-lg p-6 transition-transform transform hover:scale-105 hover:shadow-2xl shadow-slate-800 mb-[2rem]">
             <h2 className="text-xl font-bold mb-2 text-orange-600">Settings</h2>
             <p>
-              Customize your experience and preferences Lorem ipsum dolor, sit
-              amet consectetur adipisicing elit. Voluptatibus tempore tenetur
-              perspiciatis.
+            Customize your experience and preferences to suit your individual needs. Personalize your notifications, themes, and layouts, set tailored reminders, adjust accessibility options, and control the way you interact with the platform. Whether you are focusing on productivity, relaxation, or goal tracking, make the app truly yours by adjusting features that enhance your journey
             </p>
           </div>
         </Link>
