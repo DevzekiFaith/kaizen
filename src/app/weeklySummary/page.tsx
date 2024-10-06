@@ -36,17 +36,30 @@ const WeeklySummaryPage: React.FC = () => {
     setIsModalOpen((prev) => !prev); // Toggle modal
   };
 
+  function toggleTheme(): void {
+    throw new Error("Function not implemented.");
+  }
+
   return (
     <div className="bg-black min-h-screen w-full">
       <NavBar onToggleModal={handleToggleModal} />
-      <Modal isOpen={isModalOpen} onClose={handleToggleModal}>
+
+      <Modal
+        isOpen={isModalOpen}
+        onClose={handleToggleModal}
+        toggleTheme={toggleTheme}
+      >
         {/* Modal Content */}
-        <h2>Weekly Summary Settings</h2>
-        <p>This is where you can adjust settings or preferences.</p>
       </Modal>
       <div className="pt-[5rem] flex justify-center items-center w-full xl:flex-row flex-col ">
         <div className="p-[1.5rem] w-full">
-          <Image className="h-[42rem] w-[22rem]" src="/cover23.jpg" width={500} height={500} alt="" />
+          <Image
+            className="h-screen w-[22rem]"
+            src="/cover23.jpg"
+            width={500}
+            height={500}
+            alt=""
+          />
         </div>
         <div className="container mx-auto p-8 pt-[5rem]">
           <h1 className="text-2xl font-bold mb-6 text-white">Weekly Summary</h1>
