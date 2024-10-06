@@ -140,16 +140,16 @@ const DailyJournal: React.FC = () => {
                 key={index}
                 className="bg-slate-950 shadow-2xl p-4 rounded transform transition-transform duration-300 hover:scale-105"
               >
-                <p className="text-slate-400 text-[13px]">
+                <p className="text-slate-700 text-[13px]">
                   <strong>Date:</strong> {entry.date}
                 </p>
-                <p className="text-slate-400 text-[16px]">
+                <p className="text-slate-700 text-[13px]">
                   <strong>Title:</strong> {entry.title}
                 </p>
-                <p className="text-slate-400 text-[13px]">
+                <p className="text-slate-700 text-[13px]">
                   <strong>Content:</strong> {entry.content}
                 </p>
-                <p className="text-slate-400 text-[13px]">
+                <p className="text-slate-700 text-[13px]">
                   <strong>Goal:</strong> {entry.goal}
                 </p>
                 <button
@@ -163,7 +163,7 @@ const DailyJournal: React.FC = () => {
           </div>
           <button
             onClick={handleDeleteAllEntries}
-            className="mt-4 bg-[#1a0804] text-white py-2 px-4 rounded"
+            className="mt-4 bg-[#1a0804] text-slate-700 py-2 px-4 rounded"
           >
             Delete All Entries
           </button>
