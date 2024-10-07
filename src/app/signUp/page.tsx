@@ -111,7 +111,8 @@ const SignUp = () => {
         <div>
           <Image
             className="w-[28rem] h-screen"
-            src="/cover12.jpg"
+            src="/images/cover12.jpg"
+            priority
             width={300}
             height={300}
             alt="login"
@@ -234,7 +235,7 @@ const SignUp = () => {
             </form>
           </div>
           <div className="flex justify-center items-center gap-[6px] bg-transparent border-2 border-white w-[24rem] h-[2.5rem] rounded-3xl mt-[1.2rem] ml-[3rem]">
-            <Image src="/Frame.png" width={20} height={20} alt="origin" />
+            <Image src="/images/Frame.png" width={20} height={20} alt="origin" />
             <button
               onClick={() => {
                 HandleGoogle();

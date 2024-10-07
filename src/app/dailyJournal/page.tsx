@@ -132,15 +132,16 @@ const DailyJournal: React.FC = () => {
         <div className="w-full">
           <Image
             className="w-[34rem] h-screen"
-            src="/cover26.jpg"
+            src="/public/images/cover26.jpg"
             width={300}
             height={300}
+            priority
             alt="dark-cover"
           />
         </div>
         <div className="mx-auto pt-[6rem] p-[1rem] w-full">
           <h1 className="text-2xl font-bold mb-6 text-white">Daily Journal</h1>
-          <Suspense fallback={<p>Loading journal data...</p>}>
+          <Suspense fallback={<p className="text-slate-300">Loading journal data...</p>}>
             <JournalContent />
           </Suspense>
         </div>

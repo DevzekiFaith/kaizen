@@ -87,9 +87,10 @@ const SignIn = () => {
         <div>
           <Image
             className="w-[28rem] h-screen"
-            src="/cover10.jpg"
+            src="/images/cover10.jpg"
             width={300}
             height={300}
+            priority
             alt="login"
           />
         </div>
@@ -188,7 +189,7 @@ const SignIn = () => {
             </form>
           </div>
           <div className="flex justify-center items-center gap-[6px] bg-transparent border-2 border-white w-[24rem] h-[2.5rem] rounded-3xl mt-[1.2rem] ml-[3rem]">
-            <Image src="/Frame.png" width={20} height={20} alt="origin" />
+            <Image className="h-[1rem] w-[1rem]" src="/images/Frame.png" width={20} height={20} priority alt="origin" />
             <button
               onClick={() => {
                 HandleGoogle();

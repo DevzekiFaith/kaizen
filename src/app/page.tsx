@@ -8,7 +8,11 @@ import {
   IoIosArrowDropleftCircle,
 } from "react-icons/io";
 
-const images = ["/cover32.jpg", "/cover28.jpg", "/cover31.jpg"];
+const images = [
+  "/images/cover32.jpg",
+  "/images/cover28.jpg",
+  "/images/cover31.jpg",
+];
 
 const Home = () => {
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
@@ -35,6 +39,7 @@ const Home = () => {
           alt="Welcome"
           width={600}
           height={400}
+          priority
           className="rounded-lg shadow-lg transition-transform duration-500"
         />
         <button
@@ -104,5 +109,4 @@ const Home = () => {
     </div>
   );
 };
-
 export default Home;
