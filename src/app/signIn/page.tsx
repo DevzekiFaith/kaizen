@@ -96,7 +96,7 @@ const SignIn = () => {
         <div>
           <div className="mb-[2rem]">
             <h1 className="text-orange-500 uppercase font-bold text-[22px] w-[26rem] ml-[3rem]">
-              Reflectify
+              Reflectify!
             </h1>
           </div>
           <div>
@@ -134,7 +134,9 @@ const SignIn = () => {
                       type="button"
                       onClick={togglePasswordVisibility}
                       className="absolute top-2 right-0 "
-                      aria-label={showPassword ? "Hide password" : "Show password"}
+                      aria-label={
+                        showPassword ? "Hide password" : "Show password"
+                      }
                     >
                       {showPassword ? (
                         <EyeOff className="h-6 w-6  text-slate-400" />
