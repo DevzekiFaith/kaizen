@@ -63,7 +63,7 @@ const Home = () => {
               Daily Journal
             </h2>
             <p>
-            Access your daily reflections and insights, track your progress over time, and gain deeper clarity on your goals with personalized summaries, actionable takeaways, and motivational prompts. Stay inspired by reviewing past achievements, and receive tailored guidance to keep you on the path of continuous growth. This holistic approach to journaling will empower you to make informed decisions, enhance self-awareness, and embrace each day with renewed purpose and focus
+            Access your daily reflections and insights, track your progress over time, and gain deeper clarity on your goals with personalized summaries, actionable takeaways, and motivational prompts. Stay inspired by reviewing past achievements, and receive tailored guidance to keep you on the path of continuous growth
             </p>
           </div>
         </Link>
