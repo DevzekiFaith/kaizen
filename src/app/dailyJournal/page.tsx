@@ -1,18 +1,21 @@
 "use client"; // Ensures the component is rendered on the client-side
 
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, Suspense } from "react";
 import { useSearchParams } from "next/navigation";
 import NavBar from "@/components/NavBar/NavBar";
 import Modal from "@/components/Modal/Modal"; // Import the Modal component
 import Image from "next/image";
 
-
+interface JournalEntry {
+  date?: string;
+  title?: string;
+  content?: string;
+  goal?: string;
+}
 
 const DailyJournal: React.FC = () => {
   const searchParams = useSearchParams();
-  const [journalData, setJournalData] = useState<
-    Array<{ date?: string; title?: string; content?: string; goal?: string }>
-  >([]); // Change to an array to hold multiple entries
+  const [journalData, setJournalData] = useState<JournalEntry[]>([]); // Array to hold journal entries
   const [isModalOpen, setModalOpen] = useState(false); // State for modal visibility
 
   useEffect(() => {
@@ -20,7 +23,6 @@ const DailyJournal: React.FC = () => {
     const savedData = localStorage.getItem("dailyJournalData");
     if (savedData) {
       const parsedData = JSON.parse(savedData);
-      // Ensure parsedData is an array
       setJournalData(Array.isArray(parsedData) ? parsedData : []);
     }
 
@@ -33,7 +35,6 @@ const DailyJournal: React.FC = () => {
       !lastNotificationDate ||
       now.getTime() - new Date(lastNotificationDate).getTime() > oneWeek
     ) {
-      // Request permission for notifications
       if (Notification.permission !== "denied") {
         Notification.requestPermission().then((permission) => {
           if (permission === "granted") {
@@ -54,7 +55,7 @@ const DailyJournal: React.FC = () => {
 
     // Ensure the parameters exist before setting the state
     if (date || title || content || goal) {
-      const newJournalData = {
+      const newJournalData: JournalEntry = {
         date: date ?? undefined,
         title: title ?? undefined,
         content: content ?? undefined,
@@ -76,28 +77,20 @@ const DailyJournal: React.FC = () => {
     // Add your theme toggle logic here
   };
 
-  const handleSaveData = (data: {
-    date?: string;
-    title?: string;
-    content?: string;
-    goal?: string;
-  }) => {
+  const handleSaveData = (data: JournalEntry) => {
     const existingData = JSON.parse(
       localStorage.getItem("dailyJournalData") || "[]"
     ); // Retrieve existing data
-    // Ensure existingData is an array
     const updatedData = Array.isArray(existingData) ? existingData : [];
 
-    // Check for duplicates
     const isDuplicate = updatedData.some(
-      (entry) =>
+      (entry: JournalEntry) =>
         entry.date === data.date &&
         entry.title === data.title &&
         entry.content === data.content
     );
 
     if (!isDuplicate) {
-      // Only add if not a duplicate
       updatedData.push(data); // Add new data to the existing array
       setJournalData(updatedData); // Update state with the new array
       localStorage.setItem("dailyJournalData", JSON.stringify(updatedData)); // Save updated data to local storage
@@ -116,60 +109,71 @@ const DailyJournal: React.FC = () => {
   };
 
   return (
-    <div className="w-full">
-      <NavBar onToggleModal={handleToggleModal} />
-      <Modal
-        isOpen={isModalOpen}
-        onClose={handleCloseModal}
-        toggleTheme={handleToggleTheme}
-      />
-      <div className="flex xl:flex-row flex-col justify-center items-center w-full gap-[2rem] p-[2rem]">
-        <div className="w-full">
-          <Image className="w-[34rem] h-screen" src="/cover26.jpg" width={300} height={300} alt="dark-cover" />
-        </div>
-        <div className="mx-auto pt-[6rem] p-[1rem] w-full">
-          <h1 className="text-2xl font-bold mb-6 text-white">Daily Journal</h1>
-          <div className="mb-[18px]">
-            <h6 className="text-slate-400 text-[12px]">
-              Daily Journaling empowers your mind for continuation
-            </h6>
+    <Suspense fallback={<div className="text-slate-400">Loading journal entries...</div>}>
+      <div className="w-full">
+        <NavBar onToggleModal={handleToggleModal} />
+        <Modal
+          isOpen={isModalOpen}
+          onClose={handleCloseModal}
+          toggleTheme={handleToggleTheme}
+        />
+        <div className="flex xl:flex-row flex-col justify-center items-center w-full gap-[2rem] p-[2rem]">
+          <div className="w-full">
+            <Image
+              className="w-[34rem] h-screen"
+              src="/cover26.jpg"
+              width={300}
+              height={300}
+              alt="dark-cover"
+            />
           </div>
-          <div className="grid grid-cols-1 gap-4">
-            {journalData.map((entry, index) => (
-              <div
-                key={index}
-                className="bg-slate-950 shadow-2xl p-4 rounded transform transition-transform duration-300 hover:scale-105"
-              >
-                <p className="text-slate-700 text-[13px]">
-                  <strong>Date:</strong> {entry.date}
-                </p>
-                <p className="text-slate-700 text-[13px]">
-                  <strong>Title:</strong> {entry.title}
-                </p>
-                <p className="text-slate-700 text-[13px]">
-                  <strong>Content:</strong> {entry.content}
-                </p>
-                <p className="text-slate-700 text-[13px]">
-                  <strong>Goal:</strong> {entry.goal}
-                </p>
-                <button
-                  onClick={() => handleDeleteData(index)}
-                  className="mt-2 bg-orange-500 text-white text-[12px] py-1 px-2 rounded-3xl shadow-xl shadow-slate-800"
+          <div className="mx-auto pt-[6rem] p-[1rem] w-full">
+            <h1 className="text-2xl font-bold mb-6 text-white">
+              Daily Journal
+            </h1>
+            <div className="mb-[18px]">
+              <h6 className="text-slate-400 text-[12px]">
+                Daily Journaling empowers your mind for continuation
+              </h6>
+            </div>
+            <div className="grid grid-cols-1 gap-4">
+              {journalData.map((entry, index) => (
+                <div
+                  key={index}
+                  className="bg-slate-950 shadow-2xl p-4 rounded transform transition-transform duration-300 hover:scale-105"
                 >
-                  Delete Entry
-                </button>
-              </div>
-            ))}
+                  <p className="text-slate-700 text-[13px]">
+                    <strong>Date:</strong> {entry.date}
+                  </p>
+                  <p className="text-slate-700 text-[13px]">
+                    <strong>Title:</strong> {entry.title}
+                  </p>
+                  <p className="text-slate-700 text-[13px]">
+                    <strong>Content:</strong> {entry.content}
+                  </p>
+                  <p className="text-slate-700 text-[13px]">
+                    <strong>Goal:</strong> {entry.goal}
+                  </p>
+                  <button
+                    onClick={() => handleDeleteData(index)}
+                    className="mt-2 bg-orange-500 text-white text-[12px] py-1 px-2 rounded-3xl shadow-xl shadow-slate-800"
+                  >
+                    Delete Entry
+                  </button>
+                </div>
+              ))}
+            </div>
+            <button
+              onClick={handleDeleteAllEntries}
+              className="mt-4 bg-[#1a0804] text-slate-500 py-2 px-4 rounded"
+            >
+              Delete All Entries
+            </button>
           </div>
-          <button
-            onClick={handleDeleteAllEntries}
-            className="mt-4 bg-[#1a0804] text-slate-700 py-2 px-4 rounded"
-          >
-            Delete All Entries
-          </button>
         </div>
       </div>
-    </div>
-  );};
+    </Suspense>
+  );
+};
 
 export default DailyJournal;
