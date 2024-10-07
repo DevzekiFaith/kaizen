@@ -5,7 +5,6 @@ import Link from "next/link";
 import { FaAlignJustify } from "react-icons/fa";
 import { usePathname } from "next/navigation";
 import { ModeToggle } from "../Toggle/ModeToggle";
-import ImageUpload from "../ImageUpload/ImageUpload";
 import { logout } from "../../../utils/auth";
 import Image from "next/image";
 
@@ -75,7 +74,6 @@ const NavBar: React.FC<NavBarProps> = ({ onToggleModal }) => {
           </button>
 
           <div className="rounded-full w-[2.5rem] h-[2.5rem] bg-gray-400 hidden xl:block">
-            <ImageUpload />
           </div>
           <button
             onClick={handleToggle} // Use handleToggle for animation
