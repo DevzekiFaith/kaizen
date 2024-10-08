@@ -129,10 +129,10 @@ const DailyJournal: React.FC = () => {
         }}
       />
       <div className="flex xl:flex-row flex-col justify-center items-center w-full gap-[2rem] p-[2rem]">
-        <div className="w-full">
+        <div className="w-full mt-[4rem]">
           <Image
-            className="w-[34rem] h-screen"
-            src="/public/images/cover26.jpg"
+            className="w-[34rem] h-screen "
+            src="/images/cover26.jpg"
             width={300}
             height={300}
             priority

@@ -70,14 +70,26 @@ const MainPage = () => {
               reaching your goals.
             </h1>
           </div>
+          <div>
+
           <div className="p-[1.5rem] ml-[1.5rem]">
             <Image
               className=""
-              src="/cover14.jpg"
+              src="/images/cover14.jpg"
               width={300}
               height={300}
               alt="Poster"
             />
+          </div>
+          <div className="p-[1.5rem] ml-[1.5rem]">
+            <Image
+              className=""
+              src="/images/og.png"
+              width={300}
+              height={300}
+              alt="Poster"
+            />
+          </div>
           </div>
         </div>
         <form onSubmit={handleSubmit(onSubmit)}>
