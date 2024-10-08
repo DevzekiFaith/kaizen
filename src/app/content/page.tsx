@@ -81,7 +81,7 @@ const MainPage = () => {
               alt="Poster"
             />
           </div>
-          <div className="p-[1.5rem] ml-[1.5rem]">
+          {/* <div className="p-[1.5rem] ml-[1.5rem]">
             <Image
               className=""
               src="/images/og.png"
@@ -89,7 +89,7 @@ const MainPage = () => {
               height={300}
               alt="Poster"
             />
-          </div>
+          </div> */}
           </div>
         </div>
         <form onSubmit={handleSubmit(onSubmit)}>
