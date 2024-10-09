@@ -1,4 +1,3 @@
-// Ensures the component is rendered on the client-side
 "use client";
 
 import React, { useEffect, useState, Suspense } from "react";
@@ -6,13 +5,18 @@ import { useSearchParams } from "next/navigation";
 import NavBar from "@/components/NavBar/NavBar";
 import Modal from "@/components/Modal/Modal";
 import Image from "next/image";
+import jsPDF from 'jspdf';
 
-// Separate JournalContent component to handle journal logic
+interface JournalEntry {
+  date?: string;
+  title?: string;
+  content?: string;
+  goal?: string;
+}
+
 const JournalContent: React.FC = () => {
   const searchParams = useSearchParams();
-  const [journalData, setJournalData] = useState<
-    Array<{ date?: string; title?: string; content?: string; goal?: string }>
-  >([]);
+  const [journalData, setJournalData] = useState<JournalEntry[]>([]);
 
   useEffect(() => {
     const savedData = localStorage.getItem("dailyJournalData");
@@ -27,7 +31,7 @@ const JournalContent: React.FC = () => {
     const goal = searchParams.get("goal");
 
     if (date || title || content || goal) {
-      const newJournalData = {
+      const newJournalData: JournalEntry = {
         date: date ?? undefined,
         title: title ?? undefined,
         content: content ?? undefined,
@@ -37,12 +41,7 @@ const JournalContent: React.FC = () => {
     }
   }, [searchParams]);
 
-  const handleSaveData = (data: {
-    date?: string;
-    title?: string;
-    content?: string;
-    goal?: string;
-  }) => {
+  const handleSaveData = (data: JournalEntry) => {
     const existingData = JSON.parse(
       localStorage.getItem("dailyJournalData") || "[]"
     );
@@ -73,6 +72,15 @@ const JournalContent: React.FC = () => {
     localStorage.removeItem("dailyJournalData");
   };
 
+  const handleDownloadPDF = (entry: JournalEntry) => {
+    const doc = new jsPDF();
+    doc.text(`Date: ${entry.date}`, 10, 10);
+    doc.text(`Title: ${entry.title}`, 10, 20);
+    doc.text(`Content: ${entry.content}`, 10, 30);
+    doc.text(`Goal: ${entry.goal}`, 10, 40);
+    doc.save(`journal_entry_${entry.date}.pdf`);
+  };
+
   return (
     <div className="grid grid-cols-1 gap-4">
       {journalData.map((entry, index) => (
@@ -98,6 +106,12 @@ const JournalContent: React.FC = () => {
           >
             Delete Entry
           </button>
+          <button
+            onClick={() => handleDownloadPDF(entry)}
+            className="mt-2 ml-2 bg-blue-500 text-white text-[12px] py-1 px-2 rounded-3xl shadow-xl shadow-slate-800"
+          >
+            Download PDF
+          </button>
         </div>
       ))}
       <button
@@ -110,9 +124,33 @@ const JournalContent: React.FC = () => {
   );
 };
 
-// Main Component
 const DailyJournal: React.FC = () => {
   const [isModalOpen, setModalOpen] = useState(false);
+
+  useEffect(() => {
+    if (Notification.permission !== 'granted') {
+      Notification.requestPermission();
+    }
+
+    const checkAndNotify = () => {
+      const lastNotification = localStorage.getItem('lastJournalNotification');
+      const now = new Date();
+      if (!lastNotification || new Date(lastNotification).getDate() !== now.getDate()) {
+        if (Notification.permission === 'granted') {
+          new Notification('Daily Journal Reminder', {
+            body: 'Time to write in your journal!',
+            icon: '/path/to/your/icon.png' // Replace with your icon path
+          });
+        }
+        localStorage.setItem('lastJournalNotification', now.toISOString());
+      }
+    };
+
+    checkAndNotify();
+    const interval = setInterval(checkAndNotify, 86400000); // Check every 24 hours
+
+    return () => clearInterval(interval);
+  }, []);
 
   const handleToggleModal = () => setModalOpen((prev) => !prev);
 

@@ -26,16 +26,22 @@ const WeeklySummaryPage: React.FC = () => {
     startOfWeek.setHours(0, 0, 0, 0);
     startOfWeek.setDate(startOfWeek.getDate() - startOfWeek.getDay());
 
-    const weekEntries: JournalEntry[] = storedEntries.filter((entry: JournalEntry) => {
-      const entryDate: Date = new Date(entry.date);
-      return entryDate >= startOfWeek && entryDate < new Date();
-    });
+    const weekEntries: JournalEntry[] = storedEntries.filter(
+      (entry: JournalEntry) => {
+        const entryDate: Date = new Date(entry.date);
+        return entryDate >= startOfWeek && entryDate < new Date();
+      }
+    );
 
     setJournalEntries(weekEntries);
 
     const totalEntries: number = weekEntries.length;
-    const entriesWithGoals: number = weekEntries.filter((entry: JournalEntry) => entry.goal.trim() !== '').length;
-    setWeeklyGoalProgress(Math.round((entriesWithGoals / totalEntries) * 100) || 0);
+    const entriesWithGoals: number = weekEntries.filter(
+      (entry: JournalEntry) => entry.goal.trim() !== ""
+    ).length;
+    setWeeklyGoalProgress(
+      Math.round((entriesWithGoals / totalEntries) * 100) || 0
+    );
   }, []);
 
   const handleToggleModal = (): void => {
@@ -70,13 +76,17 @@ const WeeklySummaryPage: React.FC = () => {
         <div className="container mx-auto p-8 pt-[5rem]">
           <h1 className="text-2xl font-bold mb-6 text-white">Weekly Summary</h1>
           <div className="mb-6">
-            <h2 className="text-xl font-semibold text-white mb-2">Weekly Goal Progress</h2>
+            <h2 className="text-xl font-semibold text-white mb-2">
+              Weekly Goal Progress
+            </h2>
             <div className="bg-gray-200 h-4 rounded-full">
               <div
                 className={`bg-orange-600 h-full rounded-full w-[${weeklyGoalProgress}%]`}
               ></div>
             </div>
-            <p className="text-white mt-2">{weeklyGoalProgress}% of entries have goals</p>
+            <p className="text-white mt-2">
+              {weeklyGoalProgress}% of entries have goals
+            </p>
           </div>
           <div className="grid grid-cols-1 gap-4">
             {journalEntries.length > 0 ? (
@@ -92,7 +102,7 @@ const WeeklySummaryPage: React.FC = () => {
                     <strong>Content:</strong> {entry.content}
                   </p>
                   <p className="text-gray-700">
-                    <strong>Goal:</strong> {entry.goal || 'No goal set'}
+                    <strong>Goal:</strong> {entry.goal || "No goal set"}
                   </p>
                 </div>
               ))
