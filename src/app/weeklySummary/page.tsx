@@ -1,4 +1,4 @@
-"use client"; // Ensure client-side rendering
+"use client";
 
 import React, { useState, useEffect } from "react";
 import NavBar from "@/components/NavBar/NavBar";
@@ -15,6 +15,7 @@ interface JournalEntry {
 const WeeklySummaryPage: React.FC = () => {
   const [journalEntries, setJournalEntries] = useState<JournalEntry[]>([]);
   const [isModalOpen, setIsModalOpen] = useState(false);
+  // const [isDarkMode, setIsDarkMode] = useState(true);
 
   useEffect(() => {
     const storedEntries = JSON.parse(
@@ -22,23 +23,25 @@ const WeeklySummaryPage: React.FC = () => {
     );
 
     const startOfWeek = new Date();
-    startOfWeek.setDate(startOfWeek.getDate() - startOfWeek.getDay()); // Sunday
+    startOfWeek.setHours(0, 0, 0, 0);
+    startOfWeek.setDate(startOfWeek.getDate() - startOfWeek.getDay());
 
     const weekEntries = storedEntries.filter((entry: JournalEntry) => {
       const entryDate = new Date(entry.date);
-      return entryDate >= startOfWeek;
+      return entryDate >= startOfWeek && entryDate < new Date();
     });
 
     setJournalEntries(weekEntries);
   }, []);
 
   const handleToggleModal = () => {
-    setIsModalOpen((prev) => !prev); // Toggle modal
+    setIsModalOpen((prev) => !prev);
   };
 
-  function toggleTheme(): void {
-    throw new Error("Function not implemented.");
-  }
+  const toggleTheme = () => {
+    // Implement theme toggle logic here
+    // setIsDarkMode((prevMode) => !prevMode);
+  };
 
   return (
     <div className="bg-black min-h-screen w-full">
@@ -51,14 +54,14 @@ const WeeklySummaryPage: React.FC = () => {
       >
         {/* Modal Content */}
       </Modal>
-      <div className="pt-[5rem] flex justify-center items-center w-full xl:flex-row flex-col ">
+      <div className="pt-[5rem] flex justify-center items-center w-full xl:flex-row flex-col">
         <div className="p-[1.5rem] w-full">
           <Image
-            className="h-screen w-[22rem]"
-            src="/cover23.jpg"
+            className="h-screen w-[26rem] object-cover"
+            src="/images/cover23.jpg"
             width={500}
             height={500}
-            alt=""
+            alt="Weekly Summary Cover"
           />
         </div>
         <div className="container mx-auto p-8 pt-[5rem]">
@@ -67,22 +70,22 @@ const WeeklySummaryPage: React.FC = () => {
             {journalEntries.length > 0 ? (
               journalEntries.map((entry, index) => (
                 <div key={index} className="bg-white p-4 rounded shadow-md">
-                  <p className="text-slate-300 font-bold">
+                  <p className="text-gray-800 font-bold">
                     <strong>Date:</strong> {entry.date}
                   </p>
-                  <p className="text-slate-300 font-bold">
+                  <p className="text-gray-800">
                     <strong>Title:</strong> {entry.title}
                   </p>
-                  <p className="text-slate-300 font-bold">
+                  <p className="text-gray-700">
                     <strong>Content:</strong> {entry.content}
                   </p>
-                  <p className="text-slate-300 font-bold">
+                  <p className="text-gray-700">
                     <strong>Goal:</strong> {entry.goal}
                   </p>
                 </div>
               ))
             ) : (
-              <p className="text-slate-300 font-bold">
+              <p className="text-white font-bold">
                 No entries available for the week.
               </p>
             )}

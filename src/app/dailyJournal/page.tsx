@@ -129,9 +129,9 @@ const DailyJournal: React.FC = () => {
         }}
       />
       <div className="flex xl:flex-row flex-col justify-center items-center w-full gap-[2rem] p-[2rem]">
-        <div className="w-full mt-[4rem]">
+        <div className="w-full mt-[4rem] xl:mt-[-6rem]">
           <Image
-            className="w-[34rem] h-screen "
+            className="w-[34rem] h-screen transition translate-x-10 duration-10 ease-out "
             src="/images/cover26.jpg"
             width={300}
             height={300}
@@ -141,7 +141,9 @@ const DailyJournal: React.FC = () => {
         </div>
         <div className="mx-auto pt-[6rem] p-[1rem] w-full">
           <h1 className="text-2xl font-bold mb-6 text-white">Daily Journal</h1>
-          <Suspense fallback={<p className="text-slate-300">Loading journal data...</p>}>
+          <Suspense
+            fallback={<p className="text-slate-300">Loading journal data...</p>}
+          >
             <JournalContent />
           </Suspense>
         </div>
