@@ -6,9 +6,8 @@ import { FaAlignJustify } from "react-icons/fa";
 import { usePathname } from "next/navigation";
 import { ModeToggle } from "../Toggle/ModeToggle";
 import { logout } from "../../../utils/auth";
-import NotificationBell from "../NotificationBell/NotificationBell";
+import NotificationBell from "@/components/NotificationBell/NotificationBell";
 // import NotificationBell from "@/components/"
-
 
 const navLinks = [
   { name: "home", path: "/" },
@@ -39,7 +38,7 @@ const NavBar: React.FC<NavBarProps> = ({ onToggleModal }) => {
       <div className="flex justify-between items-center p-[2rem]">
         <div>
           <Link href="/">
-           <h6 className="text-slate-900 font-bold uppercase">Reflectify</h6>
+            <h6 className="text-slate-900 font-bold uppercase">Reflectify</h6>
           </Link>
         </div>
         <div className="xl:block hidden">
@@ -69,12 +68,11 @@ const NavBar: React.FC<NavBarProps> = ({ onToggleModal }) => {
             logout
           </button>
 
-          <div className="rounded-full w-[2.5rem] h-[2.5rem] bg-gray-400 hidden xl:block">
-          </div>
+          <div className="rounded-full w-[2.5rem] h-[2.5rem] bg-gray-400 hidden xl:block"></div>
           <div>
             <NotificationBell />
           </div>
-        
+
           <button
             onClick={handleToggle}
             className={`xl:hidden block transition-transform duration-300 ${

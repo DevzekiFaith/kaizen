@@ -62,26 +62,23 @@ const MainPage = () => {
               and what you still need to work on. It allows you to break down
               big tasks into smaller, more manageable steps. By writing down
               your thoughts, goals, and achievements each day, you stay more
-              organized and focused.
-
-              It is also a great way to stay motivated. When you look back at
-              what you have achieved, it can boost your confidence and push you to
-              do even better. Plus, it helps build good habits that are key to
-              reaching your goals.
+              organized and focused. It is also a great way to stay motivated.
+              When you look back at what you have achieved, it can boost your
+              confidence and push you to do even better. Plus, it helps build
+              good habits that are key to reaching your goals.
             </h1>
           </div>
           <div>
-
-          <div className="p-[1.5rem] ml-[1.5rem]">
-            <Image
-              className=""
-              src="/images/cover14.jpg"
-              width={300}
-              height={300}
-              alt="Poster"
-            />
-          </div>
-          {/* <div className="p-[1.5rem] ml-[1.5rem]">
+            <div className="p-[1.5rem] ml-[1.5rem]">
+              <Image
+                className=""
+                src="/images/cover14.jpg"
+                width={300}
+                height={300}
+                alt="Poster"
+              />
+            </div>
+            {/* <div className="p-[1.5rem] ml-[1.5rem]">
             <Image
               className=""
               src="/images/og.png"
@@ -158,11 +155,21 @@ const MainPage = () => {
                         id="Activities"
                         name="Progress Work"
                         title="Progress Work"
+                        // size={3}
                       >
-                        <option value="Eating">Eating</option>
-                        <option value="Exercise">Exercise</option>
+                        <option value="choose Your Goal"></option>
+                        <option value="Healthy Eating">Healthy Eating</option>
+                        <option value="Healthy Exercise">Healthy Exercise</option>
                         <option value="Reading">Reading</option>
-                        <option value="free Time">Free Time</option>
+                        <option value="Daily Gratitude">Daily Gratitude</option>
+                        <option value="New Learning-Learning">New Learning-Learning</option>
+                        <option value="Meditation">Meditation</option>
+                        <option value="Financial Management">Financial Management</option>
+                        <option value="Mindful Habits">Mindful Habits</option>
+                        <option value="Creativity">Creativity</option>
+                        <option value="Time Management">Time Management</option>
+                        <option value="Emotional Check-in">Emotional Check-in</option>
+                        <option value="Hobby Time">Hobby Time</option>
                       </select>
                     </div>
                   </div>
@@ -195,13 +202,15 @@ const MainPage = () => {
           </button>
           <div className="border-4 border-slate-700 border-l-slate-500w-[200px] mt-[2rem] rounded-2xl">
             <h5 className="w-[300px] p-[8px] dark:text-slate-800 text-slate-600 text-[12px] text-center xl:ml-[3rem]">
-            Over time, journaling not only helps with productivity but also allows you to recognize your own growth. When you look back, you can see how far you’ve come, and that reflection can serve as inspiration to keep pushing forward.
+              Over time, journaling not only helps with productivity but also
+              allows you to recognize your own growth. When you look back, you
+              can see how far you have come, and that reflection can serve as
+              inspiration to keep pushing forward.
             </h5>
           </div>
         </form>
       </div>
     </main>
-  );
-};
+  );};
 
 export default MainPage;

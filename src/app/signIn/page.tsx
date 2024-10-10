@@ -167,6 +167,15 @@ const SignIn = () => {
                   Sign In
                 </button>
               </div>
+              <span className="flex flex-col">
+                <Link
+                  href="/forget-password"
+                  className="text-blue-500 text-sm mt-2 self-end"
+                >
+                  Forgot Password?
+                </Link>
+              </span>
+
               <div className=" mt-[1.5rem]">
                 <h6 className="text-slate-600 text-center ml-[3rem] text-[12px]">
                   Do not have an account?{" "}
@@ -189,7 +198,14 @@ const SignIn = () => {
             </form>
           </div>
           <div className="flex justify-center items-center gap-[6px] bg-transparent border-2 border-white w-[24rem] h-[2.5rem] rounded-3xl mt-[1.2rem] ml-[3rem]">
-            <Image className="h-[1rem] w-[1rem]" src="/images/Frame.png" width={20} height={20} priority alt="origin" />
+            <Image
+              className="h-[1rem] w-[1rem]"
+              src="/images/Frame.png"
+              width={20}
+              height={20}
+              priority
+              alt="origin"
+            />
             <button
               onClick={() => {
                 HandleGoogle();
