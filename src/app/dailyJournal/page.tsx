@@ -1,11 +1,13 @@
 "use client"; // Ensure client-side rendering
 
 import React, { useEffect, useState, useCallback, useMemo } from "react";
+import dynamic from 'next/dynamic';
 import NavBar from "@/components/NavBar/NavBar";
-import Modal from "@/components/Modal/Modal";
 import Image from "next/image";
 import ConfirmationModal from "@/components/ConfirmatioModal/ConfirmationModal";
 import jsPDF from "jspdf";
+
+const DynamicModal = dynamic(() => import("@/components/Modal/Modal"), { ssr: false });
 
 interface JournalEntry {
   date: string;
@@ -18,17 +20,20 @@ const useLocalStorage = <T,>(
   key: string,
   initialValue: T
 ): [T, (value: T | ((val: T) => T)) => void] => {
-  const [storedValue, setStoredValue] = useState<T>(() => {
-    if (typeof window === "undefined") return initialValue;
+  const [storedValue, setStoredValue] = useState<T>(initialValue);
 
-    try {
-      const item = window.localStorage.getItem(key);
-      return item ? JSON.parse(item) : initialValue;
-    } catch (error) {
-      console.error(error);
-      return initialValue;
+  useEffect(() => {
+    if (typeof window !== "undefined") {
+      try {
+        const item = window.localStorage.getItem(key);
+        if (item) {
+          setStoredValue(JSON.parse(item));
+        }
+      } catch (error) {
+        console.error(error);
+      }
     }
-  });
+  }, [key]);
 
   const setValue = (value: T | ((val: T) => T)) => {
     try {
@@ -54,14 +59,14 @@ const DailyJournal: React.FC = () => {
   );
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
   const [isShareModalOpen, setIsShareModalOpen] = useState(false);
-  const [searchParams, setSearchParams] = useState<URLSearchParams | null>(
-    null
-  );
+  const [searchParams, setSearchParams] = useState<URLSearchParams | null>(null);
 
   useEffect(() => {
-    const currentSearch = window.location.search;
-    if (!searchParams || currentSearch !== searchParams.toString()) {
-      setSearchParams(new URLSearchParams(currentSearch));
+    if (typeof window !== "undefined") {
+      const currentSearch = window.location.search;
+      if (!searchParams || currentSearch !== searchParams.toString()) {
+        setSearchParams(new URLSearchParams(currentSearch));
+      }
     }
   }, [searchParams]);
 
@@ -97,10 +102,7 @@ const DailyJournal: React.FC = () => {
     }
   }, [searchParams, addOrUpdateEntry]);
 
-  const handleDeleteAllEntries = useCallback(
-    () => setIsDeleteModalOpen(true),
-    []
-  );
+  const handleDeleteAllEntries = useCallback(() => setIsDeleteModalOpen(true), []);
   const deleteAllEntries = useCallback(() => {
     setJournalData([]);
     setIsDeleteModalOpen(false);
@@ -115,10 +117,7 @@ const DailyJournal: React.FC = () => {
     [setJournalData]
   );
 
-  const handleShareWeeklyJournal = useCallback(
-    () => setIsShareModalOpen(true),
-    []
-  );
+  const handleShareWeeklyJournal = useCallback(() => setIsShareModalOpen(true), []);
 
   const confirmShareWeeklyJournal = useCallback(() => {
     const today = new Date();
@@ -155,10 +154,7 @@ const DailyJournal: React.FC = () => {
     doc.save(`journal_entry_${entry.date}.pdf`);
   }, []);
 
-  const handleToggleModal = useCallback(
-    () => setModalOpen((prev) => !prev),
-    []
-  );
+  const handleToggleModal = useCallback(() => setModalOpen((prev) => !prev), []);
   const handleCloseModal = useCallback(() => setModalOpen(false), []);
 
   const sortedJournalData = useMemo(
@@ -170,13 +166,15 @@ const DailyJournal: React.FC = () => {
   );
 
   return (
-    <div className="w-full min-h-screen bg-gradient-to-br from-gray-900 to-gray-800">
+    <div className="w-full min-h-screen bg-slate-950">
       <NavBar onToggleModal={handleToggleModal} />
-      <Modal
-        isOpen={isModalOpen}
-        onClose={handleCloseModal}
-        toggleTheme={() => console.log("Theme toggle not implemented")}
-      />
+      {isModalOpen && (
+        <DynamicModal
+          isOpen={isModalOpen}
+          onClose={handleCloseModal}
+          toggleTheme={() => console.log("Theme toggle not implemented")}
+        />
+      )}
       <div className="flex xl:flex-row flex-col justify-center items-start w-full gap-8 p-8">
         <div className="w-full xl:w-1/3 mt-4 xl:mt-0">
           <Image

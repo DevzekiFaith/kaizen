@@ -1,23 +1,27 @@
 // Import the functions you need from the SDKs you need
-import { initializeApp } from "firebase/app";
-import { getAuth } from "firebase/auth";
-import {getFirestore} from"firebase/firestore";
-import { sendPasswordResetEmail } from 'firebase/auth';
+import { getApp, getApps, initializeApp } from "firebase/app";
+import { getAuth, sendPasswordResetEmail } from "firebase/auth";
+import { getFirestore } from "firebase/firestore";
 
 const firebaseConfig = {
-  apiKey: "AIzaSyBtR4VPFdr0KHejcL57b89JAed-DQgi3Ag",
-  authDomain: "kaizen2-app.firebaseapp.com",
-  projectId: "kaizen2-app",
-  storageBucket: "kaizen2-app.appspot.com",
-  messagingSenderId: "766051691651",
-  appId: "1:766051691651:web:b0306eef3f07bbe3347fb6",
+  apiKey: process.env.NEXT_PUBLIC_FIREBASE_API_KEY,
+  authDomain: process.env.NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN,
+  projectId: process.env.NEXT_PUBLIC_FIREBASE_PROJECT_ID,
+  storageBucket: process.env.NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET,
+  messagingSenderId: process.env.NEXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID,
+  appId: process.env.NEXT_PUBLIC_FIREBASE_APP_ID,
 };
 
 // Initialize Firebase
-const app = initializeApp(firebaseConfig);
-export const auth = getAuth(app);
-export { sendPasswordResetEmail };
-export default app;
+const app = getApps().length ? getApp() : initializeApp(firebaseConfig);
+
+// Initialize Firebase services
+const auth = getAuth(app);
 const db = getFirestore(app);
 
-export {db};
+// Export Firebase services and functions
+export { app, auth, db, sendPasswordResetEmail };
+
+// Default export
+const firebaseExports = { app, auth, db };
+export default firebaseExports;
