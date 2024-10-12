@@ -7,12 +7,14 @@ import { usePathname } from "next/navigation";
 import { ModeToggle } from "../Toggle/ModeToggle";
 import { logout } from "../../../utils/auth";
 import NotificationBell from "@/components/NotificationBell/NotificationBell";
+// import Image from "next/image";
 // import NotificationBell from "@/components/"
 
 const navLinks = [
   { name: "home", path: "/" },
   { name: "daily journal", path: "/dailyJournal" },
   { name: "weekly Summary", path: "/weeklySummary" },
+  { name: "dashboard", path: "/dashboard" },
 ];
 
 interface NavBarProps {
@@ -34,7 +36,7 @@ const NavBar: React.FC<NavBarProps> = ({ onToggleModal }) => {
   };
 
   return (
-    <div className="fixed w-full bg-black mt-[-2rem] z-[100]">
+    <div className="fixed w-full bg-black mt-[-1rem] z-[100]">
       <div className="flex justify-between items-center p-[2rem]">
         <div>
           <Link href="/">
@@ -68,7 +70,9 @@ const NavBar: React.FC<NavBarProps> = ({ onToggleModal }) => {
             logout
           </button>
 
-          <div className="rounded-full w-[2.5rem] h-[2.5rem] bg-gray-400 hidden xl:block"></div>
+          <div className="rounded-full w-[2.5rem] h-[2.5rem] bg-gray-400 hidden xl:block">
+            {/* <Image src="" width={50} height={50} alt="Profile" /> */}
+          </div>
           <div>
             <NotificationBell />
           </div>

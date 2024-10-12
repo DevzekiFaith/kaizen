@@ -71,7 +71,7 @@ const MainPage = () => {
           <div>
             <div className="p-[1.5rem] ml-[1.5rem]">
               <Image
-                className=""
+                className=" h-[38rem] w-[20rem]"
                 src="/images/cover14.jpg"
                 width={300}
                 height={300}
@@ -159,16 +159,27 @@ const MainPage = () => {
                       >
                         <option value="choose Your Goal"></option>
                         <option value="Healthy Eating">Healthy Eating</option>
-                        <option value="Healthy Exercise">Healthy Exercise</option>
+                        <option value="Healthy Exercise">
+                          Healthy Exercise
+                        </option>
                         <option value="Reading">Reading</option>
                         <option value="Daily Gratitude">Daily Gratitude</option>
-                        <option value="New Learning-Learning">New Learning-Learning</option>
+                        <option value="New Learning-Learning">
+                          New Learning
+                        </option>
+                        <option value="Continuos Learning">
+                          Continuos Learning
+                        </option>
                         <option value="Meditation">Meditation</option>
-                        <option value="Financial Management">Financial Management</option>
+                        <option value="Financial Management">
+                          Financial Management
+                        </option>
                         <option value="Mindful Habits">Mindful Habits</option>
                         <option value="Creativity">Creativity</option>
                         <option value="Time Management">Time Management</option>
-                        <option value="Emotional Check-in">Emotional Check-in</option>
+                        <option value="Emotional Check-in">
+                          Emotional Check-in
+                        </option>
                         <option value="Hobby Time">Hobby Time</option>
                       </select>
                     </div>
@@ -211,6 +222,7 @@ const MainPage = () => {
         </form>
       </div>
     </main>
-  );};
+  );
+};
 
 export default MainPage;

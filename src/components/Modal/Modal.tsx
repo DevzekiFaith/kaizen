@@ -8,7 +8,8 @@ interface ModalProps {
   toggleTheme: () => void; // Ensure this prop is used if needed
 }
 
-const Modal: React.FC<ModalProps> = ({ isOpen, onClose}) => { // Added toggleTheme to props
+const Modal: React.FC<ModalProps> = ({ isOpen, onClose }) => {
+  // Added toggleTheme to props
   const currentPath = usePathname(); // Get the current path
 
   // Function to check if a given path is the current path
@@ -29,8 +30,11 @@ const Modal: React.FC<ModalProps> = ({ isOpen, onClose}) => { // Added toggleThe
           }`}
         >
           <button
-            onClick={onClose}
-            className="absolute top-2 right-2 text-slate-300 rounded-full p-[12px] transition-transform duration-300 hover:scale-110 hover:bg-orange-600" // Added hover effects
+            onClick={(e) => {
+              e.stopPropagation();
+              onClose();
+            }}
+            className="absolute top-2 right-2 text-slate-300 rounded-full p-[12px] transition-transform duration-300 hover:scale-110 hover:bg-orange-600"
             aria-label="Close modal"
           >
             ✖
@@ -69,6 +73,17 @@ const Modal: React.FC<ModalProps> = ({ isOpen, onClose}) => { // Added toggleThe
                 } hover:text-orange-500`}
               >
                 Weekly Journal
+              </Link>
+            </li>
+
+            <li>
+              <Link
+                href="/dashboard"
+                className={`block ${
+                  isActive("/dashboard") ? "text-orange-500" : "text-slate-400"
+                } hover:text-orange-500`}
+              >
+                Dashboard
               </Link>
             </li>
             <li>

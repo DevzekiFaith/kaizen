@@ -1,160 +1,159 @@
-"use client";
+"use client";  // Ensure client-side rendering
 
-import React, { useEffect, useState, Suspense } from "react";
-import { useSearchParams } from "next/navigation";
+import React, { useEffect, useState, useCallback, useMemo } from "react";
 import NavBar from "@/components/NavBar/NavBar";
 import Modal from "@/components/Modal/Modal";
 import Image from "next/image";
-import jsPDF from 'jspdf';
+import ConfirmationModal from "@/components/ConfirmatioModal/ConfirmationModal";
+import jsPDF from "jspdf";
 
 interface JournalEntry {
-  date?: string;
-  title?: string;
-  content?: string;
-  goal?: string;
+  date: string;
+  title: string;
+  content: string;
+  goal: string;
 }
 
-const JournalContent: React.FC = () => {
-  const searchParams = useSearchParams();
-  const [journalData, setJournalData] = useState<JournalEntry[]>([]);
+const useLocalStorage = <T,>(
+  key: string,
+  initialValue: T
+): [T, (value: T | ((val: T) => T)) => void] => {
+  const [storedValue, setStoredValue] = useState<T>(() => {
+    if (typeof window === "undefined") return initialValue;
 
-  useEffect(() => {
-    const savedData = localStorage.getItem("dailyJournalData");
-    if (savedData) {
-      const parsedData = JSON.parse(savedData);
-      setJournalData(Array.isArray(parsedData) ? parsedData : []);
+    try {
+      const item = window.localStorage.getItem(key);
+      return item ? JSON.parse(item) : initialValue;
+    } catch (error) {
+      console.error(error);
+      return initialValue;
     }
+  });
 
-    const date = searchParams.get("date");
-    const title = searchParams.get("title");
-    const content = searchParams.get("content");
-    const goal = searchParams.get("goal");
-
-    if (date || title || content || goal) {
-      const newJournalData: JournalEntry = {
-        date: date ?? undefined,
-        title: title ?? undefined,
-        content: content ?? undefined,
-        goal: goal ?? undefined,
-      };
-      handleSaveData(newJournalData);
-    }
-  }, [searchParams]);
-
-  const handleSaveData = (data: JournalEntry) => {
-    const existingData = JSON.parse(
-      localStorage.getItem("dailyJournalData") || "[]"
-    );
-    const updatedData = Array.isArray(existingData) ? existingData : [];
-
-    const isDuplicate = updatedData.some(
-      (entry) =>
-        entry.date === data.date &&
-        entry.title === data.title &&
-        entry.content === data.content
-    );
-
-    if (!isDuplicate) {
-      updatedData.push(data);
-      setJournalData(updatedData);
-      localStorage.setItem("dailyJournalData", JSON.stringify(updatedData));
+  const setValue = (value: T | ((val: T) => T)) => {
+    try {
+      const valueToStore = value instanceof Function ? value(storedValue) : value;
+      setStoredValue(valueToStore);
+      if (typeof window !== "undefined") {
+        window.localStorage.setItem(key, JSON.stringify(valueToStore));
+      }
+    } catch (error) {
+      console.error(error);
     }
   };
 
-  const handleDeleteData = (index: number) => {
-    const updatedData = journalData.filter((_, i) => i !== index);
-    setJournalData(updatedData);
-    localStorage.setItem("dailyJournalData", JSON.stringify(updatedData));
-  };
-
-  const handleDeleteAllEntries = () => {
-    setJournalData([]);
-    localStorage.removeItem("dailyJournalData");
-  };
-
-  const handleDownloadPDF = (entry: JournalEntry) => {
-    const doc = new jsPDF();
-    doc.text(`Date: ${entry.date}`, 10, 10);
-    doc.text(`Title: ${entry.title}`, 10, 20);
-    doc.text(`Content: ${entry.content}`, 10, 30);
-    doc.text(`Goal: ${entry.goal}`, 10, 40);
-    doc.save(`journal_entry_${entry.date}.pdf`);
-  };
-
-  return (
-    <div className="grid grid-cols-1 gap-4">
-      {journalData.map((entry, index) => (
-        <div
-          key={index}
-          className="bg-slate-950 shadow-2xl p-4 rounded transform transition-transform duration-300 hover:scale-105"
-        >
-          <p className="text-slate-700 text-[13px]">
-            <strong>Date:</strong> {entry.date}
-          </p>
-          <p className="text-slate-700 text-[13px]">
-            <strong>Title:</strong> {entry.title}
-          </p>
-          <p className="text-slate-700 text-[13px]">
-            <strong>Content:</strong> {entry.content}
-          </p>
-          <p className="text-slate-700 text-[13px]">
-            <strong>Goal:</strong> {entry.goal}
-          </p>
-          <button
-            onClick={() => handleDeleteData(index)}
-            className="mt-2 bg-orange-500 text-white text-[12px] py-1 px-2 rounded-3xl shadow-xl shadow-slate-800"
-          >
-            Delete Entry
-          </button>
-          <button
-            onClick={() => handleDownloadPDF(entry)}
-            className="mt-2 ml-2 bg-blue-500 text-white text-[12px] py-1 px-2 rounded-3xl shadow-xl shadow-slate-800"
-          >
-            Download PDF
-          </button>
-        </div>
-      ))}
-      <button
-        onClick={handleDeleteAllEntries}
-        className="mt-4 bg-[#1a0804] text-slate-500 py-2 px-4 rounded"
-      >
-        Delete All Entries
-      </button>
-    </div>
-  );
+  return [storedValue, setValue];
 };
 
 const DailyJournal: React.FC = () => {
   const [isModalOpen, setModalOpen] = useState(false);
+  const [journalData, setJournalData] = useLocalStorage<JournalEntry[]>(
+    "dailyJournalData",
+    []
+  );
+  const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
+  const [isShareModalOpen, setIsShareModalOpen] = useState(false);
+  const [searchParams, setSearchParams] = useState<URLSearchParams | null>(null);
 
   useEffect(() => {
-    if (Notification.permission !== 'granted') {
-      Notification.requestPermission();
+    const currentSearch = window.location.search;
+    if (!searchParams || currentSearch !== searchParams.toString()) {
+      setSearchParams(new URLSearchParams(currentSearch));
     }
+  }, [searchParams]);
 
-    const checkAndNotify = () => {
-      const lastNotification = localStorage.getItem('lastJournalNotification');
-      const now = new Date();
-      if (!lastNotification || new Date(lastNotification).getDate() !== now.getDate()) {
-        if (Notification.permission === 'granted') {
-          new Notification('Daily Journal Reminder', {
-            body: 'Time to write in your journal!',
-            icon: '/path/to/your/icon.png' // Replace with your icon path
-          });
+  const addOrUpdateEntry = useCallback(
+    (newEntry: JournalEntry) => {
+      setJournalData((prevData) => {
+        const existingEntryIndex = prevData.findIndex(
+          (entry) => entry.date === newEntry.date
+        );
+        if (existingEntryIndex !== -1) {
+          return prevData.map((entry, index) =>
+            index === existingEntryIndex ? newEntry : entry
+          );
+        } else {
+          return [...prevData, newEntry];
         }
-        localStorage.setItem('lastJournalNotification', now.toISOString());
+      });
+    },
+    [setJournalData]
+  );
+
+  useEffect(() => {
+    if (searchParams) {
+      const date = searchParams.get("date");
+      const goal = searchParams.get("goal");
+      const title = searchParams.get("title");
+      const content = searchParams.get("content");
+
+      if (date && goal && title && content) {
+        const newEntry = { date, goal, title, content };
+        addOrUpdateEntry(newEntry);
       }
-    };
+    }
+  }, [searchParams, addOrUpdateEntry]);
 
-    checkAndNotify();
-    const interval = setInterval(checkAndNotify, 86400000); // Check every 24 hours
+  const handleDeleteAllEntries = useCallback(() => setIsDeleteModalOpen(true), []);
+  const deleteAllEntries = useCallback(() => {
+    setJournalData([]);
+    setIsDeleteModalOpen(false);
+  }, [setJournalData]);
 
-    return () => clearInterval(interval);
+  const deleteEntry = useCallback(
+    (date: string) => {
+      setJournalData((prevData) => prevData.filter((entry) => entry.date !== date));
+    },
+    [setJournalData]
+  );
+
+  const handleShareWeeklyJournal = useCallback(() => setIsShareModalOpen(true), []);
+
+  const confirmShareWeeklyJournal = useCallback(() => {
+    const today = new Date();
+    const oneWeekAgo = new Date(today.getTime() - 7 * 24 * 60 * 60 * 1000);
+
+    const weeklyEntries = journalData.filter(
+      (entry) =>
+        new Date(entry.date) >= oneWeekAgo && new Date(entry.date) <= today
+    );
+
+    const subject = encodeURIComponent("Weekly Journal Entries");
+    const body = encodeURIComponent(
+      weeklyEntries
+        .map(
+          (entry) =>
+            `Date: ${entry.date}\nTitle: ${entry.title}\nContent: ${entry.content}\nGoal: ${entry.goal}\n\n`
+        )
+        .join("")
+    );
+
+    const mailtoLink = `mailto:?subject=${subject}&body=${body}`;
+    window.open(mailtoLink, "_blank");
+    setIsShareModalOpen(false);
+  }, [journalData]);
+
+  const downloadPDF = useCallback((entry: JournalEntry) => {
+    const doc = new jsPDF();
+    doc.setFontSize(18);
+    doc.text(entry.title, 20, 20);
+    doc.setFontSize(12);
+    doc.text(`Date: ${entry.date}`, 20, 30);
+    doc.text(`Goal: ${entry.goal}`, 20, 40);
+    doc.text(entry.content, 20, 50);
+    doc.save(`journal_entry_${entry.date}.pdf`);
   }, []);
 
-  const handleToggleModal = () => setModalOpen((prev) => !prev);
+  const handleToggleModal = useCallback(() => setModalOpen((prev) => !prev), []);
+  const handleCloseModal = useCallback(() => setModalOpen(false), []);
 
-  const handleCloseModal = () => setModalOpen(false);
+  const sortedJournalData = useMemo(
+    () =>
+      [...journalData].sort(
+        (a, b) => new Date(b.date).getTime() - new Date(a.date).getTime()
+      ),
+    [journalData]
+  );
 
   return (
     <div className="w-full">
@@ -162,14 +161,12 @@ const DailyJournal: React.FC = () => {
       <Modal
         isOpen={isModalOpen}
         onClose={handleCloseModal}
-        toggleTheme={function (): void {
-          throw new Error("Function not implemented.");
-        }}
+        toggleTheme={() => console.log("Theme toggle not implemented")}
       />
       <div className="flex xl:flex-row flex-col justify-center items-center w-full gap-[2rem] p-[2rem]">
         <div className="w-full mt-[4rem] xl:mt-[-6rem]">
           <Image
-            className="w-[34rem] h-screen transition translate-x-10 duration-10 ease-out "
+            className="w-[34rem] h-screen transition translate-x-10 duration-10 ease-out"
             src="/images/cover26.jpg"
             width={300}
             height={300}
@@ -179,13 +176,56 @@ const DailyJournal: React.FC = () => {
         </div>
         <div className="mx-auto pt-[6rem] p-[1rem] w-full">
           <h1 className="text-2xl font-bold mb-6 text-white">Daily Journal</h1>
-          <Suspense
-            fallback={<p className="text-slate-300">Loading journal data...</p>}
-          >
-            <JournalContent />
-          </Suspense>
+          <div className="grid grid-cols-1 gap-4">
+            {sortedJournalData.map((entry) => (
+              <div key={entry.date} className="bg-gray-800 p-4 rounded-lg">
+                <h2 className="text-xl font-bold text-white">{entry.title}</h2>
+                <p className="text-gray-300">{entry.date}</p>
+                <p className="text-white mt-2">{entry.content}</p>
+                <p className="text-gray-400 mt-2">Goal: {entry.goal}</p>
+                <div className="mt-4 flex justify-end space-x-2">
+                  <button
+                    onClick={() => deleteEntry(entry.date)}
+                    className="bg-red-500 text-white py-1 px-2 rounded"
+                  >
+                    Delete
+                  </button>
+                  <button
+                    onClick={() => downloadPDF(entry)}
+                    className="bg-blue-500 text-white py-1 px-2 rounded"
+                  >
+                    Download PDF
+                  </button>
+                </div>
+              </div>
+            ))}
+            <button
+              onClick={handleDeleteAllEntries}
+              className="mt-4 bg-[#1a0804] text-slate-500 py-2 px-4 rounded"
+            >
+              Delete All Entries
+            </button>
+            <button
+              onClick={handleShareWeeklyJournal}
+              className="bg-slate-500 border bg-transparent rounded-3xl text-white py-2 px-4"
+            >
+              Share Weekly Journal
+            </button>
+          </div>
         </div>
       </div>
+      <ConfirmationModal
+        isOpen={isDeleteModalOpen}
+        onClose={() => setIsDeleteModalOpen(false)}
+        onConfirm={deleteAllEntries}
+        message="Are you sure you want to delete all entries? This action cannot be undone."
+      />
+      <ConfirmationModal
+        isOpen={isShareModalOpen}
+        onClose={() => setIsShareModalOpen(false)}
+        onConfirm={confirmShareWeeklyJournal}
+        message="Are you sure you want to share your weekly journal?"
+      />
     </div>
   );
 };

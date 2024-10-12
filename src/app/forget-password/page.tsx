@@ -5,8 +5,8 @@ import { useForm, SubmitHandler } from "react-hook-form";
 import { sendPasswordResetEmail } from "firebase/auth";
 import { toast } from "react-toastify";
 import Link from "next/link";
-import { auth } from '@/firebase/firebaseConfig';
- // Use the already initialized auth object
+import { auth } from "@/firebase/firebaseConfig";
+// Use the already initialized auth object
 
 type FormValues = {
   email: string;
@@ -81,7 +81,7 @@ const ForgotPassword: React.FC = () => {
             href="/signIn"
             className="text-blue-500 hover:text-blue-600 transition duration-300"
           >
-            Back to SignIn
+            Back to Sign In
           </Link>
         </div>
       </div>
