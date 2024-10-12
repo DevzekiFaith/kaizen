@@ -1,4 +1,4 @@
-"use client";  // Ensure client-side rendering
+"use client"; // Ensure client-side rendering
 
 import React, { useEffect, useState, useCallback, useMemo } from "react";
 import NavBar from "@/components/NavBar/NavBar";
@@ -32,7 +32,8 @@ const useLocalStorage = <T,>(
 
   const setValue = (value: T | ((val: T) => T)) => {
     try {
-      const valueToStore = value instanceof Function ? value(storedValue) : value;
+      const valueToStore =
+        value instanceof Function ? value(storedValue) : value;
       setStoredValue(valueToStore);
       if (typeof window !== "undefined") {
         window.localStorage.setItem(key, JSON.stringify(valueToStore));
@@ -53,7 +54,9 @@ const DailyJournal: React.FC = () => {
   );
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
   const [isShareModalOpen, setIsShareModalOpen] = useState(false);
-  const [searchParams, setSearchParams] = useState<URLSearchParams | null>(null);
+  const [searchParams, setSearchParams] = useState<URLSearchParams | null>(
+    null
+  );
 
   useEffect(() => {
     const currentSearch = window.location.search;
@@ -94,7 +97,10 @@ const DailyJournal: React.FC = () => {
     }
   }, [searchParams, addOrUpdateEntry]);
 
-  const handleDeleteAllEntries = useCallback(() => setIsDeleteModalOpen(true), []);
+  const handleDeleteAllEntries = useCallback(
+    () => setIsDeleteModalOpen(true),
+    []
+  );
   const deleteAllEntries = useCallback(() => {
     setJournalData([]);
     setIsDeleteModalOpen(false);
@@ -102,12 +108,17 @@ const DailyJournal: React.FC = () => {
 
   const deleteEntry = useCallback(
     (date: string) => {
-      setJournalData((prevData) => prevData.filter((entry) => entry.date !== date));
+      setJournalData((prevData) =>
+        prevData.filter((entry) => entry.date !== date)
+      );
     },
     [setJournalData]
   );
 
-  const handleShareWeeklyJournal = useCallback(() => setIsShareModalOpen(true), []);
+  const handleShareWeeklyJournal = useCallback(
+    () => setIsShareModalOpen(true),
+    []
+  );
 
   const confirmShareWeeklyJournal = useCallback(() => {
     const today = new Date();
@@ -144,7 +155,10 @@ const DailyJournal: React.FC = () => {
     doc.save(`journal_entry_${entry.date}.pdf`);
   }, []);
 
-  const handleToggleModal = useCallback(() => setModalOpen((prev) => !prev), []);
+  const handleToggleModal = useCallback(
+    () => setModalOpen((prev) => !prev),
+    []
+  );
   const handleCloseModal = useCallback(() => setModalOpen(false), []);
 
   const sortedJournalData = useMemo(
@@ -156,58 +170,77 @@ const DailyJournal: React.FC = () => {
   );
 
   return (
-    <div className="w-full">
+    <div className="w-full min-h-screen bg-gradient-to-br from-gray-900 to-gray-800">
       <NavBar onToggleModal={handleToggleModal} />
       <Modal
         isOpen={isModalOpen}
         onClose={handleCloseModal}
         toggleTheme={() => console.log("Theme toggle not implemented")}
       />
-      <div className="flex xl:flex-row flex-col justify-center items-center w-full gap-[2rem] p-[2rem]">
-        <div className="w-full mt-[4rem] xl:mt-[-6rem]">
+      <div className="flex xl:flex-row flex-col justify-center items-start w-full gap-8 p-8">
+        <div className="w-full xl:w-1/3 mt-4 xl:mt-0">
           <Image
-            className="w-[34rem] h-screen transition translate-x-10 duration-10 ease-out"
+            className="w-full h-auto object-cover rounded-2xl shadow-2xl transition-transform duration-300 hover:scale-105"
             src="/images/cover26.jpg"
-            width={300}
-            height={300}
+            width={500}
+            height={700}
             priority
             alt="dark-cover"
           />
         </div>
-        <div className="mx-auto pt-[6rem] p-[1rem] w-full">
-          <h1 className="text-2xl font-bold mb-6 text-white">Daily Journal</h1>
-          <div className="grid grid-cols-1 gap-4">
+        <div className="w-full xl:w-2/3">
+          <h1 className="text-4xl font-bold mb-8 text-white text-center xl:text-left">
+            Daily Journal
+          </h1>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             {sortedJournalData.map((entry) => (
-              <div key={entry.date} className="bg-gray-800 p-4 rounded-lg">
-                <h2 className="text-xl font-bold text-white">{entry.title}</h2>
-                <p className="text-gray-300">{entry.date}</p>
-                <p className="text-white mt-2">{entry.content}</p>
-                <p className="text-gray-400 mt-2">Goal: {entry.goal}</p>
-                <div className="mt-4 flex justify-end space-x-2">
+              <div
+                key={entry.date}
+                className="bg-white bg-opacity-10 backdrop-filter backdrop-blur-lg p-6 rounded-xl shadow-lg 
+                         hover:shadow-xl transition-all duration-300 border border-gray-200 border-opacity-20
+                         transform hover:-translate-y-2 hover:scale-105"
+              >
+                <h2 className="text-2xl font-bold text-white mb-2">
+                  {entry.title}
+                </h2>
+                <p className="text-gray-300 text-sm mb-3">{entry.date}</p>
+                <p className="text-gray-100 mt-2 mb-4 line-clamp-3">
+                  {entry.content}
+                </p>
+                <p className="text-gray-400 mt-2 mb-4 text-sm">
+                  Goal: {entry.goal}
+                </p>
+                <div className="mt-4 flex justify-end space-x-3">
                   <button
                     onClick={() => deleteEntry(entry.date)}
-                    className="bg-red-500 text-white py-1 px-2 rounded"
+                    className="bg-transparent border text-white py-2 px-4 rounded-full hover:bg-red-600 
+                             transition-all duration-300 text-sm transform hover:scale-110"
                   >
                     Delete
                   </button>
                   <button
                     onClick={() => downloadPDF(entry)}
-                    className="bg-blue-500 text-white py-1 px-2 rounded"
+                    className="bg-transparent border text-white py-2 px-4 rounded-full hover:bg-blue-600 
+                             transition-all duration-300 text-sm transform hover:scale-110"
                   >
                     Download PDF
                   </button>
                 </div>
               </div>
             ))}
+          </div>
+          <div className="flex justify-center space-x-4 mt-8">
             <button
               onClick={handleDeleteAllEntries}
-              className="mt-4 bg-[#1a0804] text-slate-500 py-2 px-4 rounded"
+              className="bg-transparent border text-white py-2 px-6 rounded-full hover:bg-red-600 
+                       transition-all duration-300 transform hover:scale-105"
             >
               Delete All Entries
             </button>
             <button
               onClick={handleShareWeeklyJournal}
-              className="bg-slate-500 border bg-transparent rounded-3xl text-white py-2 px-4"
+              className="bg-transparent border text-white py-2 px-6 rounded-full hover:bg-green-600 
+                       transition-all duration-300 transform hover:scale-105"
             >
               Share Weekly Journal
             </button>
