@@ -1,4 +1,9 @@
 /** @type {import('next').NextConfig} */
-const nextConfig = {};
+const nextConfig = {
+    images: {
+        domains: ["kaizen-chi.vercel.app"], // Add any domains you use for hosting images.
+        formats: ["image/avif", "image/webp"],
+    },
+};
 
 export default nextConfig;

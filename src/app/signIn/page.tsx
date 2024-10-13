@@ -201,10 +201,10 @@ const SignIn = () => {
             <Image
               className="h-[1rem] w-[1rem]"
               src="/images/Frame.png"
-              width={20}
-              height={20}
-              priority
-              alt="origin"
+              width={48}
+              height={48}
+              unoptimized={true}
+              alt="Frame"
             />
             <button
               onClick={() => {

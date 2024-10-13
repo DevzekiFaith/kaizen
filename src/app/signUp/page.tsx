@@ -235,7 +235,7 @@ const SignUp = () => {
             </form>
           </div>
           <div className="flex justify-center items-center gap-[6px] bg-transparent border-2 border-white w-[24rem] h-[2.5rem] rounded-3xl mt-[1.2rem] ml-[3rem]">
-            <Image src="/images/Frame.png" width={20} height={20} alt="origin" />
+            <Image src="/images/Frame.png" width={48} height={48} alt="Frame" unoptimized={true} />
             <button
               onClick={() => {
                 HandleGoogle();

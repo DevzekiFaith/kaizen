@@ -1,0 +1,40 @@
+{
+    "version": 2,
+    "builds": [{
+        "src": "next.config.js",
+        "use": "@vercel/next"
+    }],
+    "rewrites": [{
+        "source": "/api/:path*",
+        "destination": "/api/:path*"
+    }],
+    "headers": [{
+        "source": "/(.*)",
+        "headers": [{
+            "key": "Cache-Control",
+            "value": "public, max-age=0, must-revalidate"
+        }]
+    }],
+    "redirects": [{
+        "source": "/old-route",
+        "destination": "/new-route",
+        "permanent": true
+    }],
+    "routes": [{
+        "src": "/_next/image",
+        "dest": "/_next/image"
+    }],
+    "images": {
+        "domains": ["kaizen-chi.vercel.app"],
+        "minimumCacheTTL": 60
+    },
+    "env": {
+        "NEXT_PUBLIC_API_URL": "https://your-api-url.com"
+    },
+    "functions": {
+        "api/**/*.js": {
+            "memory": 512,
+            "maxDuration": 10
+        }
+    }
+}
