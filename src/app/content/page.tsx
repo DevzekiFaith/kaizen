@@ -9,6 +9,7 @@ import NavBar from "@/components/NavBar/NavBar";
 import { FaArrowUpRightFromSquare } from "react-icons/fa6";
 import { useRouter } from "next/navigation";
 import Modal from "@/components/Modal/Modal"; // Import useRouter for navigation
+import Cover14 from "../../../Public/images/cover14.jpg";
 
 type FormValues = {
   date: string;
@@ -72,10 +73,11 @@ const MainPage = () => {
             <div className="p-[1.5rem] ml-[1.5rem]">
               <Image
                 className=" h-[38rem] w-[20rem]"
-                src="/images/cover14.jpg"
+                src={Cover14}
                 width={300}
                 height={300}
                 alt="Poster"
+                placeholder="blur"
               />
             </div>
             {/* <div className="p-[1.5rem] ml-[1.5rem]">

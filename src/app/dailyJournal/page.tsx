@@ -6,6 +6,7 @@ import NavBar from "@/components/NavBar/NavBar";
 import Image from "next/image";
 import ConfirmationModal from "@/components/ConfirmatioModal/ConfirmationModal";
 import jsPDF from "jspdf";
+import Cover26 from "../../../Public/images/cover26.jpg";
 
 const DynamicModal = dynamic(() => import("@/components/Modal/Modal"), { ssr: false });
 
@@ -179,11 +180,11 @@ const DailyJournal: React.FC = () => {
         <div className="w-full xl:w-1/3 mt-4 xl:mt-0">
           <Image
             className="w-full h-auto object-cover rounded-2xl shadow-2xl transition-transform duration-300 hover:scale-105"
-            src="/images/cover26.jpg"
+            src={Cover26}
             width={500}
             height={700}
-            priority
-            alt="dark-cover"
+            placeholder="blur"
+            alt="Cover-Cover"
           />
         </div>
         <div className="w-full xl:w-2/3">

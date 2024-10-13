@@ -15,6 +15,8 @@ import { useRouter } from "next/navigation";
 import { ToastContainer, Zoom, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import { Eye, EyeOff } from "lucide-react"; // Import eye icons
+import Cover10 from "../../../Public/images/cover10.jpg";
+import Frame from "../../../Public/images/Frame.png"
 
 type FormValues = {
   email: string;
@@ -87,11 +89,11 @@ const SignIn = () => {
         <div>
           <Image
             className="w-[28rem] h-screen"
-            src="/images/cover10.jpg"
+            src={Cover10}
             width={300}
             height={300}
-            priority
-            alt="login"
+            placeholder="blur"
+            alt="Cover"
           />
         </div>
         <div>
@@ -200,10 +202,10 @@ const SignIn = () => {
           <div className="flex justify-center items-center gap-[6px] bg-transparent border-2 border-white w-[24rem] h-[2.5rem] rounded-3xl mt-[1.2rem] ml-[3rem]">
             <Image
               className="h-[1rem] w-[1rem]"
-              src="/images/Frame.png"
+              src={Frame}
               width={48}
               height={48}
-              unoptimized={true}
+             placeholder="blur"
               alt="Frame"
             />
             <button

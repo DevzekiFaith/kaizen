@@ -18,6 +18,9 @@ import { onAuthStateChanged } from "firebase/auth";
 import { FirebaseError } from "firebase/app";
 import { ToastContainer, Zoom, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
+import Cover12 from "../../../Public/images/cover12.jpg";
+import Frame from "../../../Public/images/Frame.png";
+
 
 async function addDataToFireStore(name: string, email: string) {
   try {
@@ -111,11 +114,12 @@ const SignUp = () => {
         <div>
           <Image
             className="w-[28rem] h-screen"
-            src="/images/cover12.jpg"
+            src={Cover12}
             priority
             width={300}
             height={300}
-            alt="login"
+            alt="cover"
+            placeholder="blur"
           />
         </div>
         <div className="mt-[5rem]">
@@ -183,12 +187,18 @@ const SignUp = () => {
                       type="button"
                       onClick={togglePasswordVisibility}
                       className="absolute right-2 top-2"
-                      aria-label={showPassword ? "Hide password" : "Show password"}
+                      aria-label={
+                        showPassword ? "Hide password" : "Show password"
+                      }
                     >
                       {showPassword ? (
-                        <span className="text-slate-300 w-[18px] h-[18px]">👁️</span> // Open eye icon
+                        <span className="text-slate-300 w-[18px] h-[18px]">
+                          👁️
+                        </span> // Open eye icon
                       ) : (
-                        <span className="text-slate-300 w-[28px] h-[28px]">👁️‍🗨️</span> // Closed eye icon
+                        <span className="text-slate-300 w-[28px] h-[28px]">
+                          👁️‍🗨️
+                        </span> // Closed eye icon
                       )}
                     </button>
                   </div>
@@ -235,7 +245,13 @@ const SignUp = () => {
             </form>
           </div>
           <div className="flex justify-center items-center gap-[6px] bg-transparent border-2 border-white w-[24rem] h-[2.5rem] rounded-3xl mt-[1.2rem] ml-[3rem]">
-            <Image src="/images/Frame.png" width={48} height={48} alt="Frame" unoptimized={true} />
+            <Image
+              src={Frame}
+              width={48}
+              height={48}
+              alt="Frame"
+              placeholder="blur"
+            />
             <button
               onClick={() => {
                 HandleGoogle();
@@ -265,6 +281,6 @@ const SignUp = () => {
       </div>
     </div>
   );
-};
 
+};
 export default SignUp;

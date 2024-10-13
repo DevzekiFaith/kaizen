@@ -9,12 +9,11 @@ import {
 } from "react-icons/io";
 import { FaUser } from "react-icons/fa";
 import { FaLaughWink } from "react-icons/fa";
+import Cover32 from "../../Public/images/cover32.jpg";
+import Cover28 from "../../Public/images/cover28.jpg";
+import Cover31 from "../../Public/images/cover31.jpg";
 
-const images = [
-  "/images/cover32.jpg",
-  "/images/cover28.jpg",
-  "/images/cover31.jpg",
-];
+const images = [Cover32, Cover28, Cover31];
 
 const inspirations = [
   "What are you grateful for today?",
@@ -73,7 +72,7 @@ const Home = () => {
           alt="Welcome"
           width={600}
           height={400}
-          priority
+          placeholder="blur"
           className="rounded-lg shadow-lg transition-transform duration-500"
         />
         <button
