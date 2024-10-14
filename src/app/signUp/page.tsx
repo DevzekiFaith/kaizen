@@ -18,8 +18,8 @@ import { onAuthStateChanged } from "firebase/auth";
 import { FirebaseError } from "firebase/app";
 import { ToastContainer, Zoom, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
-import Cover12 from "../../../public/images/cover12.jpg"
-import Frame from "../../../public/images/Frame.png"
+// import Cover12 from "../../../public/images/cover12.jpg"
+// import Frame from "../../../public/images/Frame.png"
 
 async function addDataToFireStore(name: string, email: string) {
   try {
@@ -113,7 +113,7 @@ const SignUp = () => {
         <div>
           <Image
             className="w-[28rem] h-screen"
-            src={Cover12}
+            src="/public/images/cover12.jpg"
             width={300}
             height={300}
             alt="cover"
@@ -244,7 +244,7 @@ const SignUp = () => {
           </div>
           <div className="flex justify-center items-center gap-[6px] bg-transparent border-2 border-white w-[24rem] h-[2.5rem] rounded-3xl mt-[1.2rem] ml-[3rem]">
             <Image
-              src={Frame}
+              src="/public/images/Frame.png"
               width={48}
               height={48}
               alt="Frame"
