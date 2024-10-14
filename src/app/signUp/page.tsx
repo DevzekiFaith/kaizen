@@ -117,7 +117,7 @@ const SignUp = () => {
             width={300}
             height={300}
             alt="cover"
-            placeholder="blur"
+            // placeholder="blur"
           />
         </div>
         <div className="mt-[5rem]">

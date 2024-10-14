@@ -94,7 +94,7 @@ const SignIn = () => {
             src={Cover10}
             width={300}
             height={300}
-            placeholder="blur"
+            // placeholder="blur"
             alt="Cover"
           />
         </div>
