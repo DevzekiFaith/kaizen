@@ -249,6 +249,7 @@ const SignUp = () => {
               height={48}
               alt="Frame"
               placeholder="blur"
+              className="w-[20px] h-[20px]"
             />
             <button
               onClick={() => {
