@@ -18,8 +18,8 @@ import { onAuthStateChanged } from "firebase/auth";
 import { FirebaseError } from "firebase/app";
 import { ToastContainer, Zoom, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
-import Cover12 from "../../../public/images/cover12.jpg";
-import Frame from "../../../public/images/Frame.png";
+import Cover12 from "../../../public/images/cover12.jpg"
+import Frame from "../../../public/images/Frame.png"
 
 async function addDataToFireStore(name: string, email: string) {
   try {

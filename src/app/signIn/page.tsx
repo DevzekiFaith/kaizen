@@ -15,8 +15,8 @@ import { useRouter } from "next/navigation";
 import { ToastContainer, Zoom, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import { Eye, EyeOff } from "lucide-react"; // Import eye icons
-import Cover10 from "../../../public/images/cover10.jpg";
-import Framer from "../../../public/images/Frame.png";
+import Cover10 from "../../../public/images/cover10.jpg"
+import Framer from "../../../public/images/Frame.png"
 
 
 
