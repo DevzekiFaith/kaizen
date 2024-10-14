@@ -4,6 +4,7 @@ import React, { useState, useEffect } from "react";
 import NavBar from "@/components/NavBar/NavBar";
 import Modal from "@/components/Modal/Modal";
 import Image from "next/image";
+import Cover23 from "../../../Public/images/cover23.jpg"
 
 interface JournalEntry {
   date: string;
@@ -67,7 +68,7 @@ const WeeklySummaryPage: React.FC = () => {
         <div className="p-[1.5rem] w-full">
           <Image
             className="h-screen w-[26rem] object-cover"
-            src="/images/cover23.jpg"
+            src={Cover23}
             width={500}
             height={500}
             alt="Weekly Summary Cover"
