@@ -16,7 +16,7 @@ import { ToastContainer, Zoom, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import { Eye, EyeOff } from "lucide-react"; // Import eye icons
 import Cover10 from "../../../public/images/cover10.jpg";
-import Frame from "../../../public/images/Frame.png";
+import Framer from "../../../public/images/Frame.png";
 
 
 
@@ -204,11 +204,11 @@ const SignIn = () => {
           <div className="flex justify-center items-center gap-[6px] bg-transparent border-2 border-white w-[24rem] h-[2.5rem] rounded-3xl mt-[1.2rem] ml-[3rem]">
             <Image
               className="h-[1rem] w-[1rem]"
-              src={Frame}
+              src={Framer}
               width={48}
               height={48}
              placeholder="blur"
-              alt="Frame"
+              alt="Frammer"
             />
             <button
               onClick={() => {
