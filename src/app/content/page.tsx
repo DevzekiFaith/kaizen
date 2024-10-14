@@ -4,7 +4,7 @@
 import React, { useState } from "react";
 import { useForm, SubmitHandler } from "react-hook-form"; // Correct for v7+
 import Image from "next/image";
-import TimeTracker from "@/components/Time-Tracker/Time-Tracker";
+// import TimeTracker from "@/components/Time-Tracker/Time-Tracker";
 import NavBar from "@/components/NavBar/NavBar";
 import { FaArrowUpRightFromSquare } from "react-icons/fa6";
 import { useRouter } from "next/navigation";
@@ -188,9 +188,9 @@ const MainPage = () => {
                   </div>
                 </div>
               </div>
-              <div className="mt-[1rem]">
+              {/* <div className="mt-[1rem]">
                 <TimeTracker />
-              </div>
+              </div> */}
             </span>
             <span className="flex flex-col">
               <label htmlFor="">Content</label>
