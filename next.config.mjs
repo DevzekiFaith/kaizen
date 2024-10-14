@@ -1,7 +1,15 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
     images: {
-        domains: ["kaizen-chi.vercel.app", "https://www.pinterest.com/"], // Add any domains you use for hosting images.
+        remotePatterns: [{
+                protocol: 'https',
+                hostname: 'kaizen-chi.vercel.app',
+            },
+            {
+                protocol: 'https',
+                hostname: 'www.pinterest.com',
+            },
+        ],
         formats: ["image/avif", "image/webp"],
     },
 };
