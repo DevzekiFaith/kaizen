@@ -15,8 +15,9 @@ import { useRouter } from "next/navigation";
 import { ToastContainer, Zoom, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import { Eye, EyeOff } from "lucide-react"; // Import eye icons
-import Cover10 from "../../../Public/images/cover10.jpg";
-import Frame from "../../../Public/images/Frame.png"
+import Cover10 from "@/public/images/cover12.jpg";
+import Frame from "@/public/images/Frame.png";
+
 
 type FormValues = {
   email: string;
