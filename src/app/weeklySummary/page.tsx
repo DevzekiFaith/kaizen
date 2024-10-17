@@ -18,6 +18,14 @@ const WeeklySummaryPage: React.FC = () => {
   const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
   const [weeklyGoalProgress, setWeeklyGoalProgress] = useState<number>(0);
 
+  const calculateProgress = (entries: JournalEntry[]) => {
+    const totalEntries = entries.length;
+    const entriesWithGoals = entries.filter(
+      (entry: JournalEntry) => entry.goal === "true"
+    ).length;
+    return totalEntries > 0 ? Math.round((entriesWithGoals / totalEntries) * 100) : 0;
+  };
+
   useEffect(() => {
     const storedEntries: JournalEntry[] = JSON.parse(
       localStorage.getItem("journalEntries") || "[]"
@@ -35,23 +43,22 @@ const WeeklySummaryPage: React.FC = () => {
     );
 
     setJournalEntries(weekEntries);
-
-    const totalEntries: number = weekEntries.length;
-    const entriesWithGoals: number = weekEntries.filter(
-      (entry: JournalEntry) => entry.goal.trim() !== ""
-    ).length;
-    setWeeklyGoalProgress(
-      Math.round((entriesWithGoals / totalEntries) * 100) || 0
-    );
+    setWeeklyGoalProgress(calculateProgress(weekEntries));
   }, []);
 
-  const handleToggleModal = (): void => {
-    setIsModalOpen((prev: boolean) => !prev);
+  useEffect(() => {
+    const progress = calculateProgress(journalEntries);
+    setWeeklyGoalProgress(progress);
+    console.log("Weekly Goal Progress:", progress);
+  }, [journalEntries]);
+
+  const handleToggleModal = () => {
+    setIsModalOpen(prevState => !prevState);
   };
 
-  const toggleTheme = (): void => {
-    // Implement theme toggle logic here
-  };
+  function toggleTheme(): void {
+    throw new Error("Function not implemented.");
+  }
 
   return (
     <div className="bg-black min-h-screen w-full">
@@ -103,7 +110,7 @@ const WeeklySummaryPage: React.FC = () => {
                     <strong>Content:</strong> {entry.content}
                   </p>
                   <p className="text-gray-700">
-                    <strong>Goal:</strong> {entry.goal || "No goal set"}
+                    <strong>Goal:</strong> {entry.goal === "true" ? "Set" : "Not set"}
                   </p>
                 </div>
               ))

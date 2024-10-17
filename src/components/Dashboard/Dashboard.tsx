@@ -22,23 +22,23 @@ ChartJS.register(
 );
 
 interface JournalEntry {
-  date?: string;
-  title?: string;
-  content?: string;
-  goal?: string;
+  date: string;
+  title: string;
+  content: string;
+  goal: string;
 }
 
 const Dashboard: React.FC = () => {
-  const [journalData, setJournalData] = useState<JournalEntry[]>([]);
   const [entriesThisWeek, setEntriesThisWeek] = useState(0);
   const [totalEntries, setTotalEntries] = useState(0);
   const [streak, setStreak] = useState(0);
+  const [weeklyEntries, setWeeklyEntries] = useState<number[]>([0, 0, 0, 0, 0, 0, 0]);
 
   const calculateEntriesThisWeek = (data: JournalEntry[]) => {
     const oneWeekAgo = new Date();
     oneWeekAgo.setDate(oneWeekAgo.getDate() - 7);
     const recentEntries = data.filter(
-      (entry) => new Date(entry.date!) >= oneWeekAgo
+      (entry) => new Date(entry.date) >= oneWeekAgo
     );
     setEntriesThisWeek(recentEntries.length);
   };
@@ -49,11 +49,11 @@ const Dashboard: React.FC = () => {
     let lastDate: Date | null = null;
 
     data.sort(
-      (a, b) => new Date(b.date!).getTime() - new Date(a.date!).getTime()
+      (a, b) => new Date(b.date).getTime() - new Date(a.date).getTime()
     );
 
     data.forEach((entry) => {
-      const entryDate = new Date(entry.date!);
+      const entryDate = new Date(entry.date);
       if (lastDate === null || isConsecutiveDay(lastDate, entryDate)) {
         currentStreak++;
         maxStreak = Math.max(maxStreak, currentStreak);
@@ -72,23 +72,32 @@ const Dashboard: React.FC = () => {
     return diffDays === 1;
   };
 
+  const groupEntriesByDayOfWeek = (data: JournalEntry[]) => {
+    const daysOfWeek = [0, 0, 0, 0, 0, 0, 0];
+    data.forEach((entry) => {
+      const dayIndex = new Date(entry.date).getDay();
+      daysOfWeek[dayIndex]++;
+    });
+    setWeeklyEntries(daysOfWeek);
+  };
+
   useEffect(() => {
-    const savedData = localStorage.getItem("dailyJournalData");
+    const savedData = localStorage.getItem("journalEntries");
     if (savedData) {
       const parsedData: JournalEntry[] = JSON.parse(savedData);
-      setJournalData(parsedData);
       setTotalEntries(parsedData.length);
       calculateEntriesThisWeek(parsedData);
       calculateStreak(parsedData);
+      groupEntriesByDayOfWeek(parsedData);
     }
   }, [calculateStreak]);
 
   const chartData = {
-    labels: ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"],
+    labels: ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"],
     datasets: [
       {
         label: "Entries This Week",
-        data: journalData.slice(0, 7).map((entry) => (entry.content ? 1 : 0)),
+        data: weeklyEntries,
         borderColor: "rgb(75, 192, 192)",
         tension: 0.1,
       },

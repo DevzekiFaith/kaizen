@@ -1,27 +1,32 @@
 "use client";
-// import React from 'react'
 
-import React, { useState } from "react";
-import { useForm, SubmitHandler } from "react-hook-form"; // Correct for v7+
+import React, { useState, useEffect } from "react";
+import { useForm, SubmitHandler } from "react-hook-form";
 import Image from "next/image";
-// import TimeTracker from "@/components/Time-Tracker/Time-Tracker";
 import NavBar from "@/components/NavBar/NavBar";
 import { FaArrowUpRightFromSquare } from "react-icons/fa6";
 import { useRouter } from "next/navigation";
-import Modal from "@/components/Modal/Modal"; // Import useRouter for navigation
+import Modal from "@/components/Modal/Modal";
 import Cover14 from "../../../Public/images/cover14.jpg";
+import Badge from "@/components/Badge/Badge";
+import Link from "next/link";
 
-type FormValues = {
+interface FormValues {
   date: string;
   title: string;
   content: string;
   goal: string;
-};
+  weeklySummary: string;
+}
 
 const MainPage = () => {
   const router = useRouter();
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isDarkTheme, setIsDarkTheme] = useState(false);
+  const [milestones, setMilestones] = useState<string[]>([]);
+  const [dailyShareImage, setDailyShareImage] = useState<string>("");
+  const [weeklyShareImage, setWeeklyShareImage] = useState<string>("");
+  const [imagesReady, setImagesReady] = useState(false);
 
   const toggleModal = () => setIsModalOpen(!isModalOpen);
   const toggleTheme = () => setIsDarkTheme(!isDarkTheme);
@@ -33,16 +38,163 @@ const MainPage = () => {
     formState: { errors },
   } = useForm<FormValues>();
 
-  const onSubmit: SubmitHandler<FormValues> = (data) => {
+  useEffect(() => {
+    if (typeof window !== "undefined") {
+      Notification.requestPermission();
+    }
+  }, []);
+
+  const notifyMilestone = (milestone: string): void => {
+    if (
+      typeof window !== "undefined" &&
+      Notification.permission === "granted"
+    ) {
+      new Notification(`Milestone Reached: ${milestone}`);
+    }
+  };
+
+  const checkMilestones = (data: FormValues): void => {
+    const newMilestones: string[] = [];
+    if (data.content.length > 100) {
+      newMilestones.push("100+ characters");
+      notifyMilestone("100+ characters");
+    }
+    if (data.goal === "true") {
+      newMilestones.push("Goal set");
+      notifyMilestone("Goal set");
+    }
+    if (data.content.length > 500) newMilestones.push("500 words written");
+    if (data.weeklySummary.length > 200)
+      newMilestones.push("Detailed weekly summary");
+    setMilestones(newMilestones);
+  };
+
+  const generateShareableImage = async (
+    data: FormValues,
+    isWeekly = false
+  ): Promise<string> => {
+    const canvas = document.createElement("canvas");
+    canvas.width = 800;
+    canvas.height = 600;
+    const ctx = canvas.getContext("2d");
+
+    if (!ctx) {
+      throw new Error("Could not get canvas context");
+    }
+
+    ctx.fillStyle = "#f0f0f0";
+    ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+    ctx.font = "24px Arial";
+    ctx.fillStyle = "black";
+
+    ctx.fillText(isWeekly ? "Weekly Summary" : "Daily Goals", 50, 50);
+
+    const content = isWeekly ? data.weeklySummary : data.content;
+    const lines = content.split("\n");
+    lines.forEach((line, index) => {
+      ctx.fillText(line, 50, 100 + index * 30);
+    });
+
+    return canvas.toDataURL();
+  };
+
+  const onSubmit: SubmitHandler<FormValues> = async (data) => {
     console.log(data);
+    checkMilestones(data);
+
+    const storedEntries = JSON.parse(
+      localStorage.getItem("journalEntries") || "[]"
+    );
+    storedEntries.push(data);
+    localStorage.setItem("journalEntries", JSON.stringify(storedEntries));
+
+    const dailyImage = await generateShareableImage(data);
+    const weeklyImage = await generateShareableImage(data, true);
+
+    setDailyShareImage(dailyImage);
+    setWeeklyShareImage(weeklyImage);
+    setImagesReady(true);
+
+    console.log("Daily image URL:", dailyImage);
+    console.log("Weekly image URL:", weeklyImage);
+
     reset();
-    alert("just Dropped my Schedule for the Day! SUPER-EXCITED");
-    // Moved reset inside onSubmit
-    const queryString = new URLSearchParams(data).toString();
+    alert("Just Dropped my Schedule for the Day! SUPER-EXCITED");
+    const queryString = new URLSearchParams(
+      Object.entries(data).reduce((acc, [key, value]) => {
+        acc[key] = String(value);
+        return acc;
+      }, {} as Record<string, string>)
+    ).toString();
     router.push(`/dailyJournal?${queryString}`);
   };
+
+  // const shareToSocialMedia = (imageUrl: string, type: "daily" | "weekly") => {
+  //   const message =
+  //     type === "daily"
+  //       ? "Check out my daily goals!"
+  //       : "Here's my weekly summary!";
+  //   const url = `https://twitter.com/intent/tweet?text=${encodeURIComponent(
+  //     message
+  //   )}&url=${encodeURIComponent(imageUrl)}`;
+  //   window.open(url, "_blank");
+  // };
+
+  const downloadImage = (imageUrl: string, fileName: string) => {
+    const link = document.createElement("a");
+    link.href = imageUrl;
+    link.download = fileName;
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+  };
+
+  const ShareButtons = ({
+    dailyImage,
+    weeklyImage,
+  }: {
+    dailyImage: string;
+    weeklyImage: string;
+  }) => (
+    <div className="mt-4 mb-5 bg-transparent flex justify-center items-center">
+      {/* <button
+        onClick={() => shareToSocialMedia(dailyImage, "daily")}
+        className="bg-transparent border rounded-2xl text-[10px] text-slate-600 px-4 py-2 mr-2"
+        disabled={!dailyImage || !imagesReady}
+      >
+        Share Daily Goals
+      </button>
+      <button
+        onClick={() => shareToSocialMedia(weeklyImage, "weekly")}
+        className="bg-transparent border rounded-2xl px-4 py-2 text-[10px] text-slate-600 mr-2"
+        disabled={!weeklyImage || !imagesReady}
+      >
+        Share Weekly Summary
+      </button> */}
+      <button
+        onClick={() =>
+          dailyImage && downloadImage(dailyImage, "daily-goals.png")
+        }
+        className="bg-transparent border rounded-2xl text-[10px] text-slate-600 px-4 py-2 mr-2"
+        disabled={!dailyImage || !imagesReady}
+      >
+        Download Daily Goals
+      </button>
+      <button
+        onClick={() =>
+          weeklyImage && downloadImage(weeklyImage, "weekly-summary.png")
+        }
+        className="bg-transparent border rounded-2xl px-4 py-2 text-[10px] text-slate-600"
+        disabled={!weeklyImage || !imagesReady}
+      >
+        Download Weekly Summary
+      </button>
+    </div>
+  );
+
   return (
-    <main>
+    <main className="">
       <div>
         <NavBar onToggleModal={toggleModal} />
       </div>
@@ -57,7 +209,6 @@ const MainPage = () => {
         <div>
           <div className="border-4 border-slate-700 rounded-xl p-[1rem]">
             {" "}
-            {/* Fixed typo here */}
             <h1 className="p-[4px] xl:w-[400px] dark:text-slate-800 text-slate-600 text-[12px]">
               Journaling your daily progress helps you see how far you have come
               and what you still need to work on. It allows you to break down
@@ -80,15 +231,6 @@ const MainPage = () => {
                 placeholder="blur"
               />
             </div>
-            {/* <div className="p-[1.5rem] ml-[1.5rem]">
-            <Image
-              className=""
-              src="/images/og.png"
-              width={300}
-              height={300}
-              alt="Poster"
-            />
-          </div> */}
           </div>
         </div>
         <form onSubmit={handleSubmit(onSubmit)}>
@@ -109,9 +251,8 @@ const MainPage = () => {
             </span>
             <span className="flex justify-start items-center mb-[1rem] gap-[1rem]">
               <label className="text-slate-600 text-[12px]">Goal</label>{" "}
-              {/* Added htmlFor */}
               <input
-                id="goal" // Added id for accessibility
+                id="goal"
                 className="text-white text-[12px] p-[8px] rounded-full accent-orange-500"
                 type="checkbox"
                 placeholder="goals"
@@ -157,7 +298,6 @@ const MainPage = () => {
                         id="Activities"
                         name="Progress Work"
                         title="Progress Work"
-                        // size={3}
                       >
                         <option value="choose Your Goal"></option>
                         <option value="Healthy Eating">Healthy Eating</option>
@@ -188,9 +328,6 @@ const MainPage = () => {
                   </div>
                 </div>
               </div>
-              {/* <div className="mt-[1rem]">
-                <TimeTracker />
-              </div> */}
             </span>
             <span className="flex flex-col">
               <label htmlFor="">Content</label>
@@ -205,10 +342,26 @@ const MainPage = () => {
                 </p>
               )}
             </span>
+
+            <span className="flex flex-col mb-[1.5rem]">
+              <label className="text-slate-500 text-[12px] mb-[2rem]">
+                Weekly Goal Summary
+              </label>
+              <textarea
+                className="text-slate-400 text-[12px] p-[8px] rounded-2xl h-[5rem]"
+                placeholder="Summarize your week's goal"
+                {...register("weeklySummary", { required: true })}
+              />
+              {errors.weeklySummary?.type === "required" && (
+                <p className="text-red-500 text-[10px]" role="alert">
+                  Weekly summary is required
+                </p>
+              )}
+            </span>
           </div>
           <button
             type="submit"
-            className="flex  justify-center gap-[1.5rem]  items-center bg-transparent border border-slate-800 p-[3px] mt-[2rem] xl:w-[24rem] rounded-full h-[2.5rem] font-extrabold w-[16rem] text-orange-500 hover:translate-x-5"
+            className="flex justify-center gap-[1.5rem] items-center bg-transparent border border-slate-800 p-[3px] mt-[2rem] xl:w-[24rem] rounded-full h-[2.5rem] font-extrabold w-[16rem] text-orange-500 hover:translate-x-5"
           >
             Lets Go!{" "}
             <FaArrowUpRightFromSquare className="text-slate-800 translate-x-3 cursor-pointer hover:translate-x-6" />
@@ -222,6 +375,25 @@ const MainPage = () => {
             </h5>
           </div>
         </form>
+      </div>
+      <div className="mt-4">
+        {milestones.map((milestone, index) => (
+          <Badge key={index} milestone={milestone} />
+        ))}
+      </div>
+      <div className="">
+        <ShareButtons
+          dailyImage={dailyShareImage}
+          weeklyImage={weeklyShareImage}
+        />
+      </div>
+      <div className="mt-4 text-center">
+        <Link
+          href="/weeklySummary"
+          className="text-orange-500 hover:text-blue-700"
+        >
+          View Weekly Summary
+        </Link>
       </div>
     </main>
   );
