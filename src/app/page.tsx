@@ -47,7 +47,7 @@ const Home = () => {
   };
 
   return (
-    <div className="flex flex-col items-center justify-center min-h-screen bg-black text-gray-800">
+    <div className="flex flex-col items-center justify-center bg-black text-gray-800">
       <div className="absolute top-4 right-4 flex items-center space-x-4">
         {isLoggedIn ? (
           <Link href="/signIn">

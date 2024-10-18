@@ -130,17 +130,6 @@ const MainPage = () => {
     router.push(`/dailyJournal?${queryString}`);
   };
 
-  // const shareToSocialMedia = (imageUrl: string, type: "daily" | "weekly") => {
-  //   const message =
-  //     type === "daily"
-  //       ? "Check out my daily goals!"
-  //       : "Here's my weekly summary!";
-  //   const url = `https://twitter.com/intent/tweet?text=${encodeURIComponent(
-  //     message
-  //   )}&url=${encodeURIComponent(imageUrl)}`;
-  //   window.open(url, "_blank");
-  // };
-
   const downloadImage = (imageUrl: string, fileName: string) => {
     const link = document.createElement("a");
     link.href = imageUrl;
@@ -158,20 +147,6 @@ const MainPage = () => {
     weeklyImage: string;
   }) => (
     <div className="mt-4 mb-5 bg-transparent flex justify-center items-center">
-      {/* <button
-        onClick={() => shareToSocialMedia(dailyImage, "daily")}
-        className="bg-transparent border rounded-2xl text-[10px] text-slate-600 px-4 py-2 mr-2"
-        disabled={!dailyImage || !imagesReady}
-      >
-        Share Daily Goals
-      </button>
-      <button
-        onClick={() => shareToSocialMedia(weeklyImage, "weekly")}
-        className="bg-transparent border rounded-2xl px-4 py-2 text-[10px] text-slate-600 mr-2"
-        disabled={!weeklyImage || !imagesReady}
-      >
-        Share Weekly Summary
-      </button> */}
       <button
         onClick={() =>
           dailyImage && downloadImage(dailyImage, "daily-goals.png")
@@ -207,6 +182,9 @@ const MainPage = () => {
       </div>
       <div className="flex justify-center items-center flex-col xl:flex-row gap-[4rem] pt-[10rem]">
         <div>
+          <div className="wrapper">
+            <div className="typing-demo text-slate-500 p-3 text-[14px]">Welcome to Your daily Entry Life Style!</div>
+          </div>
           <div className="border-4 border-slate-700 rounded-xl p-[1rem]">
             {" "}
             <h1 className="p-[4px] xl:w-[400px] dark:text-slate-800 text-slate-600 text-[12px]">
