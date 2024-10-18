@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState} from "react";
+import React, { useState } from "react";
 // import { useRouter } from "next/navigation";
 import NavBar from "@/components/NavBar/NavBar";
 import Dashboard from "@/components/Dashboard/Dashboard";
@@ -55,9 +55,10 @@ const DashboardPage: React.FC = () => {
     <div className="w-full">
       <NavBar onToggleModal={toggleModal} />
       <div className="container mx-auto px-4 py-8 z-[-50] pt-[6rem]">
-
         <div>
-          <h1 className="text-slate-500 uppercase">Daily Entries for the Week</h1>
+          <h1 className="text-slate-500 uppercase font-bold p-4">
+            Daily Entries for the Week
+          </h1>
         </div>
         <Dashboard />
       </div>
