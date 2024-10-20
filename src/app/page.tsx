@@ -34,6 +34,12 @@ const Home = () => {
     setJournalStreak(Math.floor(Math.random() * 30));
     const randomIndex = Math.floor(Math.random() * inspirations.length);
     setDailyInspiration(inspirations[randomIndex]);
+
+    const timer = setInterval(() => {
+      setCurrentImageIndex((prevIndex) => (prevIndex + 1) % images.length);
+    }, 5000); // Change image every 5 seconds
+
+    return () => clearInterval(timer);
   }, []);
 
   const nextImage = () => {
@@ -51,11 +57,17 @@ const Home = () => {
       <div className="absolute top-4 right-4 flex items-center space-x-4">
         {isLoggedIn ? (
           <Link href="/signIn">
-            <FaUser className="text-orange-600 w-6 h-6 xl:block block" aria-label="Profile" />
+            <FaUser
+              className="text-orange-600 w-6 h-6 xl:block block"
+              aria-label="Profile"
+            />
           </Link>
         ) : (
           <Link href="/signIn">
-            <button className="bg-orange-600 text-white px-4 py-2 rounded" aria-label="Sign In">
+            <button
+              className="bg-orange-600 text-white px-4 py-2 rounded"
+              aria-label="Sign In"
+            >
               <FaLaughWink className="xl:block block" />
             </button>
           </Link>
@@ -95,7 +107,7 @@ const Home = () => {
         <h3 className="text-orange-600 font-bold mb-2">Daily Inspiration</h3>
         <p className="text-slate-500 font-[8px]">{dailyInspiration}</p>
         <Link href="/signIn">
-          <button className="mt-4 bg-orange-600 text-white px-4 py-2 rounded hover:bg-orange-700 transition">
+          <button className="mt-4 bg-orange-600 text-white px-4 py-2 rounded hover:bg-orange-700 transition animate-bounce">
             Start Journaling!
           </button>
         </Link>

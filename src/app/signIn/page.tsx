@@ -166,7 +166,7 @@ const SignIn = () => {
               <div>
                 <button
                   onClick={notify}
-                  className="bg-orange-600 w-[24rem] h-[2.5rem] mt-[1.2rem] rounded-3xl text-slate-300 font-bold"
+                  className="bg-orange-600 w-[24rem] h-[2.5rem] mt-[1.2rem] rounded-3xl text-slate-300 font-bold animate-bounce"
                 >
                   Sign In
                 </button>
@@ -215,7 +215,7 @@ const SignIn = () => {
                 HandleGoogle();
                 notify();
               }}
-              className="text-slate-400 text-[12px]"
+              className="text-slate-400 text-[12px] animate-bounce"
             >
               Continue with Google
             </button>
