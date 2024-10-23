@@ -27,16 +27,17 @@ const MainPage = () => {
   const [dailyShareImage, setDailyShareImage] = useState<string>("");
   const [weeklyShareImage, setWeeklyShareImage] = useState<string>("");
   const [imagesReady, setImagesReady] = useState(false);
-  // const [selectedDate, setSelectedDate] = useState("");
+  const [initialDate, setInitialDate] = useState("");
 
-  const toggleModal = useCallback(
-    () => setIsModalOpen(!isModalOpen),
-    [isModalOpen]
-  );
-  const toggleTheme = useCallback(
-    () => setIsDarkTheme(!isDarkTheme),
-    [isDarkTheme]
-  );
+  useEffect(() => {
+    setInitialDate(new Date().toISOString().slice(0, 16));
+    if (typeof window !== "undefined") {
+      Notification.requestPermission();
+    }
+  }, []);
+
+  const toggleModal = useCallback(() => setIsModalOpen(!isModalOpen), [isModalOpen]);
+  const toggleTheme = useCallback(() => setIsDarkTheme(!isDarkTheme), [isDarkTheme]);
 
   const {
     register,
@@ -45,49 +46,32 @@ const MainPage = () => {
     formState: { errors },
   } = useForm<FormValues>();
 
-  useEffect(() => {
-    if (typeof window !== "undefined") {
-      Notification.requestPermission();
-    }
-  }, []);
-
   const notifyMilestone = useCallback((milestone: string): void => {
-    if (
-      typeof window !== "undefined" &&
-      Notification.permission === "granted"
-    ) {
+    if (typeof window !== "undefined" && Notification.permission === "granted") {
       new Notification(`Milestone Reached: ${milestone}`);
     }
   }, []);
 
-  const checkMilestones = useCallback(
-    (data: FormValues): void => {
-      const newMilestones: string[] = [];
-      if (data.content.length > 100) {
-        newMilestones.push("100+ characters");
-        notifyMilestone("100+ characters");
-      }
-      if (data.goal === "true") {
-        newMilestones.push("Goal set");
-        notifyMilestone("Goal set");
-      }
-      if (data.content.length > 500) newMilestones.push("500 words written");
-      if (data.weeklySummary.length > 200)
-        newMilestones.push("Detailed weekly summary");
-      setMilestones(newMilestones);
-    },
-    [notifyMilestone]
-  );
-
-  // const handleDateChange = useCallback(
-  //   (e: React.ChangeEvent<HTMLInputElement>) => {
-  //     setSelectedDate(e.target.value);
-  //   },
-  //   []
-  // );
+  const checkMilestones = useCallback((data: FormValues): void => {
+    const newMilestones: string[] = [];
+    if (data.content.length > 100) {
+      newMilestones.push("100+ characters");
+      notifyMilestone("100+ characters");
+    }
+    if (data.goal === "true") {
+      newMilestones.push("Goal set");
+      notifyMilestone("Goal set");
+    }
+    if (data.content.length > 500) newMilestones.push("500 words written");
+    if (data.weeklySummary.length > 200)
+      newMilestones.push("Detailed weekly summary");
+    setMilestones(newMilestones);
+  }, [notifyMilestone]);
 
   const generateShareableImage = useCallback(
     async (data: FormValues, isWeekly = false): Promise<string> => {
+      if (typeof window === 'undefined') return '';
+      
       const canvas = document.createElement("canvas");
       canvas.width = 800;
       canvas.height = 600;
@@ -246,8 +230,12 @@ const MainPage = () => {
                 id="dateInput"
                 className="text-slate-800 text-[12px] p-[8px] rounded-2xl"
                 type="datetime-local"
+                value={initialDate}
+                {...register("date", { 
+                  required: true,
+                  onChange: (e) => setInitialDate(e.target.value)
+                })}
                 placeholder="Select date and time"
-                {...register("date", { required: true })}
               />
               {errors.date?.type === "required" && (
                 <p className="text-red-500 text-[10px]" role="alert">
@@ -320,27 +308,17 @@ const MainPage = () => {
                       >
                         <option value="">Choose Your Goal</option>
                         <option value="Healthy Eating">Healthy Eating</option>
-                        <option value="Healthy Exercise">
-                          Healthy Exercise
-                        </option>
+                        <option value="Healthy Exercise">Healthy Exercise</option>
                         <option value="Reading">Reading</option>
                         <option value="Daily Gratitude">Daily Gratitude</option>
-                        <option value="New Learning-Learning">
-                          New Learning
-                        </option>
-                        <option value="Continuos Learning">
-                          Continuos Learning
-                        </option>
+                        <option value="New Learning-Learning">New Learning</option>
+                        <option value="Continuos Learning">Continuos Learning</option>
                         <option value="Meditation">Meditation</option>
-                        <option value="Financial Management">
-                          Financial Management
-                        </option>
+                        <option value="Financial Management">Financial Management</option>
                         <option value="Mindful Habits">Mindful Habits</option>
                         <option value="Creativity">Creativity</option>
                         <option value="Time Management">Time Management</option>
-                        <option value="Emotional Check-in">
-                          Emotional Check-in
-                        </option>
+                        <option value="Emotional Check-in">Emotional Check-in</option>
                         <option value="Hobby Time">Hobby Time</option>
                       </select>
                     </div>
@@ -420,7 +398,7 @@ const MainPage = () => {
         </Link>
       </div>
     </main>
-  );
-};
+
+  );};
 
 export default MainPage;

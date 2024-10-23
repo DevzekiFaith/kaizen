@@ -24,7 +24,7 @@
         "i18next": "^23.15.2",
         "jspdf": "^2.5.2",
         "lucide-react": "^0.452.0",
-        "next": "^15.0.0",
+        "next": "^14.2.16",
         "next-query-params": "^5.0.1",
         "next-themes": "^0.3.0",
         "react": "^18.2.0",
