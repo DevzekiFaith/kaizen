@@ -1,6 +1,7 @@
-"use client"; // Ensure client-side rendering
+"use client";
 
 import React, { useEffect, useState, useCallback, useMemo } from "react";
+import { useSearchParams, usePathname, useRouter } from 'next/navigation';
 import dynamic from 'next/dynamic';
 import NavBar from "@/components/NavBar/NavBar";
 import Image from "next/image";
@@ -53,6 +54,10 @@ const useLocalStorage = <T,>(
 };
 
 const DailyJournal: React.FC = () => {
+  const nextSearchParams = useSearchParams();
+  const pathname = usePathname();
+  const router = useRouter();
+
   const [isModalOpen, setModalOpen] = useState(false);
   const [journalData, setJournalData] = useLocalStorage<JournalEntry[]>(
     "dailyJournalData",
@@ -60,15 +65,6 @@ const DailyJournal: React.FC = () => {
   );
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
   const [isShareModalOpen, setIsShareModalOpen] = useState(false);
-  const [searchParams, setSearchParams] = useState<URLSearchParams | null>(null);
-
-  useEffect(() => {
-    if (typeof window !== 'undefined') {
-      const currentSearch = window.location.search;
-      const currentSearchParams = new URLSearchParams(currentSearch);
-      setSearchParams(currentSearchParams);
-    }
-  }, []);
 
   const addOrUpdateEntry = useCallback(
     (newEntry: JournalEntry) => {
@@ -89,20 +85,20 @@ const DailyJournal: React.FC = () => {
   );
 
   useEffect(() => {
-    if (searchParams) {
-      const date = searchParams.get("date");
-      const goal = searchParams.get("goal");
-      const title = searchParams.get("title");
-      const content = searchParams.get("content");
+    const date = nextSearchParams.get("date");
+    const goal = nextSearchParams.get("goal");
+    const title = nextSearchParams.get("title");
+    const content = nextSearchParams.get("content");
 
-      if (date && goal && title && content) {
-        const newEntry = { date, goal, title, content };
-        addOrUpdateEntry(newEntry);
-      }
+    if (date && goal && title && content) {
+      const newEntry = { date, goal, title, content };
+      addOrUpdateEntry(newEntry);
+      router.push(pathname);
     }
-  }, [searchParams, addOrUpdateEntry]);
+  }, [nextSearchParams, addOrUpdateEntry, pathname, router]);
 
   const handleDeleteAllEntries = useCallback(() => setIsDeleteModalOpen(true), []);
+  
   const deleteAllEntries = useCallback(() => {
     setJournalData([]);
     setIsDeleteModalOpen(false);
@@ -194,7 +190,7 @@ const DailyJournal: React.FC = () => {
             {sortedJournalData.map((entry) => (
               <div
                 key={entry.date}
-                className="bg-white bg-opacity-10 backdrop-filter backdrop-blur-lg p-6 rounded-xl shadow-lg 
+                className="bg-white bg-opacity-10 backdrop-filter backdrop-blur-lg p-6 rounded-xl shadow-lg
                          hover:shadow-xl transition-all duration-300 border border-gray-200 border-opacity-20
                          transform hover:-translate-y-2 hover:scale-105"
               >
@@ -211,14 +207,14 @@ const DailyJournal: React.FC = () => {
                 <div className="mt-4 flex justify-end space-x-3">
                   <button
                     onClick={() => deleteEntry(entry.date)}
-                    className="bg-transparent border text-white py-2 px-4 rounded-full hover:bg-red-600 
+                    className="bg-transparent border text-white py-2 px-4 rounded-full hover:bg-red-600
                              transition-all duration-300 text-sm transform hover:scale-110"
                   >
                     Delete
                   </button>
                   <button
                     onClick={() => downloadPDF(entry)}
-                    className="bg-transparent border text-white py-2 px-4 rounded-full hover:bg-blue-600 
+                    className="bg-transparent border text-white py-2 px-4 rounded-full hover:bg-blue-600
                              transition-all duration-300 text-sm transform hover:scale-110"
                   >
                     Download PDF
@@ -230,14 +226,14 @@ const DailyJournal: React.FC = () => {
           <div className="flex justify-center space-x-4 mt-8">
             <button
               onClick={handleDeleteAllEntries}
-              className="bg-transparent border text-white py-2 px-6 rounded-full hover:bg-red-600 
+              className="bg-transparent border text-white py-2 px-6 rounded-full hover:bg-red-600
                        transition-all duration-300 transform hover:scale-105"
             >
               Delete All Entries
             </button>
             <button
               onClick={handleShareWeeklyJournal}
-              className="bg-transparent border text-white py-2 px-6 rounded-full hover:bg-green-600 
+              className="bg-transparent border text-white py-2 px-6 rounded-full hover:bg-green-600
                        transition-all duration-300 transform hover:scale-105"
             >
               Share Weekly Journal
