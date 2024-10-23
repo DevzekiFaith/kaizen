@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useEffect, useState, useCallback, useMemo } from "react";
+import React, { useEffect, useState, useCallback, useMemo, Suspense } from "react";
 import { useSearchParams, usePathname, useRouter } from 'next/navigation';
 import dynamic from 'next/dynamic';
 import NavBar from "@/components/NavBar/NavBar";
@@ -53,7 +53,7 @@ const useLocalStorage = <T,>(
   return [storedValue, setValue];
 };
 
-const DailyJournal: React.FC = () => {
+function DailyJournalContent() {
   const nextSearchParams = useSearchParams();
   const pathname = usePathname();
   const router = useRouter();
@@ -98,7 +98,7 @@ const DailyJournal: React.FC = () => {
   }, [nextSearchParams, addOrUpdateEntry, pathname, router]);
 
   const handleDeleteAllEntries = useCallback(() => setIsDeleteModalOpen(true), []);
-  
+
   const deleteAllEntries = useCallback(() => {
     setJournalData([]);
     setIsDeleteModalOpen(false);
@@ -254,6 +254,18 @@ const DailyJournal: React.FC = () => {
         message="Are you sure you want to share your weekly journal?"
       />
     </div>
+  );
+}
+
+const DailyJournal: React.FC = () => {
+  return (
+    <Suspense fallback={
+      <div className="w-full min-h-screen bg-slate-950 flex items-center justify-center">
+        <div className="text-white text-xl">Loading journal entries...</div>
+      </div>
+    }>
+      <DailyJournalContent />
+    </Suspense>
   );
 };
 
