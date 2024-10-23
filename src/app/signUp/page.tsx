@@ -122,7 +122,7 @@ const SignUp = () => {
         </div>
         <div className="mt-[5rem]">
           <div className="mb-[2rem]">
-            <h1 className="text-orange-500 uppercase font-bold text-[22px] w-[26rem] ml-[3rem]">
+            <h1 className="text-orange-500 uppercase font-bold text-[22px] w-[26rem] ml-[3rem] animate-pulse">
               Reflectify
             </h1>
           </div>
@@ -213,7 +213,7 @@ const SignUp = () => {
                   <span className="text-green-700">Terms and Conditions</span>
                 </h6>
               </span>
-              <div>
+              <div className="animate-bounce">
                 <button
                   onClick={notify}
                   className="bg-orange-600 w-[24rem] h-[2.5rem] mt-[1.2rem] rounded-3xl text-slate-300 font-bold"
@@ -257,7 +257,7 @@ const SignUp = () => {
                 notify();
               }}
               type="submit"
-              className="text-slate-400 text-[12px]"
+              className="text-slate-400 text-[12px] animate-bounce"
             >
               Continue with Google
             </button>

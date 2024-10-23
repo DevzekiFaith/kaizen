@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useCallback } from "react";
 import { useForm, SubmitHandler } from "react-hook-form";
 import Image from "next/image";
 import NavBar from "@/components/NavBar/NavBar";
@@ -27,9 +27,16 @@ const MainPage = () => {
   const [dailyShareImage, setDailyShareImage] = useState<string>("");
   const [weeklyShareImage, setWeeklyShareImage] = useState<string>("");
   const [imagesReady, setImagesReady] = useState(false);
+  // const [selectedDate, setSelectedDate] = useState("");
 
-  const toggleModal = () => setIsModalOpen(!isModalOpen);
-  const toggleTheme = () => setIsDarkTheme(!isDarkTheme);
+  const toggleModal = useCallback(
+    () => setIsModalOpen(!isModalOpen),
+    [isModalOpen]
+  );
+  const toggleTheme = useCallback(
+    () => setIsDarkTheme(!isDarkTheme),
+    [isDarkTheme]
+  );
 
   const {
     register,
@@ -44,128 +51,144 @@ const MainPage = () => {
     }
   }, []);
 
-  const notifyMilestone = (milestone: string): void => {
+  const notifyMilestone = useCallback((milestone: string): void => {
     if (
       typeof window !== "undefined" &&
       Notification.permission === "granted"
     ) {
       new Notification(`Milestone Reached: ${milestone}`);
     }
-  };
+  }, []);
 
-  const checkMilestones = (data: FormValues): void => {
-    const newMilestones: string[] = [];
-    if (data.content.length > 100) {
-      newMilestones.push("100+ characters");
-      notifyMilestone("100+ characters");
-    }
-    if (data.goal === "true") {
-      newMilestones.push("Goal set");
-      notifyMilestone("Goal set");
-    }
-    if (data.content.length > 500) newMilestones.push("500 words written");
-    if (data.weeklySummary.length > 200)
-      newMilestones.push("Detailed weekly summary");
-    setMilestones(newMilestones);
-  };
+  const checkMilestones = useCallback(
+    (data: FormValues): void => {
+      const newMilestones: string[] = [];
+      if (data.content.length > 100) {
+        newMilestones.push("100+ characters");
+        notifyMilestone("100+ characters");
+      }
+      if (data.goal === "true") {
+        newMilestones.push("Goal set");
+        notifyMilestone("Goal set");
+      }
+      if (data.content.length > 500) newMilestones.push("500 words written");
+      if (data.weeklySummary.length > 200)
+        newMilestones.push("Detailed weekly summary");
+      setMilestones(newMilestones);
+    },
+    [notifyMilestone]
+  );
 
-  const generateShareableImage = async (
-    data: FormValues,
-    isWeekly = false
-  ): Promise<string> => {
-    const canvas = document.createElement("canvas");
-    canvas.width = 800;
-    canvas.height = 600;
-    const ctx = canvas.getContext("2d");
+  // const handleDateChange = useCallback(
+  //   (e: React.ChangeEvent<HTMLInputElement>) => {
+  //     setSelectedDate(e.target.value);
+  //   },
+  //   []
+  // );
 
-    if (!ctx) {
-      throw new Error("Could not get canvas context");
-    }
+  const generateShareableImage = useCallback(
+    async (data: FormValues, isWeekly = false): Promise<string> => {
+      const canvas = document.createElement("canvas");
+      canvas.width = 800;
+      canvas.height = 600;
+      const ctx = canvas.getContext("2d");
 
-    ctx.fillStyle = "#f0f0f0";
-    ctx.fillRect(0, 0, canvas.width, canvas.height);
+      if (!ctx) {
+        throw new Error("Could not get canvas context");
+      }
 
-    ctx.font = "24px Arial";
-    ctx.fillStyle = "black";
+      ctx.fillStyle = "#f0f0f0";
+      ctx.fillRect(0, 0, canvas.width, canvas.height);
 
-    ctx.fillText(isWeekly ? "Weekly Summary" : "Daily Goals", 50, 50);
+      ctx.font = "24px Arial";
+      ctx.fillStyle = "black";
 
-    const content = isWeekly ? data.weeklySummary : data.content;
-    const lines = content.split("\n");
-    lines.forEach((line, index) => {
-      ctx.fillText(line, 50, 100 + index * 30);
-    });
+      ctx.fillText(isWeekly ? "Weekly Summary" : "Daily Goals", 50, 50);
 
-    return canvas.toDataURL();
-  };
+      const content = isWeekly ? data.weeklySummary : data.content;
+      const lines = content.split("\n");
+      lines.forEach((line, index) => {
+        ctx.fillText(line, 50, 100 + index * 30);
+      });
 
-  const onSubmit: SubmitHandler<FormValues> = async (data) => {
-    console.log(data);
-    checkMilestones(data);
+      return canvas.toDataURL();
+    },
+    []
+  );
 
-    const storedEntries = JSON.parse(
-      localStorage.getItem("journalEntries") || "[]"
-    );
-    storedEntries.push(data);
-    localStorage.setItem("journalEntries", JSON.stringify(storedEntries));
+  const onSubmit: SubmitHandler<FormValues> = useCallback(
+    async (data) => {
+      console.log(data);
+      checkMilestones(data);
 
-    const dailyImage = await generateShareableImage(data);
-    const weeklyImage = await generateShareableImage(data, true);
+      const storedEntries = JSON.parse(
+        localStorage.getItem("journalEntries") || "[]"
+      );
+      storedEntries.push(data);
+      localStorage.setItem("journalEntries", JSON.stringify(storedEntries));
 
-    setDailyShareImage(dailyImage);
-    setWeeklyShareImage(weeklyImage);
-    setImagesReady(true);
+      const dailyImage = await generateShareableImage(data);
+      const weeklyImage = await generateShareableImage(data, true);
 
-    console.log("Daily image URL:", dailyImage);
-    console.log("Weekly image URL:", weeklyImage);
+      setDailyShareImage(dailyImage);
+      setWeeklyShareImage(weeklyImage);
+      setImagesReady(true);
 
-    reset();
-    alert("Just Dropped my Schedule for the Day! SUPER-EXCITED");
-    const queryString = new URLSearchParams(
-      Object.entries(data).reduce((acc, [key, value]) => {
-        acc[key] = String(value);
-        return acc;
-      }, {} as Record<string, string>)
-    ).toString();
-    router.push(`/dailyJournal?${queryString}`);
-  };
+      console.log("Daily image URL:", dailyImage);
+      console.log("Weekly image URL:", weeklyImage);
 
-  const downloadImage = (imageUrl: string, fileName: string) => {
+      reset();
+      alert("Just Dropped my Schedule for the Day! SUPER-EXCITED");
+      const queryString = new URLSearchParams(
+        Object.entries(data).reduce((acc, [key, value]) => {
+          acc[key] = String(value);
+          return acc;
+        }, {} as Record<string, string>)
+      ).toString();
+      router.push(`/dailyJournal?${queryString}`);
+    },
+    [checkMilestones, generateShareableImage, reset, router]
+  );
+
+  const downloadImage = useCallback((imageUrl: string, fileName: string) => {
     const link = document.createElement("a");
     link.href = imageUrl;
     link.download = fileName;
     document.body.appendChild(link);
     link.click();
     document.body.removeChild(link);
-  };
+  }, []);
 
-  const ShareButtons = ({
-    dailyImage,
-    weeklyImage,
-  }: {
-    dailyImage: string;
-    weeklyImage: string;
-  }) => (
-    <div className="mt-4 mb-5 bg-transparent flex justify-center items-center">
-      <button
-        onClick={() =>
-          dailyImage && downloadImage(dailyImage, "daily-goals.png")
-        }
-        className="bg-transparent border rounded-2xl text-[10px] text-slate-600 px-4 py-2 mr-2"
-        disabled={!dailyImage || !imagesReady}
-      >
-        Download Daily Goals
-      </button>
-      <button
-        onClick={() =>
-          weeklyImage && downloadImage(weeklyImage, "weekly-summary.png")
-        }
-        className="bg-transparent border rounded-2xl px-4 py-2 text-[10px] text-slate-600"
-        disabled={!weeklyImage || !imagesReady}
-      >
-        Download Weekly Summary
-      </button>
-    </div>
+  const ShareButtons = useCallback(
+    ({
+      dailyImage,
+      weeklyImage,
+    }: {
+      dailyImage: string;
+      weeklyImage: string;
+    }) => (
+      <div className="mt-4 mb-5 bg-transparent flex justify-center items-center">
+        <button
+          onClick={() =>
+            dailyImage && downloadImage(dailyImage, "daily-goals.png")
+          }
+          className="bg-transparent border rounded-2xl text-[10px] text-slate-600 px-4 py-2 mr-2"
+          disabled={!dailyImage || !imagesReady}
+        >
+          Download Daily Goals
+        </button>
+        <button
+          onClick={() =>
+            weeklyImage && downloadImage(weeklyImage, "weekly-summary.png")
+          }
+          className="bg-transparent border rounded-2xl px-4 py-2 text-[10px] text-slate-600"
+          disabled={!weeklyImage || !imagesReady}
+        >
+          Download Weekly Summary
+        </button>
+      </div>
+    ),
+    [downloadImage, imagesReady]
   );
 
   return (
@@ -183,7 +206,9 @@ const MainPage = () => {
       <div className="flex justify-center items-center flex-col xl:flex-row gap-[4rem] pt-[10rem]">
         <div>
           <div className="wrapper">
-            <div className="typing-demo text-slate-500 p-3 text-[14px]">Welcome to Your daily Entry Life Style!</div>
+            <div className="typing-demo text-slate-500 p-3 text-[14px]">
+              Welcome to Your daily Entry Life Style!
+            </div>
           </div>
           <div className="border-4 border-slate-700 rounded-xl p-[1rem]">
             {" "}
@@ -214,11 +239,14 @@ const MainPage = () => {
         <form onSubmit={handleSubmit(onSubmit)}>
           <div>
             <span className="flex flex-col mb-[1.5rem] ">
-              <label className="text-slate-500 text-[12px]">Date</label>
+              <label className="text-slate-500 text-[12px]" htmlFor="dateInput">
+                Date
+              </label>
               <input
+                id="dateInput"
                 className="text-slate-800 text-[12px] p-[8px] rounded-2xl"
                 type="datetime-local"
-                placeholder="date"
+                placeholder="Select date and time"
                 {...register("date", { required: true })}
               />
               {errors.date?.type === "required" && (
@@ -228,12 +256,16 @@ const MainPage = () => {
               )}
             </span>
             <span className="flex justify-start items-center mb-[1rem] gap-[1rem]">
-              <label className="text-slate-600 text-[12px]">Goal</label>{" "}
+              <label
+                className="text-slate-600 text-[12px]"
+                htmlFor="goalCheckbox"
+              >
+                Goal
+              </label>{" "}
               <input
-                id="goal"
+                id="goalCheckbox"
                 className="text-white text-[12px] p-[8px] rounded-full accent-orange-500"
                 type="checkbox"
-                placeholder="goals"
                 {...register("goal", { required: true })}
               />
               {errors.goal?.type === "required" && (
@@ -247,11 +279,17 @@ const MainPage = () => {
             </span>
 
             <span className="flex flex-col mb-[1.5rem] ">
-              <label className="text-slate-500 text-[12px]">Title</label>
+              <label
+                className="text-slate-500 text-[12px]"
+                htmlFor="titleInput"
+              >
+                Title
+              </label>
               <input
+                id="titleInput"
                 className="text-slate-400 text-[12px] p-[8px] rounded-2xl"
                 type="text"
-                placeholder="title of goal"
+                placeholder="Enter title of goal"
                 {...register("title", { required: true })}
               />
               {errors.title?.type === "required" && (
@@ -261,23 +299,26 @@ const MainPage = () => {
               )}
             </span>
             <span className="flex flex-col mb-[1.5rem] ">
-              <label htmlFor="">Category</label>
+              <label htmlFor="categorySelect">Category</label>
               <div>
                 <div>
                   <div>
                     <div>
                       <div className="mb-[1rem]">
-                        <label className="text-slate-400 text-[12px]">
+                        <label
+                          className="text-slate-400 text-[12px]"
+                          htmlFor="activitySelect"
+                        >
                           Activity
                         </label>
                       </div>
                       <select
+                        id="activitySelect"
                         className="bg-slate-500 text-[12px] p-[8px] rounded-2xl xl:w-[24rem] w-[18rem] h-[2.5rem]"
-                        id="Activities"
                         name="Progress Work"
-                        title="Progress Work"
+                        title="Select your activity"
                       >
-                        <option value="choose Your Goal"></option>
+                        <option value="">Choose Your Goal</option>
                         <option value="Healthy Eating">Healthy Eating</option>
                         <option value="Healthy Exercise">
                           Healthy Exercise
@@ -308,10 +349,11 @@ const MainPage = () => {
               </div>
             </span>
             <span className="flex flex-col">
-              <label htmlFor="">Content</label>
+              <label htmlFor="contentTextarea">Content</label>
               <textarea
+                id="contentTextarea"
                 className="text-white text-[12px] p-[8px] rounded-2xl h-[14rem]"
-                placeholder="content"
+                placeholder="Enter your content here"
                 {...register("content", { required: true })}
               ></textarea>
               {errors.content?.type === "required" && (
@@ -322,10 +364,14 @@ const MainPage = () => {
             </span>
 
             <span className="flex flex-col mb-[1.5rem]">
-              <label className="text-slate-500 text-[12px] mb-[2rem]">
+              <label
+                className="text-slate-500 text-[12px] mb-[2rem]"
+                htmlFor="weeklySummaryTextarea"
+              >
                 Weekly Goal Summary
               </label>
               <textarea
+                id="weeklySummaryTextarea"
                 className="text-slate-400 text-[12px] p-[8px] rounded-2xl h-[5rem]"
                 placeholder="Summarize your week's goal"
                 {...register("weeklySummary", { required: true })}

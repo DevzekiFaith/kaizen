@@ -63,13 +63,12 @@ const DailyJournal: React.FC = () => {
   const [searchParams, setSearchParams] = useState<URLSearchParams | null>(null);
 
   useEffect(() => {
-    if (typeof window !== "undefined") {
+    if (typeof window !== 'undefined') {
       const currentSearch = window.location.search;
-      if (!searchParams || currentSearch !== searchParams.toString()) {
-        setSearchParams(new URLSearchParams(currentSearch));
-      }
+      const currentSearchParams = new URLSearchParams(currentSearch);
+      setSearchParams(currentSearchParams);
     }
-  }, [searchParams]);
+  }, []);
 
   const addOrUpdateEntry = useCallback(
     (newEntry: JournalEntry) => {

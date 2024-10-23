@@ -9,3 +9,5 @@ export const logout = () => {
     // Redirect to sign-in page
     window.location.href = '/signIn';
   };
+
+  

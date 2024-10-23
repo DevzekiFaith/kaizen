@@ -87,7 +87,7 @@ const WeeklySummaryPage: React.FC = () => {
             <h2 className="text-xl font-semibold text-white mb-2">
               Weekly Goal Progress
             </h2>
-            <div className="bg-gray-200 h-4 rounded-full">
+            <div className="bg-slate-700 h-4 rounded-full">
               <div
                 className={`bg-orange-600 h-full rounded-full w-[${weeklyGoalProgress}%]`}
               ></div>
@@ -99,7 +99,7 @@ const WeeklySummaryPage: React.FC = () => {
           <div className="grid grid-cols-1 gap-4">
             {journalEntries.length > 0 ? (
               journalEntries.map((entry: JournalEntry, index: number) => (
-                <div key={index} className="bg-white p-4 rounded shadow-md">
+                <div key={index} className="bg-slate-950 p-4 rounded shadow-md">
                   <p className="text-gray-800 font-bold">
                     <strong>Date:</strong> {entry.date}
                   </p>

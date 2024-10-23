@@ -4,7 +4,7 @@ import React, { useState } from "react";
 import Link from "next/link";
 import { FaAlignJustify } from "react-icons/fa";
 import { usePathname } from "next/navigation";
-import { ModeToggle } from "../Toggle/ModeToggle";
+import ModeToggle from "../../components/ModeToggle/ModeToggle";
 import { logout } from "../../../utils/auth";
 import NotificationBell from "@/components/NotificationBell/NotificationBell";
 // import Image from "next/image";

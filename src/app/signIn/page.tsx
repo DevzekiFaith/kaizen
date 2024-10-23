@@ -100,7 +100,7 @@ const SignIn = () => {
         </div>
         <div>
           <div className="mb-[2rem]">
-            <h1 className="text-orange-500 uppercase font-bold text-[22px] w-[26rem] ml-[3rem]">
+            <h1 className="text-orange-500 uppercase font-bold text-[22px] w-[26rem] ml-[3rem] animate-pulse">
               Reflectify!
             </h1>
           </div>
