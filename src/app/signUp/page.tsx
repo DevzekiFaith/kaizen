@@ -1,7 +1,6 @@
 "use client";
 
-// import { UploadIcon } from '@radix-ui/react-icons'
-import React, { useState, useEffect } from "react"; // Import useState and useEffect
+import React, { useState, useEffect } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { useForm, SubmitHandler } from "react-hook-form";
@@ -31,7 +30,7 @@ async function addDataToFireStore(name: string, email: string) {
     return true;
   } catch (error) {
     console.error("Error adding document: ", error);
-    alert("Failed to create user data. Please check your permissions.");
+    toast.error("Failed to create user data. Please try again.");
     return false;
   }
 }
@@ -43,14 +42,38 @@ type FormValues = {
 };
 
 const SignUp = () => {
-  const notify = () => toast("Wow so easy!");
   const router = useRouter();
-  const [showPassword, setShowPassword] = useState(false); // State for password visibility
+  const [showPassword, setShowPassword] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
 
   const HandleGoogle = async () => {
-    const provider = await new GoogleAuthProvider();
-    await signInWithPopup(auth, provider);
-    router.push("/signIn");
+    try {
+      setIsLoading(true);
+      const provider = new GoogleAuthProvider();
+      const result = await signInWithPopup(auth, provider);
+      
+      if (result.user) {
+        // Add user data to Firestore
+        await addDataToFireStore(
+          result.user.displayName || "Unknown",
+          result.user.email || "No email"
+        );
+        
+        toast.success("Successfully signed in with Google!");
+        // Delay navigation slightly to allow toast to show
+        setTimeout(() => {
+          router.push("/dashboard");
+        }, 1500);
+      }
+    } catch (error) {
+      const errorMessage = error instanceof FirebaseError 
+        ? error.message 
+        : "Failed to sign in with Google";
+      toast.error(errorMessage);
+      console.error("Google sign-in error:", error);
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   const {
@@ -62,46 +85,38 @@ const SignUp = () => {
 
   const onSubmit: SubmitHandler<FormValues> = async (data) => {
     try {
+      setIsLoading(true);
       await createUserWithEmailAndPassword(auth, data.email, data.password);
-      console.log("User signed up:", data);
-      reset();
-      alert("Account created successfully!");
-      router.push("/signIn");
-
+      
       const success = await addDataToFireStore(data.name, data.email);
-      if (!success) {
-        console.error("Failed to add user data to Firestore.");
+      if (success) {
+        toast.success("Account created successfully!");
+        reset();
+        setTimeout(() => {
+          router.push("/dashboard");
+        }, 1500);
       }
     } catch (error) {
+      const errorMessage = error instanceof FirebaseError 
+        ? error.message 
+        : "An unknown error occurred";
+      toast.error("Error signing up: " + errorMessage);
       console.error("Error signing up:", error);
-      const errorMessage =
-        (error as FirebaseError).message || "An unknown error occurred.";
-      alert("Error signing up: " + errorMessage);
+    } finally {
+      setIsLoading(false);
     }
   };
 
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, (user) => {
       if (user) {
-        console.log("User is signed in:", user);
+        console.log("User is signed in:", user.email);
       } else {
         console.log("No user is signed in.");
       }
     });
-    return () => unsubscribe(); // Cleanup subscription on unmount
-  }, []); // Empty dependency array to run only on mount
-
-  toast.success("🦄 Wow! Successfully Signed Up", {
-    position: "top-center",
-    autoClose: 1000,
-    hideProgressBar: false,
-    closeOnClick: true,
-    pauseOnHover: true,
-    draggable: true,
-    progress: undefined,
-    theme: "dark",
-    transition: Zoom,
-  });
+    return () => unsubscribe();
+  }, []);
 
   const togglePasswordVisibility = () => {
     setShowPassword((prev) => !prev);
@@ -117,7 +132,6 @@ const SignUp = () => {
             width={300}
             height={300}
             alt="cover"
-            // placeholder="blur"
           />
         </div>
         <div className="mt-[5rem]">
@@ -165,7 +179,7 @@ const SignUp = () => {
                   />
                   {errors.email?.type === "required" && (
                     <p className="text-red-500" role="alert">
-                      email is required
+                      Email is required
                     </p>
                   )}
                 </span>
@@ -176,7 +190,7 @@ const SignUp = () => {
                   <div className="relative">
                     <input
                       className="w-[24rem] h-[2.5rem] text-slate-300 bg-slate-800 rounded-3xl px-6 text-[12px]"
-                      type={showPassword ? "text" : "password"} // Toggle between text and password
+                      type={showPassword ? "text" : "password"}
                       id="password"
                       placeholder="Create your password"
                       {...register("password", { required: true })}
@@ -185,24 +199,22 @@ const SignUp = () => {
                       type="button"
                       onClick={togglePasswordVisibility}
                       className="absolute right-2 top-2"
-                      aria-label={
-                        showPassword ? "Hide password" : "Show password"
-                      }
+                      aria-label={showPassword ? "Hide password" : "Show password"}
                     >
                       {showPassword ? (
                         <span className="text-slate-300 w-[18px] h-[18px]">
                           👁️
-                        </span> // Open eye icon
+                        </span>
                       ) : (
                         <span className="text-slate-300 w-[28px] h-[28px]">
                           👁️‍🗨️
-                        </span> // Closed eye icon
+                        </span>
                       )}
                     </button>
                   </div>
                   {errors.password?.type === "required" && (
                     <p className="text-red-500" role="alert">
-                      password is required
+                      Password is required
                     </p>
                   )}
                 </span>
@@ -213,15 +225,18 @@ const SignUp = () => {
                   <span className="text-green-700">Terms and Conditions</span>
                 </h6>
               </span>
-              <div className="animate-bounce">
+              <div>
                 <button
-                  onClick={notify}
-                  className="bg-orange-600 w-[24rem] h-[2.5rem] mt-[1.2rem] rounded-3xl text-slate-300 font-bold"
+                  type="submit"
+                  disabled={isLoading}
+                  className={`bg-orange-600 w-[24rem] h-[2.5rem] mt-[1.2rem] rounded-3xl text-slate-300 font-bold ${
+                    isLoading ? 'opacity-50 cursor-not-allowed' : 'hover:bg-orange-700'
+                  }`}
                 >
-                  Sign Up
+                  {isLoading ? 'Signing up...' : 'Sign Up'}
                 </button>
               </div>
-              <div className=" ml-[3rem] mt-[1.5rem]">
+              <div className="ml-[3rem] mt-[1.5rem]">
                 <h6 className="text-slate-600 text-center text-[12px]">
                   Already have an account?{" "}
                   <Link href="/signIn">
@@ -248,25 +263,24 @@ const SignUp = () => {
               width={48}
               height={48}
               alt="Frame"
-              placeholder="blur"
               className="w-[20px] h-[20px]"
             />
             <button
-              onClick={() => {
-                HandleGoogle();
-                notify();
-              }}
-              type="submit"
-              className="text-slate-400 text-[12px] animate-bounce"
+              onClick={HandleGoogle}
+              disabled={isLoading}
+              type="button"
+              className={`text-slate-400 text-[12px] ${
+                isLoading ? 'opacity-50 cursor-not-allowed' : 'hover:text-slate-300'
+              }`}
             >
-              Continue with Google
+              {isLoading ? 'Connecting...' : 'Continue with Google'}
             </button>
           </div>
         </div>
         <ToastContainer
           position="top-center"
           limit={1}
-          autoClose={1000}
+          autoClose={1500}
           hideProgressBar={false}
           newestOnTop={false}
           closeOnClick
@@ -281,4 +295,5 @@ const SignUp = () => {
     </div>
   );
 };
+
 export default SignUp;
