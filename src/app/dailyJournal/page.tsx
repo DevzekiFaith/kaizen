@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useEffect, useState, useCallback, useMemo } from "react";
+import React, { useEffect, useState, useCallback, useMemo, Suspense } from "react";
 import { useSearchParams, usePathname, useRouter } from "next/navigation";
 import dynamic from "next/dynamic";
 import NavBar from "@/components/NavBar/NavBar";
@@ -25,7 +25,6 @@ const useLocalStorage = <T,>(
   key: string,
   initialValue: T
 ): [T, (value: T | ((val: T) => T)) => void] => {
-  // Initialize state with a function to load from localStorage
   const [storedValue, setStoredValue] = useState<T>(() => {
     if (typeof window === "undefined") {
       return initialValue;
@@ -41,7 +40,8 @@ const useLocalStorage = <T,>(
 
   const setValue = (value: T | ((val: T) => T)) => {
     try {
-      const valueToStore = value instanceof Function ? value(storedValue) : value;
+      const valueToStore =
+        value instanceof Function ? value(storedValue) : value;
       setStoredValue(valueToStore);
       if (typeof window !== "undefined") {
         window.localStorage.setItem(key, JSON.stringify(valueToStore));
@@ -54,46 +54,17 @@ const useLocalStorage = <T,>(
   return [storedValue, setValue];
 };
 
-const DailyJournal: React.FC = () => {
+// Create a separate component for the part that uses useSearchParams
+const JournalContent: React.FC<{
+  journalData: JournalEntry[];
+  onDeleteEntry: (id: string) => void;
+  onDownloadPDF: (entry: JournalEntry) => void;
+}> = ({ journalData, onDeleteEntry, onDownloadPDF }) => {
   const nextSearchParams = useSearchParams();
   const pathname = usePathname();
   const router = useRouter();
 
-  const [isModalOpen, setModalOpen] = useState(false);
-  const [journalData, setJournalData] = useLocalStorage<JournalEntry[]>(
-    "dailyJournalData",
-    []
-  );
-  const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
-  const [isShareModalOpen, setIsShareModalOpen] = useState(false);
-
-  const addOrUpdateEntry = useCallback(
-    (newEntry: Omit<JournalEntry, "id">) => {
-      setJournalData((prevData) => {
-        // Check if an entry for this date already exists
-        const existingEntryIndex = prevData.findIndex(
-          (entry) => entry.date === newEntry.date
-        );
-
-        const timestamp = new Date().getTime();
-        const entryWithId = {
-          ...newEntry,
-          id: existingEntryIndex >= 0 ? prevData[existingEntryIndex].id : `${timestamp}-${crypto.randomUUID()}`,
-        };
-
-        if (existingEntryIndex >= 0) {
-          // Update existing entry
-          const updatedData = [...prevData];
-          updatedData[existingEntryIndex] = entryWithId;
-          return updatedData;
-        } else {
-          // Add new entry
-          return [...prevData, entryWithId];
-        }
-      });
-    },
-    [setJournalData]
-  );
+  const [journalEntries, setJournalEntries] = useState(journalData);
 
   useEffect(() => {
     const date = nextSearchParams.get("date");
@@ -102,11 +73,70 @@ const DailyJournal: React.FC = () => {
     const content = nextSearchParams.get("content");
 
     if (date && goal && title && content) {
-      const newEntry = { date, goal, title, content };
-      addOrUpdateEntry(newEntry);
+      const timestamp = new Date().getTime();
+      const newEntry = {
+        date,
+        goal,
+        title,
+        content,
+        id: `${timestamp}-${crypto.randomUUID()}`,
+      };
+      setJournalEntries((prev) => [...prev, newEntry]);
       router.push(pathname);
     }
-  }, [nextSearchParams, addOrUpdateEntry, pathname, router]);
+  }, [nextSearchParams, pathname, router]);
+
+  const sortedJournalData = useMemo(
+    () =>
+      [...journalEntries].sort(
+        (a, b) => new Date(b.date).getTime() - new Date(a.date).getTime()
+      ),
+    [journalEntries]
+  );
+
+  return (
+    <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+      {sortedJournalData.map((entry) => (
+        <div
+          key={entry.id}
+          className="bg-white bg-opacity-10 backdrop-filter backdrop-blur-lg p-6 rounded-xl shadow-lg
+                   hover:shadow-xl transition-all duration-300 border border-gray-200 border-opacity-20
+                   transform hover:-translate-y-2 hover:scale-105"
+        >
+          <h2 className="text-2xl font-bold text-white mb-2">{entry.title}</h2>
+          <p className="text-gray-300 text-sm mb-3">{entry.date}</p>
+          <p className="text-gray-100 mt-2 mb-4 line-clamp-3">{entry.content}</p>
+          <p className="text-gray-400 mt-2 mb-4 text-sm">Goal: {entry.goal}</p>
+          <div className="mt-4 flex justify-end space-x-3">
+            <button
+              onClick={() => onDeleteEntry(entry.id!)}
+              className="bg-transparent border text-white py-2 px-4 rounded-full hover:bg-red-600
+                       transition-all duration-300 text-sm transform hover:scale-110"
+            >
+              Delete
+            </button>
+            <button
+              onClick={() => onDownloadPDF(entry)}
+              className="bg-transparent border text-white py-2 px-4 rounded-full hover:bg-blue-600
+                       transition-all duration-300 text-sm transform hover:scale-110"
+            >
+              Download PDF
+            </button>
+          </div>
+        </div>
+      ))}
+    </div>
+  );
+};
+
+const DailyJournal: React.FC = () => {
+  const [isModalOpen, setModalOpen] = useState(false);
+  const [journalData, setJournalData] = useLocalStorage<JournalEntry[]>(
+    "dailyJournalData",
+    []
+  );
+  const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
+  const [isShareModalOpen, setIsShareModalOpen] = useState(false);
 
   const handleDeleteAllEntries = useCallback(
     () => setIsDeleteModalOpen(true),
@@ -120,9 +150,7 @@ const DailyJournal: React.FC = () => {
 
   const deleteEntry = useCallback(
     (id: string) => {
-      setJournalData((prevData) =>
-        prevData.filter((entry) => entry.id !== id)
-      );
+      setJournalData((prevData) => prevData.filter((entry) => entry.id !== id));
     },
     [setJournalData]
   );
@@ -173,14 +201,6 @@ const DailyJournal: React.FC = () => {
   );
   const handleCloseModal = useCallback(() => setModalOpen(false), []);
 
-  const sortedJournalData = useMemo(
-    () =>
-      [...journalData].sort(
-        (a, b) => new Date(b.date).getTime() - new Date(a.date).getTime()
-      ),
-    [journalData]
-  );
-
   return (
     <div className="w-full min-h-screen bg-slate-950">
       <NavBar onToggleModal={handleToggleModal} />
@@ -206,43 +226,13 @@ const DailyJournal: React.FC = () => {
           <h1 className="text-4xl font-bold mb-8 text-white text-center xl:text-left">
             Daily Journal
           </h1>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            {sortedJournalData.map((entry) => (
-              <div
-                key={entry.id}
-                className="bg-white bg-opacity-10 backdrop-filter backdrop-blur-lg p-6 rounded-xl shadow-lg
-                         hover:shadow-xl transition-all duration-300 border border-gray-200 border-opacity-20
-                         transform hover:-translate-y-2 hover:scale-105"
-              >
-                <h2 className="text-2xl font-bold text-white mb-2">
-                  {entry.title}
-                </h2>
-                <p className="text-gray-300 text-sm mb-3">{entry.date}</p>
-                <p className="text-gray-100 mt-2 mb-4 line-clamp-3">
-                  {entry.content}
-                </p>
-                <p className="text-gray-400 mt-2 mb-4 text-sm">
-                  Goal: {entry.goal}
-                </p>
-                <div className="mt-4 flex justify-end space-x-3">
-                  <button
-                    onClick={() => deleteEntry(entry.id!)}
-                    className="bg-transparent border text-white py-2 px-4 rounded-full hover:bg-red-600
-                             transition-all duration-300 text-sm transform hover:scale-110"
-                  >
-                    Delete
-                  </button>
-                  <button
-                    onClick={() => downloadPDF(entry)}
-                    className="bg-transparent border text-white py-2 px-4 rounded-full hover:bg-blue-600
-                             transition-all duration-300 text-sm transform hover:scale-110"
-                  >
-                    Download PDF
-                  </button>
-                </div>
-              </div>
-            ))}
-          </div>
+          <Suspense fallback={<div className="text-white">Loading...</div>}>
+            <JournalContent
+              journalData={journalData}
+              onDeleteEntry={deleteEntry}
+              onDownloadPDF={downloadPDF}
+            />
+          </Suspense>
           <div className="flex justify-center space-x-4 mt-8">
             <button
               onClick={handleDeleteAllEntries}
