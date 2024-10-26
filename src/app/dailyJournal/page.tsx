@@ -1,46 +1,47 @@
 "use client";
 
-import React, { useEffect, useState, useCallback, useMemo, Suspense } from "react";
-import { useSearchParams, usePathname, useRouter } from 'next/navigation';
-import dynamic from 'next/dynamic';
+import React, { useEffect, useState, useCallback, useMemo } from "react";
+import { useSearchParams, usePathname, useRouter } from "next/navigation";
+import dynamic from "next/dynamic";
 import NavBar from "@/components/NavBar/NavBar";
 import Image from "next/image";
 import ConfirmationModal from "@/components/ConfirmatioModal/ConfirmationModal";
 import jsPDF from "jspdf";
 import Cover26 from "../../../Public/images/cover26.jpg";
 
-const DynamicModal = dynamic(() => import("@/components/Modal/Modal"), { ssr: false });
+const DynamicModal = dynamic(() => import("@/components/Modal/Modal"), {
+  ssr: false,
+});
 
 interface JournalEntry {
   date: string;
   title: string;
   content: string;
   goal: string;
+  id?: string;
 }
 
 const useLocalStorage = <T,>(
   key: string,
   initialValue: T
 ): [T, (value: T | ((val: T) => T)) => void] => {
-  const [storedValue, setStoredValue] = useState<T>(initialValue);
-
-  useEffect(() => {
-    if (typeof window !== "undefined") {
-      try {
-        const item = window.localStorage.getItem(key);
-        if (item) {
-          setStoredValue(JSON.parse(item));
-        }
-      } catch (error) {
-        console.error(error);
-      }
+  // Initialize state with a function to load from localStorage
+  const [storedValue, setStoredValue] = useState<T>(() => {
+    if (typeof window === "undefined") {
+      return initialValue;
     }
-  }, [key]);
+    try {
+      const item = window.localStorage.getItem(key);
+      return item ? JSON.parse(item) : initialValue;
+    } catch (error) {
+      console.error(error);
+      return initialValue;
+    }
+  });
 
   const setValue = (value: T | ((val: T) => T)) => {
     try {
-      const valueToStore =
-        value instanceof Function ? value(storedValue) : value;
+      const valueToStore = value instanceof Function ? value(storedValue) : value;
       setStoredValue(valueToStore);
       if (typeof window !== "undefined") {
         window.localStorage.setItem(key, JSON.stringify(valueToStore));
@@ -53,7 +54,7 @@ const useLocalStorage = <T,>(
   return [storedValue, setValue];
 };
 
-function DailyJournalContent() {
+const DailyJournal: React.FC = () => {
   const nextSearchParams = useSearchParams();
   const pathname = usePathname();
   const router = useRouter();
@@ -67,17 +68,27 @@ function DailyJournalContent() {
   const [isShareModalOpen, setIsShareModalOpen] = useState(false);
 
   const addOrUpdateEntry = useCallback(
-    (newEntry: JournalEntry) => {
+    (newEntry: Omit<JournalEntry, "id">) => {
       setJournalData((prevData) => {
+        // Check if an entry for this date already exists
         const existingEntryIndex = prevData.findIndex(
           (entry) => entry.date === newEntry.date
         );
-        if (existingEntryIndex !== -1) {
-          return prevData.map((entry, index) =>
-            index === existingEntryIndex ? newEntry : entry
-          );
+
+        const timestamp = new Date().getTime();
+        const entryWithId = {
+          ...newEntry,
+          id: existingEntryIndex >= 0 ? prevData[existingEntryIndex].id : `${timestamp}-${crypto.randomUUID()}`,
+        };
+
+        if (existingEntryIndex >= 0) {
+          // Update existing entry
+          const updatedData = [...prevData];
+          updatedData[existingEntryIndex] = entryWithId;
+          return updatedData;
         } else {
-          return [...prevData, newEntry];
+          // Add new entry
+          return [...prevData, entryWithId];
         }
       });
     },
@@ -97,7 +108,10 @@ function DailyJournalContent() {
     }
   }, [nextSearchParams, addOrUpdateEntry, pathname, router]);
 
-  const handleDeleteAllEntries = useCallback(() => setIsDeleteModalOpen(true), []);
+  const handleDeleteAllEntries = useCallback(
+    () => setIsDeleteModalOpen(true),
+    []
+  );
 
   const deleteAllEntries = useCallback(() => {
     setJournalData([]);
@@ -105,15 +119,18 @@ function DailyJournalContent() {
   }, [setJournalData]);
 
   const deleteEntry = useCallback(
-    (date: string) => {
+    (id: string) => {
       setJournalData((prevData) =>
-        prevData.filter((entry) => entry.date !== date)
+        prevData.filter((entry) => entry.id !== id)
       );
     },
     [setJournalData]
   );
 
-  const handleShareWeeklyJournal = useCallback(() => setIsShareModalOpen(true), []);
+  const handleShareWeeklyJournal = useCallback(
+    () => setIsShareModalOpen(true),
+    []
+  );
 
   const confirmShareWeeklyJournal = useCallback(() => {
     const today = new Date();
@@ -150,7 +167,10 @@ function DailyJournalContent() {
     doc.save(`journal_entry_${entry.date}.pdf`);
   }, []);
 
-  const handleToggleModal = useCallback(() => setModalOpen((prev) => !prev), []);
+  const handleToggleModal = useCallback(
+    () => setModalOpen((prev) => !prev),
+    []
+  );
   const handleCloseModal = useCallback(() => setModalOpen(false), []);
 
   const sortedJournalData = useMemo(
@@ -189,7 +209,7 @@ function DailyJournalContent() {
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             {sortedJournalData.map((entry) => (
               <div
-                key={entry.date}
+                key={entry.id}
                 className="bg-white bg-opacity-10 backdrop-filter backdrop-blur-lg p-6 rounded-xl shadow-lg
                          hover:shadow-xl transition-all duration-300 border border-gray-200 border-opacity-20
                          transform hover:-translate-y-2 hover:scale-105"
@@ -206,7 +226,7 @@ function DailyJournalContent() {
                 </p>
                 <div className="mt-4 flex justify-end space-x-3">
                   <button
-                    onClick={() => deleteEntry(entry.date)}
+                    onClick={() => deleteEntry(entry.id!)}
                     className="bg-transparent border text-white py-2 px-4 rounded-full hover:bg-red-600
                              transition-all duration-300 text-sm transform hover:scale-110"
                   >
@@ -254,18 +274,6 @@ function DailyJournalContent() {
         message="Are you sure you want to share your weekly journal?"
       />
     </div>
-  );
-}
-
-const DailyJournal: React.FC = () => {
-  return (
-    <Suspense fallback={
-      <div className="w-full min-h-screen bg-slate-950 flex items-center justify-center">
-        <div className="text-white text-xl">Loading journal entries...</div>
-      </div>
-    }>
-      <DailyJournalContent />
-    </Suspense>
   );
 };
 

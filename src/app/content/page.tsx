@@ -17,6 +17,7 @@ interface FormValues {
   content: string;
   goal: string;
   weeklySummary: string;
+  category?: string;
 }
 
 const MainPage = () => {
@@ -27,51 +28,70 @@ const MainPage = () => {
   const [dailyShareImage, setDailyShareImage] = useState<string>("");
   const [weeklyShareImage, setWeeklyShareImage] = useState<string>("");
   const [imagesReady, setImagesReady] = useState(false);
-  const [initialDate, setInitialDate] = useState("");
-
-  useEffect(() => {
-    setInitialDate(new Date().toISOString().slice(0, 16));
-    if (typeof window !== "undefined") {
-      Notification.requestPermission();
-    }
-  }, []);
-
-  const toggleModal = useCallback(() => setIsModalOpen(!isModalOpen), [isModalOpen]);
-  const toggleTheme = useCallback(() => setIsDarkTheme(!isDarkTheme), [isDarkTheme]);
 
   const {
     register,
     handleSubmit,
     reset,
     formState: { errors },
-  } = useForm<FormValues>();
+  } = useForm<FormValues>({
+    defaultValues: {
+      date: new Date().toISOString().slice(0, 16),
+      goal: "",
+      title: "",
+      content: "",
+      weeklySummary: "",
+      category: "",
+    },
+  });
+
+  useEffect(() => {
+    if (typeof window !== "undefined") {
+      Notification.requestPermission();
+    }
+  }, []);
+
+  const toggleModal = useCallback(
+    () => setIsModalOpen(!isModalOpen),
+    [isModalOpen]
+  );
+  const toggleTheme = useCallback(
+    () => setIsDarkTheme(!isDarkTheme),
+    [isDarkTheme]
+  );
 
   const notifyMilestone = useCallback((milestone: string): void => {
-    if (typeof window !== "undefined" && Notification.permission === "granted") {
+    if (
+      typeof window !== "undefined" &&
+      Notification.permission === "granted"
+    ) {
       new Notification(`Milestone Reached: ${milestone}`);
     }
   }, []);
 
-  const checkMilestones = useCallback((data: FormValues): void => {
-    const newMilestones: string[] = [];
-    if (data.content.length > 100) {
-      newMilestones.push("100+ characters");
-      notifyMilestone("100+ characters");
-    }
-    if (data.goal === "true") {
-      newMilestones.push("Goal set");
-      notifyMilestone("Goal set");
-    }
-    if (data.content.length > 500) newMilestones.push("500 words written");
-    if (data.weeklySummary.length > 200)
-      newMilestones.push("Detailed weekly summary");
-    setMilestones(newMilestones);
-  }, [notifyMilestone]);
+  const checkMilestones = useCallback(
+    (data: FormValues): void => {
+      const newMilestones: string[] = [];
+      if (data.content.length > 100) {
+        newMilestones.push("100+ characters");
+        notifyMilestone("100+ characters");
+      }
+      if (data.goal === "true") {
+        newMilestones.push("Goal set");
+        notifyMilestone("Goal set");
+      }
+      if (data.content.length > 500) newMilestones.push("500 words written");
+      if (data.weeklySummary.length > 200)
+        newMilestones.push("Detailed weekly summary");
+      setMilestones(newMilestones);
+    },
+    [notifyMilestone]
+  );
 
   const generateShareableImage = useCallback(
     async (data: FormValues, isWeekly = false): Promise<string> => {
-      if (typeof window === 'undefined') return '';
-      
+      if (typeof window === "undefined") return "";
+
       const canvas = document.createElement("canvas");
       canvas.width = 800;
       canvas.height = 600;
@@ -83,10 +103,8 @@ const MainPage = () => {
 
       ctx.fillStyle = "#f0f0f0";
       ctx.fillRect(0, 0, canvas.width, canvas.height);
-
       ctx.font = "24px Arial";
       ctx.fillStyle = "black";
-
       ctx.fillText(isWeekly ? "Weekly Summary" : "Daily Goals", 50, 50);
 
       const content = isWeekly ? data.weeklySummary : data.content;
@@ -105,11 +123,23 @@ const MainPage = () => {
       console.log(data);
       checkMilestones(data);
 
-      const storedEntries = JSON.parse(
-        localStorage.getItem("journalEntries") || "[]"
-      );
-      storedEntries.push(data);
-      localStorage.setItem("journalEntries", JSON.stringify(storedEntries));
+      let existingEntries = [];
+      try {
+        const storedData = localStorage.getItem("journalEntries");
+        existingEntries = storedData ? JSON.parse(storedData) : [];
+      } catch (error) {
+        console.error("Error reading from localStorage:", error);
+        existingEntries = [];
+      }
+
+      const newEntry = {
+        ...data,
+        id: Date.now(),
+        createdAt: new Date().toISOString(),
+      };
+
+      const updatedEntries = [...existingEntries, newEntry];
+      localStorage.setItem("journalEntries", JSON.stringify(updatedEntries));
 
       const dailyImage = await generateShareableImage(data);
       const weeklyImage = await generateShareableImage(data, true);
@@ -118,17 +148,16 @@ const MainPage = () => {
       setWeeklyShareImage(weeklyImage);
       setImagesReady(true);
 
-      console.log("Daily image URL:", dailyImage);
-      console.log("Weekly image URL:", weeklyImage);
-
       reset();
       alert("Just Dropped my Schedule for the Day! SUPER-EXCITED");
+
       const queryString = new URLSearchParams(
         Object.entries(data).reduce((acc, [key, value]) => {
           acc[key] = String(value);
           return acc;
         }, {} as Record<string, string>)
       ).toString();
+
       router.push(`/dailyJournal?${queryString}`);
     },
     [checkMilestones, generateShareableImage, reset, router]
@@ -195,7 +224,6 @@ const MainPage = () => {
             </div>
           </div>
           <div className="border-4 border-slate-700 rounded-xl p-[1rem]">
-            {" "}
             <h1 className="p-[4px] xl:w-[400px] dark:text-slate-800 text-slate-600 text-[12px]">
               Journaling your daily progress helps you see how far you have come
               and what you still need to work on. It allows you to break down
@@ -222,43 +250,34 @@ const MainPage = () => {
         </div>
         <form onSubmit={handleSubmit(onSubmit)}>
           <div>
-            <span className="flex flex-col mb-[1.5rem] ">
-              <label className="text-slate-500 text-[12px]" htmlFor="dateInput">
-                Date
-              </label>
+            <span className="flex flex-col mb-[1.5rem]">
+              <label className="text-slate-500 text-[12px]">Date</label>
               <input
                 id="dateInput"
                 className="text-slate-800 text-[12px] p-[8px] rounded-2xl"
                 type="datetime-local"
-                value={initialDate}
-                {...register("date", { 
-                  required: true,
-                  onChange: (e) => setInitialDate(e.target.value)
-                })}
-                placeholder="Select date and time"
+                {...register("date", { required: "Date is required" })}
               />
-              {errors.date?.type === "required" && (
-                <p className="text-red-500 text-[10px]" role="alert">
-                  date is required
+              {errors.date && (
+                <p className="text-red-500 text-[10px]">
+                  {errors.date.message}
                 </p>
               )}
             </span>
+
             <span className="flex justify-start items-center mb-[1rem] gap-[1rem]">
-              <label
-                className="text-slate-600 text-[12px]"
-                htmlFor="goalCheckbox"
-              >
-                Goal
-              </label>{" "}
+              <label className="text-slate-600 text-[12px]">Goal</label>
               <input
                 id="goalCheckbox"
                 className="text-white text-[12px] p-[8px] rounded-full accent-orange-500"
                 type="checkbox"
-                {...register("goal", { required: true })}
+                {...register("goal", {
+                  required: "Goal selection is required",
+                })}
               />
-              {errors.goal?.type === "required" && (
-                <p className="text-red-500 text-[10px]" role="alert">
-                  goal is required
+              {errors.goal && (
+                <p className="text-red-500 text-[10px]">
+                  {errors.goal.message}
                 </p>
               )}
               <h6 className="text-slate-400 text-[12px]">
@@ -266,7 +285,7 @@ const MainPage = () => {
               </h6>
             </span>
 
-            <span className="flex flex-col mb-[1.5rem] ">
+            <span className="flex flex-col mb-[1.5rem]">
               <label
                 className="text-slate-500 text-[12px]"
                 htmlFor="titleInput"
@@ -278,15 +297,22 @@ const MainPage = () => {
                 className="text-slate-400 text-[12px] p-[8px] rounded-2xl"
                 type="text"
                 placeholder="Enter title of goal"
-                {...register("title", { required: true })}
+                {...register("title", {
+                  required: "Title is required",
+                  minLength: {
+                    value: 3,
+                    message: "Title must be at least 3 characters",
+                  },
+                })}
               />
-              {errors.title?.type === "required" && (
-                <p className="text-red-500 text-[10px]" role="alert">
-                  title is required
+              {errors.title && (
+                <p className="text-red-500 text-[10px]">
+                  {errors.title.message}
                 </p>
               )}
             </span>
-            <span className="flex flex-col mb-[1.5rem] ">
+
+            <span className="flex flex-col mb-[1.5rem]">
               <label htmlFor="categorySelect">Category</label>
               <div>
                 <div>
@@ -303,40 +329,61 @@ const MainPage = () => {
                       <select
                         id="activitySelect"
                         className="bg-slate-500 text-[12px] p-[8px] rounded-2xl xl:w-[24rem] w-[18rem] h-[2.5rem]"
-                        name="Progress Work"
-                        title="Select your activity"
+                        {...register("category", {
+                          required: "Please select a category",
+                        })}
                       >
                         <option value="">Choose Your Goal</option>
                         <option value="Healthy Eating">Healthy Eating</option>
-                        <option value="Healthy Exercise">Healthy Exercise</option>
+                        <option value="Healthy Exercise">
+                          Healthy Exercise
+                        </option>
                         <option value="Reading">Reading</option>
                         <option value="Daily Gratitude">Daily Gratitude</option>
-                        <option value="New Learning-Learning">New Learning</option>
-                        <option value="Continuos Learning">Continuos Learning</option>
+                        <option value="New Learning">New Learning</option>
+                        <option value="Continuous Learning">
+                          Continuous Learning
+                        </option>
                         <option value="Meditation">Meditation</option>
-                        <option value="Financial Management">Financial Management</option>
+                        <option value="Financial Management">
+                          Financial Management
+                        </option>
                         <option value="Mindful Habits">Mindful Habits</option>
                         <option value="Creativity">Creativity</option>
                         <option value="Time Management">Time Management</option>
-                        <option value="Emotional Check-in">Emotional Check-in</option>
+                        <option value="Emotional Check-in">
+                          Emotional Check-in
+                        </option>
                         <option value="Hobby Time">Hobby Time</option>
                       </select>
+                      {errors.category && (
+                        <p className="text-red-500 text-[10px]">
+                          {errors.category.message}
+                        </p>
+                      )}
                     </div>
                   </div>
                 </div>
               </div>
             </span>
+
             <span className="flex flex-col">
               <label htmlFor="contentTextarea">Content</label>
               <textarea
                 id="contentTextarea"
-                className="text-white text-[12px] p-[8px] rounded-2xl h-[14rem]"
+                className="text-slate-600 text-[12px] p-[8px] rounded-2xl h-[14rem]"
                 placeholder="Enter your content here"
-                {...register("content", { required: true })}
-              ></textarea>
-              {errors.content?.type === "required" && (
-                <p className="text-red-500 text-[10px]" role="alert">
-                  Content is required
+                {...register("content", {
+                  required: "Content is required",
+                  minLength: {
+                    value: 10,
+                    message: "Content must be at least 10 characters",
+                  },
+                })}
+              />
+              {errors.content && (
+                <p className="text-red-500 text-[10px]">
+                  {errors.content.message}
                 </p>
               )}
             </span>
@@ -352,15 +399,22 @@ const MainPage = () => {
                 id="weeklySummaryTextarea"
                 className="text-slate-400 text-[12px] p-[8px] rounded-2xl h-[5rem]"
                 placeholder="Summarize your week's goal"
-                {...register("weeklySummary", { required: true })}
+                {...register("weeklySummary", {
+                  required: "Weekly summary is required",
+                  minLength: {
+                    value: 20,
+                    message: "Summary must be at least 20 characters",
+                  },
+                })}
               />
-              {errors.weeklySummary?.type === "required" && (
-                <p className="text-red-500 text-[10px]" role="alert">
-                  Weekly summary is required
+              {errors.weeklySummary && (
+                <p className="text-red-500 text-[10px]">
+                  {errors.weeklySummary.message}
                 </p>
               )}
             </span>
           </div>
+
           <button
             type="submit"
             className="flex justify-center gap-[1.5rem] items-center bg-transparent border border-slate-800 p-[3px] mt-[2rem] xl:w-[24rem] rounded-full h-[2.5rem] font-extrabold w-[16rem] text-orange-500 hover:translate-x-5"
@@ -398,7 +452,7 @@ const MainPage = () => {
         </Link>
       </div>
     </main>
-
-  );};
+  );
+};
 
 export default MainPage;

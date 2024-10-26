@@ -28,11 +28,38 @@ interface JournalEntry {
   goal: string;
 }
 
+interface TimeMetrics {
+  days: number;
+  weeks: number;
+  months: number;
+}
+
 const Dashboard: React.FC = () => {
   const [entriesThisWeek, setEntriesThisWeek] = useState(0);
   const [totalEntries, setTotalEntries] = useState(0);
   const [streak, setStreak] = useState(0);
-  const [weeklyEntries, setWeeklyEntries] = useState<number[]>([0, 0, 0, 0, 0, 0, 0]);
+  const [weeklyEntries, setWeeklyEntries] = useState<number[]>([
+    0, 0, 0, 0, 0, 0, 0,
+  ]);
+  const [timeMetrics, setTimeMetrics] = useState<TimeMetrics>({
+    days: 0,
+    weeks: 0,
+    months: 0,
+  });
+
+  const calculateTimeMetrics = (data: JournalEntry[]) => {
+    if (data.length === 0) return;
+
+    const firstEntry = new Date(data[0].date);
+    const now = new Date();
+    const diffTime = Math.abs(now.getTime() - firstEntry.getTime());
+
+    const days = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+    const weeks = Math.floor(days / 7);
+    const months = Math.floor(days / 30);
+
+    setTimeMetrics({ days, weeks, months });
+  };
 
   const calculateEntriesThisWeek = (data: JournalEntry[]) => {
     const oneWeekAgo = new Date();
@@ -89,6 +116,7 @@ const Dashboard: React.FC = () => {
       calculateEntriesThisWeek(parsedData);
       calculateStreak(parsedData);
       groupEntriesByDayOfWeek(parsedData);
+      calculateTimeMetrics(parsedData);
     }
   }, [calculateStreak]);
 
@@ -107,20 +135,49 @@ const Dashboard: React.FC = () => {
   return (
     <div className="bg-slate-900 text-white p-6 rounded-lg shadow-xl">
       <h2 className="text-2xl font-bold mb-6">Journal Dashboard</h2>
+
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-6">
+        <div className="bg-slate-800 p-4 rounded-lg">
+          <h3 className="text-lg font-semibold mb-2">Time Tracking</h3>
+          <div className="flex justify-between">
+            <div className="text-center">
+              <p className="text-3xl font-bold text-orange-500">
+                {timeMetrics.days}
+              </p>
+              <p className="text-sm">Days</p>
+            </div>
+            <div className="text-center">
+              <p className="text-3xl font-bold text-orange-500">
+                {timeMetrics.weeks}
+              </p>
+              <p className="text-sm">Weeks</p>
+            </div>
+            <div className="text-center">
+              <p className="text-3xl font-bold text-orange-500">
+                {timeMetrics.months}
+              </p>
+              <p className="text-sm">Months</p>
+            </div>
+          </div>
+        </div>
+
         <div className="bg-slate-800 p-4 rounded-lg">
           <h3 className="text-lg font-semibold mb-2">Entries This Week</h3>
           <p className="text-3xl font-bold">{entriesThisWeek}</p>
         </div>
-        <div className="bg-slate-800 p-4 rounded-lg">
-          <h3 className="text-lg font-semibold mb-2">Total Entries</h3>
-          <p className="text-3xl font-bold">{totalEntries}</p>
+        <div>
+          <div className="bg-slate-800 p-4 rounded-lg shadow-2xl shadow-slate-800">
+            <h3 className="text-lg text-slate-600 font-semibold mb-2">Total Entries</h3>
+            <p className="text-3xl text-slate-700 font-bold">{totalEntries}</p>
+          </div>
         </div>
+
         <div className="bg-slate-800 p-4 rounded-lg">
           <h3 className="text-lg font-semibold mb-2">Current Streak</h3>
           <p className="text-3xl font-bold">{streak} days</p>
         </div>
       </div>
+
       <div className="bg-slate-800 p-4 rounded-lg">
         <h3 className="text-lg font-semibold mb-4">Weekly Entry Trend</h3>
         <Line data={chartData} />
