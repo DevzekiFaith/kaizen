@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useEffect, useState, useCallback, useMemo, Suspense } from "react";
+import React, { useEffect, useState, useCallback, useMemo } from "react";
 import { useSearchParams, usePathname, useRouter } from "next/navigation";
 import dynamic from "next/dynamic";
 import NavBar from "@/components/NavBar/NavBar";
@@ -25,18 +25,20 @@ const useLocalStorage = <T,>(
   key: string,
   initialValue: T
 ): [T, (value: T | ((val: T) => T)) => void] => {
-  const [storedValue, setStoredValue] = useState<T>(() => {
-    if (typeof window === "undefined") {
-      return initialValue;
-    }
+  // Initialize state with a function to avoid running on server
+  const [storedValue, setStoredValue] = useState<T>(initialValue);
+
+  // Only run on client-side
+  useEffect(() => {
     try {
       const item = window.localStorage.getItem(key);
-      return item ? JSON.parse(item) : initialValue;
+      if (item) {
+        setStoredValue(JSON.parse(item));
+      }
     } catch (error) {
       console.error(error);
-      return initialValue;
     }
-  });
+  }, [key]);
 
   const setValue = useCallback((value: T | ((val: T) => T)) => {
     try {
@@ -64,13 +66,13 @@ const generateUniqueId = () => {
 };
 
 const isEntryDuplicate = (entry: JournalEntry, entries: JournalEntry[]): boolean => {
-  return entries.some(
+  const existingEntry = entries.find(
     (existing) =>
       existing.date === entry.date &&
       existing.title === entry.title &&
-      existing.content === entry.content &&
       existing.goal === entry.goal
   );
+  return !!existingEntry;
 };
 
 const URLParamsHandler: React.FC<{
@@ -99,7 +101,9 @@ const URLParamsHandler: React.FC<{
       if (!isEntryDuplicate(newEntry, existingEntries)) {
         onNewEntry(newEntry);
       }
-      router.push(pathname);
+      
+      // Clear the URL parameters after processing
+      router.replace(pathname);
     }
   }, [searchParams, pathname, router, onNewEntry, existingEntries]);
 
@@ -118,6 +122,14 @@ const JournalEntries: React.FC<{
       ),
     [entries]
   );
+
+  if (!entries || entries.length === 0) {
+    return (
+      <div className="text-center text-gray-400 py-8">
+        No journal entries yet. Start writing your first entry!
+      </div>
+    );
+  }
 
   return (
     <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -155,6 +167,7 @@ const JournalEntries: React.FC<{
 };
 
 const DailyJournal: React.FC = () => {
+  const [isClient, setIsClient] = useState(false);
   const [isModalOpen, setModalOpen] = useState(false);
   const [journalData, setJournalData] = useLocalStorage<JournalEntry[]>(
     "dailyJournalData",
@@ -162,6 +175,11 @@ const DailyJournal: React.FC = () => {
   );
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
   const [isShareModalOpen, setIsShareModalOpen] = useState(false);
+
+  // Set isClient to true when component mounts
+  useEffect(() => {
+    setIsClient(true);
+  }, []);
 
   const handleDeleteAllEntries = useCallback(
     () => setIsDeleteModalOpen(true),
@@ -239,6 +257,15 @@ const DailyJournal: React.FC = () => {
     [setJournalData]
   );
 
+  // Show loading state before client-side hydration
+  if (!isClient) {
+    return (
+      <div className="w-full min-h-screen bg-slate-950 flex items-center justify-center">
+        <div className="text-white text-xl">Loading journal...</div>
+      </div>
+    );
+  }
+
   return (
     <div className="w-full min-h-screen bg-slate-950">
       <NavBar onToggleModal={handleToggleModal} />
@@ -264,14 +291,12 @@ const DailyJournal: React.FC = () => {
           <h1 className="text-4xl font-bold mb-8 text-white text-center xl:text-left">
             Daily Journal
           </h1>
-          <Suspense fallback={<div className="text-white">Loading...</div>}>
-            <URLParamsHandler onNewEntry={addNewEntry} existingEntries={journalData} />
-            <JournalEntries
-              entries={journalData}
-              onDeleteEntry={deleteEntry}
-              onDownloadPDF={downloadPDF}
-            />
-          </Suspense>
+          <URLParamsHandler onNewEntry={addNewEntry} existingEntries={journalData} />
+          <JournalEntries
+            entries={journalData}
+            onDeleteEntry={deleteEntry}
+            onDownloadPDF={downloadPDF}
+          />
           <div className="flex justify-center space-x-4 mt-8">
             <button
               onClick={handleDeleteAllEntries}
