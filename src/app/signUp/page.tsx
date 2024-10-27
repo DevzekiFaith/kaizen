@@ -15,7 +15,7 @@ import { db } from "@/firebase/firebaseConfig";
 import { collection, addDoc } from "firebase/firestore";
 import { onAuthStateChanged } from "firebase/auth";
 import { FirebaseError } from "firebase/app";
-import { ToastContainer, Zoom, toast } from "react-toastify";
+import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import Cover12 from "../../../Public/images/cover12.jpg";
 import Frame from "../../../Public/images/Frame.png";
@@ -134,7 +134,7 @@ export default function SignUp() {
 
     try {
       setIsLoading(true);
-      const userCredential: UserCredential = await createUserWithEmailAndPassword(
+      await createUserWithEmailAndPassword(
         auth,
         data.email,
         data.password

@@ -9,10 +9,6 @@ const nextConfig = {
                 protocol: 'https',
                 hostname: 'www.pinterest.com',
             },
-            {
-                protocol: 'https',
-                hostname: 'kaizen2-app.firebaseapp.com',
-            }
         ],
         formats: ["image/avif", "image/webp"],
     },
@@ -31,17 +27,11 @@ const nextConfig = {
     headers: async() => {
         return [{
             source: '/:path*',
-            headers: [
-                {
-                    key: 'Permissions-Policy',
-                    value: 'popup=*'
-                },
-                {
-                    key: 'Content-Security-Policy',
-                    value: "frame-ancestors 'self' https://kaizen2-app.firebaseapp.com"
-                }
-            ],
-        }];
+            headers: [{
+                key: 'Permissions-Policy',
+                value: 'popup=*'
+            }],
+        }, ];
     },
 };
 
