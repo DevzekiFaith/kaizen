@@ -8,6 +8,7 @@ import {
   GoogleAuthProvider,
   signInWithPopup,
   createUserWithEmailAndPassword,
+  browserPopupRedirectResolver,
 } from "firebase/auth";
 import { auth } from "@/firebase/firebaseConfig";
 import { useRouter } from "next/navigation";
@@ -60,39 +61,46 @@ export default function SignUp() {
       
       provider.setCustomParameters({
         prompt: 'select_account',
-        display: 'popup'
+        login_hint: 'user@example.com'
       });
 
       console.log("Initialized Google provider with scopes");
 
-      // First check if popup is allowed
-      const testPopup = window.open('', '_blank', 'width=1,height=1');
-      if (!testPopup || testPopup.closed || typeof testPopup.closed === 'undefined') {
-        toast.error('Please allow popups for this website to sign in with Google');
-        console.error('Popups are blocked');
-        return;
-      }
-      testPopup.close();
+      try {
+        console.log("Proceeding with signInWithPopup...");
+        const result = await signInWithPopup(auth, provider, browserPopupRedirectResolver);
+        
+        console.log("Sign-in successful:", result.user.email);
 
-      console.log("Popup test passed, proceeding with signInWithPopup...");
-      const result = await signInWithPopup(auth, provider);
-      
-      console.log("Sign-in successful:", result.user.email);
+        if (!result.user) throw new Error('No user data returned');
 
-      if (!result.user) throw new Error('No user data returned');
+        const success = await addDataToFireStore(
+          result.user.displayName || 'Unknown',
+          result.user.email || 'No email'
+        );
 
-      const success = await addDataToFireStore(
-        result.user.displayName || 'Unknown',
-        result.user.email || 'No email'
-      );
-
-      if (success) {
-        toast.success('Successfully signed in with Google!');
-        setTimeout(() => {
-          router.push('/dashboard');
-        }, 1000);
-      } else {
-        throw new Error('Failed to create user profile');
+        if (success) {
+          toast.success('Successfully signed in with Google!');
+          setTimeout(() => {
+            router.push('/dashboard');
+          }, 1000);
+        } else {
+          throw new Error('Failed to create user profile');
+        }
+      } catch (popupError) {
+        console.error('Popup error:', popupError);
+        if (popupError instanceof FirebaseError) {
+          if (popupError.code === 'auth/popup-blocked') {
+            toast.error('Popup was blocked. Please allow popups for this website and try again.');
+          } else if (popupError.code === 'auth/internal-error') {
+            // Fallback handling for internal errors
+            toast.error('Authentication error. Please try again or use a different browser.');
+          } else {
+            throw popupError;
+          }
+        } else {
+          throw popupError;
+        }
       }
     } catch (error) {
       console.error('Detailed Google sign-in error:', error);
