@@ -52,12 +52,33 @@ export default function SignUp() {
 
     try {
       setIsLoading(true);
+      console.log("Starting Google sign-in process...");
+
       const provider = new GoogleAuthProvider();
+      provider.addScope('email');
+      provider.addScope('profile');
+      
       provider.setCustomParameters({
-        prompt: 'select_account'
+        prompt: 'select_account',
+        display: 'popup'
       });
 
+      console.log("Initialized Google provider with scopes");
+
+      // First check if popup is allowed
+      const testPopup = window.open('', '_blank', 'width=1,height=1');
+      if (!testPopup || testPopup.closed || typeof testPopup.closed === 'undefined') {
+        toast.error('Please allow popups for this website to sign in with Google');
+        console.error('Popups are blocked');
+        return;
+      }
+      testPopup.close();
+
+      console.log("Popup test passed, proceeding with signInWithPopup...");
       const result = await signInWithPopup(auth, provider);
+      
+      console.log("Sign-in successful:", result.user.email);
+
       if (!result.user) throw new Error('No user data returned');
 
       const success = await addDataToFireStore(
@@ -74,18 +95,24 @@ export default function SignUp() {
         throw new Error('Failed to create user profile');
       }
     } catch (error) {
-      console.error('Google sign-in error:', error);
+      console.error('Detailed Google sign-in error:', error);
       if (error instanceof FirebaseError) {
         // Handle specific Firebase errors
         switch (error.code) {
           case 'auth/popup-closed-by-user':
-            toast.info('Sign-in cancelled');
+            toast.info('Sign-in cancelled by user');
             break;
           case 'auth/popup-blocked':
-            toast.error('Please allow popups for this website');
+            toast.error('Popup was blocked. Please allow popups for this website');
+            break;
+          case 'auth/cancelled-popup-request':
+            toast.info('Previous sign-in operation in progress');
+            break;
+          case 'auth/network-request-failed':
+            toast.error('Network error. Please check your internet connection');
             break;
           default:
-            toast.error(error.message);
+            toast.error(`Authentication error: ${error.code}`);
         }
       } else {
         toast.error('Failed to sign in with Google. Please try again.');
@@ -107,7 +134,7 @@ export default function SignUp() {
 
     try {
       setIsLoading(true);
-      const userCredential = await createUserWithEmailAndPassword(
+      const userCredential: UserCredential = await createUserWithEmailAndPassword(
         auth,
         data.email,
         data.password
