@@ -9,6 +9,14 @@ const nextConfig = {
                 protocol: 'https',
                 hostname: 'www.pinterest.com',
             },
+            {
+                protocol: 'https',
+                hostname: 'lh3.googleusercontent.com',
+            },
+            {
+                protocol: 'https',
+                hostname: 'firebasestorage.googleapis.com',
+            },
         ],
         formats: ["image/avif", "image/webp"],
     },
@@ -27,11 +35,25 @@ const nextConfig = {
     headers: async() => {
         return [{
             source: '/:path*',
-            headers: [{
-                key: 'Permissions-Policy',
-                value: 'popup=*'
-            }],
-        }, ];
+            headers: [
+                {
+                    key: 'Permissions-Policy',
+                    value: 'popup=*'
+                },
+                {
+                    key: 'Access-Control-Allow-Origin',
+                    value: '*'
+                },
+                {
+                    key: 'Access-Control-Allow-Methods',
+                    value: 'GET, POST, PUT, DELETE, OPTIONS'
+                },
+                {
+                    key: 'Access-Control-Allow-Headers',
+                    value: 'Content-Type, Authorization'
+                }
+            ],
+        }];
     },
 };
 

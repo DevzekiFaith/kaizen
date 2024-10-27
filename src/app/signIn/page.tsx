@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useEffect, useState } from "react"; // Import useState
+import React, { useEffect, useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { useForm, SubmitHandler } from "react-hook-form";
@@ -9,16 +9,14 @@ import {
   getAuth,
   signInWithEmailAndPassword,
   onAuthStateChanged,
-} from "firebase/auth"; // Ensure this import is present
+} from "firebase/auth";
 import { auth } from "@/firebase/firebaseConfig";
 import { useRouter } from "next/navigation";
 import { ToastContainer, Zoom, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
-import { Eye, EyeOff } from "lucide-react"; // Import eye icons
+import { Eye, EyeOff } from "lucide-react";
 import Cover10 from "../../../Public/images/cover10.jpg"
 import Framer from "../../../Public/images/Frame.png"
-
-
 
 type FormValues = {
   email: string;
@@ -26,14 +24,36 @@ type FormValues = {
 };
 
 const SignIn = () => {
-  const notify = () => toast("So good to be here!");
   const router = useRouter();
-  const [showPassword, setShowPassword] = useState(false); // State for password visibility
+  const [showPassword, setShowPassword] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
 
   const HandleGoogle = async () => {
-    const provider = await new GoogleAuthProvider();
-    await signInWithPopup(auth, provider);
-    router.push("/content");
+    if (isLoading) return;
+    
+    try {
+      setIsLoading(true);
+      const provider = new GoogleAuthProvider();
+      await signInWithPopup(auth, provider);
+      toast.success("Successfully signed in with Google!", {
+        position: "top-center",
+        autoClose: 2000,
+        hideProgressBar: false,
+        closeOnClick: true,
+        pauseOnHover: true,
+        draggable: true,
+        theme: "dark",
+        transition: Zoom,
+      });
+      setTimeout(() => {
+        router.push("/content");
+      }, 1000);
+    } catch (error) {
+      console.error("Error signing in with Google:", error);
+      toast.error("Failed to sign in with Google. Please try again.");
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   const {
@@ -41,24 +61,40 @@ const SignIn = () => {
     handleSubmit,
     reset,
     formState: { errors },
-  } = useForm<FormValues>(); // Ensure useForm is correctly imported
+  } = useForm<FormValues>();
 
   const onSubmit: SubmitHandler<FormValues> = async (data) => {
+    if (isLoading) return;
+
     try {
+      setIsLoading(true);
       const { email, password } = data;
-      const auth = getAuth(); // Initialize auth
-      await signInWithEmailAndPassword(auth, email, password); // Updated to use the correct method
+      const auth = getAuth();
+      await signInWithEmailAndPassword(auth, email, password);
       reset();
-      alert("Successfully signed in!"); // Updated alert message
-      router.push("/content");
+      toast.success("Successfully signed in!", {
+        position: "top-center",
+        autoClose: 2000,
+        hideProgressBar: false,
+        closeOnClick: true,
+        pauseOnHover: true,
+        draggable: true,
+        theme: "dark",
+        transition: Zoom,
+      });
+      setTimeout(() => {
+        router.push("/content");
+      }, 1000);
     } catch (error) {
       console.error("Error signing in:", error);
-      alert("Failed to sign in. Please check your credentials.");
+      toast.error("Failed to sign in. Please check your credentials.");
+    } finally {
+      setIsLoading(false);
     }
   };
 
   useEffect(() => {
-    const auth = getAuth(); // Initialize auth
+    const auth = getAuth();
     const unsubscribe = onAuthStateChanged(auth, (user) => {
       if (user) {
         console.log("User is signed in:", user);
@@ -66,20 +102,8 @@ const SignIn = () => {
         console.log("No user is signed in.");
       }
     });
-    return () => unsubscribe(); // Cleanup subscription on unmount
-  }, []); // Empty dependency array to run only on mount
-
-  toast.success("🦄 Wow! Successfully Signed In", {
-    position: "top-center",
-    autoClose: 1000,
-    hideProgressBar: false,
-    closeOnClick: true,
-    pauseOnHover: true,
-    draggable: true,
-    progress: undefined,
-    theme: "dark",
-    transition: Zoom,
-  });
+    return () => unsubscribe();
+  }, []);
 
   const togglePasswordVisibility = () => {
     setShowPassword((prev) => !prev);
@@ -94,8 +118,8 @@ const SignIn = () => {
             src={Cover10}
             width={300}
             height={300}
-            // placeholder="blur"
             alt="Cover"
+            priority
           />
         </div>
         <div>
@@ -113,14 +137,14 @@ const SignIn = () => {
                 <span className="flex flex-col">
                   <label className="text-slate-200 mb-[1rem]">Email</label>
                   <input
-                    className="w-[24rem] h-[2.5rem] text-slate-500 bg-slate-800 rounded-3xl px-6 text-[12px] "
+                    className="w-[24rem] h-[2.5rem] text-slate-500 bg-slate-800 rounded-3xl px-6 text-[12px]"
                     type="email"
                     placeholder="Enter your email"
                     {...register("email", { required: true })}
                   />
                   {errors.email?.type === "required" && (
                     <p className="text-red-500" role="alert">
-                      email is required
+                      Email is required
                     </p>
                   )}
                 </span>
@@ -131,7 +155,7 @@ const SignIn = () => {
                   <div className="relative">
                     <input
                       className="w-[24rem] h-[2.5rem] text-slate-300 bg-slate-800 rounded-3xl px-6 text-[12px]"
-                      type={showPassword ? "text" : "password"} // Toggle between text and password
+                      type={showPassword ? "text" : "password"}
                       placeholder="Enter your password"
                       {...register("password", { required: true })}
                     />
@@ -139,12 +163,10 @@ const SignIn = () => {
                       type="button"
                       onClick={togglePasswordVisibility}
                       className="absolute top-2 right-0 "
-                      aria-label={
-                        showPassword ? "Hide password" : "Show password"
-                      }
+                      aria-label={showPassword ? "Hide password" : "Show password"}
                     >
                       {showPassword ? (
-                        <EyeOff className="h-6 w-6  text-slate-400" />
+                        <EyeOff className="h-6 w-6 text-slate-400" />
                       ) : (
                         <Eye className="h-6 w-6 text-slate-400" />
                       )}
@@ -165,10 +187,11 @@ const SignIn = () => {
               </span>
               <div>
                 <button
-                  onClick={notify}
-                  className="bg-orange-600 w-[24rem] h-[2.5rem] mt-[1.2rem] rounded-3xl text-slate-300 font-bold animate-bounce"
+                  type="submit"
+                  disabled={isLoading}
+                  className="bg-orange-600 w-[24rem] h-[2.5rem] mt-[1.2rem] rounded-3xl text-slate-300 font-bold hover:bg-orange-700 disabled:opacity-50 disabled:cursor-not-allowed"
                 >
-                  Sign In
+                  {isLoading ? "Signing in..." : "Sign In"}
                 </button>
               </div>
               <span className="flex flex-col">
@@ -180,11 +203,11 @@ const SignIn = () => {
                 </Link>
               </span>
 
-              <div className=" mt-[1.5rem]">
+              <div className="mt-[1.5rem]">
                 <h6 className="text-slate-600 text-center ml-[3rem] text-[12px]">
                   Do not have an account?{" "}
                   <Link href="/signUp">
-                    <span className="cursor-pointer text-green-500">
+                    <span className="cursor-pointer text-green-500 hover:text-green-400">
                       Sign Up
                     </span>
                   </Link>
@@ -192,32 +215,30 @@ const SignIn = () => {
               </div>
               <div className="flex justify-center items-align mt-[1.5rem] ml-[3rem]">
                 <span>
-                  <hr className="bg-slate-400  w-[6rem] mt-[9px] mr-3" />
+                  <hr className="bg-slate-400 w-[6rem] mt-[9px] mr-3" />
                 </span>
                 <h1 className="text-slate-400">OR</h1>
                 <span>
-                  <hr className="bg-slate-400  w-[6rem] mt-[9px] ml-3" />
+                  <hr className="bg-slate-400 w-[6rem] mt-[9px] ml-3" />
                 </span>
               </div>
             </form>
           </div>
-          <div className="flex justify-center items-center gap-[6px] bg-transparent border-2 border-white w-[24rem] h-[2.5rem] rounded-3xl mt-[1.2rem] ml-[3rem]">
-            <Image
-              className="h-[1rem] w-[1rem]"
-              src={Framer}
-              width={48}
-              height={48}
-             placeholder="blur"
-              alt="Frammer"
-            />
+          <div className="flex justify-center items-center">
             <button
-              onClick={() => {
-                HandleGoogle();
-                notify();
-              }}
-              className="text-slate-400 text-[12px] animate-bounce"
+              onClick={HandleGoogle}
+              disabled={isLoading}
+              className="flex items-center gap-2 bg-transparent border-2 border-white hover:border-slate-300 w-[24rem] h-[2.5rem] rounded-3xl text-slate-400 hover:text-slate-300 transition-all duration-200 justify-center disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:border-white disabled:hover:text-slate-400"
             >
-              Continue with Google
+              <Image
+                className="h-5 w-5"
+                src={Framer}
+                width={20}
+                height={20}
+                alt="Google"
+                priority
+              />
+              {isLoading ? "Connecting..." : "Continue with Google"}
             </button>
           </div>
         </div>
@@ -225,7 +246,7 @@ const SignIn = () => {
         <ToastContainer
           position="top-center"
           limit={1}
-          autoClose={1000}
+          autoClose={2000}
           hideProgressBar={false}
           newestOnTop={false}
           closeOnClick

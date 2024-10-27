@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import localFont from "next/font/local";
 import { ThemeProvider } from "@/components/Theme-Provider/Theme-Provider";
+import { FirebaseInitializer } from "@/components/Firebase/FirebaseInitializer";
 import "./globals.css";
 
 const geistSans = localFont({
@@ -38,7 +39,9 @@ export default function RootLayout({
           enableSystem
           disableTransitionOnChange
         >
-          {children}
+          <FirebaseInitializer>
+            {children}
+          </FirebaseInitializer>
         </ThemeProvider>
       </body>
     </html>

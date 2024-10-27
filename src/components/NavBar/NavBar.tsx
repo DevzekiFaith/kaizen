@@ -1,14 +1,14 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import Link from "next/link";
-import { FaAlignJustify } from "react-icons/fa";
+import { FaAlignJustify, FaCog } from "react-icons/fa";
 import { usePathname } from "next/navigation";
 import ModeToggle from "../../components/ModeToggle/ModeToggle";
 import { logout } from "../../../utils/auth";
 import NotificationBell from "@/components/NotificationBell/NotificationBell";
-// import Image from "next/image";
-// import NotificationBell from "@/components/"
+import { auth } from "@/firebase/firebaseConfig";
+import Image from "next/image";
 
 const navLinks = [
   { name: "home", path: "/" },
@@ -24,6 +24,24 @@ interface NavBarProps {
 const NavBar: React.FC<NavBarProps> = ({ onToggleModal }) => {
   const currentPath = usePathname();
   const [isAnimating, setIsAnimating] = useState(false);
+  const [displayName, setDisplayName] = useState<string | null>(null);
+  const [photoURL, setPhotoURL] = useState<string | null>(null);
+
+  useEffect(() => {
+    // Set up an auth state listener to update profile info
+    const unsubscribe = auth.onAuthStateChanged((user) => {
+      if (user) {
+        setDisplayName(user.displayName);
+        setPhotoURL(user.photoURL);
+      } else {
+        setDisplayName(null);
+        setPhotoURL(null);
+      }
+    });
+
+    // Clean up subscription
+    return () => unsubscribe();
+  }, []);
 
   const isActive = (path: string): boolean => {
     return currentPath === path;
@@ -63,6 +81,9 @@ const NavBar: React.FC<NavBarProps> = ({ onToggleModal }) => {
         </div>
 
         <div className="flex justify-center items-center gap-2">
+          <Link href="/settings" className="text-slate-500 hover:text-slate-800 xl:block hidden">
+            <FaCog className="text-[1.2rem]" />
+          </Link>
           <button
             onClick={logout}
             className="mr-[1rem] border-1 bg-orange-500 p-[6px] w-[4rem] rounded-full font-bold text-slate-300 xl:block hidden"
@@ -70,9 +91,42 @@ const NavBar: React.FC<NavBarProps> = ({ onToggleModal }) => {
             logout
           </button>
 
-          <div className="rounded-full w-[2.5rem] h-[2.5rem] bg-gray-400 hidden xl:block">
-            {/* <Image src="" width={50} height={50} alt="Profile" /> */}
+          {/* Desktop Profile Section */}
+          <div className="items-center gap-2 hidden xl:flex">
+            {displayName && (
+              <span className="text-slate-300 text-sm">{displayName}</span>
+            )}
+            <div className="rounded-full w-[2.5rem] h-[2.5rem] bg-gray-400 overflow-hidden">
+              {photoURL ? (
+                <Image 
+                  src={photoURL} 
+                  width={40} 
+                  height={40} 
+                  alt="Profile"
+                  className="w-full h-full object-cover"
+                />
+              ) : null}
+            </div>
           </div>
+
+          {/* Mobile Profile Section */}
+          <div className="flex items-center gap-2 xl:hidden">
+            {displayName && (
+              <span className="text-slate-300 text-sm truncate max-w-[100px]">{displayName}</span>
+            )}
+            <div className="rounded-full w-[2rem] h-[2rem] bg-gray-400 overflow-hidden">
+              {photoURL ? (
+                <Image 
+                  src={photoURL} 
+                  width={32} 
+                  height={32} 
+                  alt="Profile"
+                  className="w-full h-full object-cover"
+                />
+              ) : null}
+            </div>
+          </div>
+          
           <div>
             <NotificationBell />
           </div>

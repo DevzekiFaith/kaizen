@@ -80,7 +80,15 @@ export default function SignUp() {
         );
 
         if (success) {
-          toast.success('Successfully signed in with Google!');
+          toast.success('Successfully signed in with Google!', {
+            position: "top-center",
+            autoClose: 2000,
+            hideProgressBar: false,
+            closeOnClick: true,
+            pauseOnHover: true,
+            draggable: true,
+            theme: "dark",
+          });
           setTimeout(() => {
             router.push('/dashboard');
           }, 1000);
@@ -93,7 +101,6 @@ export default function SignUp() {
           if (popupError.code === 'auth/popup-blocked') {
             toast.error('Popup was blocked. Please allow popups for this website and try again.');
           } else if (popupError.code === 'auth/internal-error') {
-            // Fallback handling for internal errors
             toast.error('Authentication error. Please try again or use a different browser.');
           } else {
             throw popupError;
@@ -105,7 +112,6 @@ export default function SignUp() {
     } catch (error) {
       console.error('Detailed Google sign-in error:', error);
       if (error instanceof FirebaseError) {
-        // Handle specific Firebase errors
         switch (error.code) {
           case 'auth/popup-closed-by-user':
             toast.info('Sign-in cancelled by user');
@@ -150,7 +156,15 @@ export default function SignUp() {
 
       const success = await addDataToFireStore(data.name, data.email);
       if (success) {
-        toast.success('Account created successfully!');
+        toast.success('Account created successfully!', {
+          position: "top-center",
+          autoClose: 2000,
+          hideProgressBar: false,
+          closeOnClick: true,
+          pauseOnHover: true,
+          draggable: true,
+          theme: "dark",
+        });
         reset();
         setTimeout(() => {
           router.push('/dashboard');
@@ -320,6 +334,7 @@ export default function SignUp() {
                   height={20}
                   alt="Google"
                   className="w-[20px] h-[20px]"
+                  priority
                 />
                 {isLoading ? "Connecting..." : "Continue with Google"}
               </button>
@@ -330,6 +345,7 @@ export default function SignUp() {
       <ToastContainer
         position="top-center"
         autoClose={2000}
+        limit={1}
         hideProgressBar={false}
         newestOnTop
         closeOnClick
