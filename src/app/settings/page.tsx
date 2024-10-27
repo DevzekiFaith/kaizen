@@ -2,20 +2,18 @@
 
 import React, { useState, useEffect } from 'react';
 import { updateProfile } from 'firebase/auth';
-import { ref, uploadBytes, getDownloadURL } from 'firebase/storage';
 import { Button } from '../../components/ui/Button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Card } from '@/components/ui/card';
-import { auth, storage } from '@/firebase/firebaseConfig';
-import Image from "next/image"
+import { auth } from '@/firebase/firebaseConfig';
+// import Image from "next/image";
 import { useRouter } from 'next/navigation';
+import PhotoUploader from '@/components/PhotoUploader/PhotoUploader';
 
 const SettingsPage = () => {
   const router = useRouter();
   const [displayName, setDisplayName] = useState('');
-  const [photoURL, setPhotoURL] = useState('');
-  const [photoFile, setPhotoFile] = useState<File | null>(null);
   const [loading, setLoading] = useState(false);
   const [message, setMessage] = useState('');
   const [isFormChanged, setIsFormChanged] = useState(false);
@@ -24,7 +22,6 @@ const SettingsPage = () => {
   useEffect(() => {
     if (user) {
       setDisplayName(user.displayName || '');
-      setPhotoURL(user.photoURL || '');
     } else {
       router.push('/signin');
     }
@@ -34,20 +31,25 @@ const SettingsPage = () => {
   useEffect(() => {
     if (user) {
       const hasNameChanged = displayName !== (user.displayName || '');
-      const hasPhotoChanged = photoFile !== null;
-      setIsFormChanged(hasNameChanged || hasPhotoChanged);
+      setIsFormChanged(hasNameChanged);
     }
-  }, [displayName, photoFile, user]);
-
-  const handlePhotoChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    if (e.target.files && e.target.files[0]) {
-      setPhotoFile(e.target.files[0]);
-      setPhotoURL(URL.createObjectURL(e.target.files[0]));
-    }
-  };
+  }, [displayName, user]);
 
   const handleGoBack = () => {
     router.back();
+  };
+
+  const handlePhotoUploadComplete = async (photoURL: string) => {
+    if (!user) return;
+
+    try {
+      await updateProfile(user, { photoURL });
+      setMessage('Profile photo updated successfully!');
+      setIsFormChanged(true);
+    } catch (error) {
+      console.error('Error updating profile photo:', error);
+      setMessage('Error updating profile photo. Please try again.');
+    }
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -64,17 +66,8 @@ const SettingsPage = () => {
     setMessage('');
 
     try {
-      let newPhotoURL = user.photoURL;
-
-      if (photoFile) {
-        const photoRef = ref(storage, `profile-photos/${user.uid}`);
-        await uploadBytes(photoRef, photoFile);
-        newPhotoURL = await getDownloadURL(photoRef);
-      }
-
       await updateProfile(user, {
         displayName: displayName,
-        photoURL: newPhotoURL,
       });
 
       setMessage('Profile updated successfully!');
@@ -122,25 +115,13 @@ const SettingsPage = () => {
           </div>
 
           <div className="space-y-2">
-            <Label htmlFor="photo">Profile Photo</Label>
-            <div className="flex items-center space-x-4">
-              {photoURL && (
-                <Image
-                  src={photoURL}
-                  alt="Profile preview"
-                  className="w-16 h-16 rounded-full object-cover"
-                  width={64}
-                  height={64}
-                />
-              )}
-              <Input
-                id="photo"
-                type="file"
-                accept="image/*"
-                onChange={handlePhotoChange}
-                className="flex-1"
-              />
-            </div>
+            <Label>Profile Photo</Label>
+            <PhotoUploader
+              folder="profile-photos"
+              onUploadComplete={handlePhotoUploadComplete}
+              existingPhotoURL={user.photoURL || ''}
+              className="w-full flex flex-col items-center"
+            />
           </div>
 
           {message && (
