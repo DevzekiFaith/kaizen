@@ -16,7 +16,7 @@ const plans: Record<string, SubscriptionPlan> = {
   pro: {
     id: 'pro_monthly',
     name: 'Pro Plan',
-    price: 499,
+    price: 12,
     features: [
       'Advanced Analytics',
       '10 Journal Templates',
@@ -121,7 +121,7 @@ const SubscribePage = () => {
           <div className="px-6 py-8">
             <div className="flex justify-between items-center mb-8">
               <h2 className="text-2xl font-bold text-white">{selectedPlan.name}</h2>
-              <span className="text-3xl font-bold text-white">₹{selectedPlan.price}/mo</span>
+              <span className="text-3xl font-bold text-white">${selectedPlan.price}/mo</span>
             </div>
 
             <div className="space-y-6">
@@ -151,7 +151,7 @@ const SubscribePage = () => {
                 <h3 className="text-lg font-medium text-white mb-4">Billing Information</h3>
                 <div className="bg-gray-900 p-4 rounded-md">
                   <p className="text-gray-300 text-sm">
-                    You will be charged ₹{selectedPlan.price} (plus applicable taxes) monthly.
+                    You will be charged ${selectedPlan.price} (plus applicable taxes) monthly.
                     You can cancel your subscription at any time.
                   </p>
                 </div>
