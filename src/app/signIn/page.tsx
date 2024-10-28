@@ -4,9 +4,16 @@ import React, { useEffect, useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { useForm, SubmitHandler } from "react-hook-form";
-import { GoogleAuthProvider, signInWithPopup, User } from "firebase/auth";
+import { 
+  GoogleAuthProvider, 
+  signInWithPopup, 
+  User,
+  browserPopupRedirectResolver,
+  browserLocalPersistence,
+  setPersistence 
+} from "firebase/auth";
 import {
-  getAuth,
+  // getAuth, // Removed unused import
   signInWithEmailAndPassword,
   onAuthStateChanged,
 } from "firebase/auth";
@@ -17,6 +24,7 @@ import "react-toastify/dist/ReactToastify.css";
 import { Eye, EyeOff } from "lucide-react";
 import Cover10 from "../../../Public/images/cover10.jpg"
 import Framer from "../../../Public/images/Frame.png"
+import { FirebaseError } from "firebase/app";
 
 type FormValues = {
   email: string;
@@ -27,6 +35,13 @@ const SignIn = () => {
   const router = useRouter();
   const [showPassword, setShowPassword] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
+
+  useEffect(() => {
+    const setupAuth = async () => {
+      await setPersistence(auth, browserLocalPersistence);
+    };
+    setupAuth();
+  }, []);
 
   const showWelcomeBack = (user: User) => {
     const name = user.displayName || user.email?.split('@')[0] || 'User';
@@ -47,15 +62,56 @@ const SignIn = () => {
     
     try {
       setIsLoading(true);
+      console.log("Starting Google sign-in process...");
+
       const provider = new GoogleAuthProvider();
-      const result = await signInWithPopup(auth, provider);
+      provider.addScope('email');
+      provider.addScope('profile');
+      
+      provider.setCustomParameters({
+        prompt: 'select_account'
+      });
+
+      console.log("Initialized Google provider with scopes");
+
+      const result = await signInWithPopup(auth, provider, browserPopupRedirectResolver);
+      console.log("Sign-in successful:", result.user.email);
+      
+      // Store the user info immediately after successful sign-in
+      if (result.user) {
+        localStorage.setItem('userDisplayName', result.user.displayName || '');
+        localStorage.setItem('userPhotoURL', result.user.photoURL || '');
+        localStorage.setItem('userEmail', result.user.email || '');
+      }
+      
       showWelcomeBack(result.user);
+      
       setTimeout(() => {
-        router.push("/content");
+        router.push("/dashboard");
       }, 2000);
     } catch (error) {
-      console.error("Error signing in with Google:", error);
-      toast.error("Failed to sign in with Google. Please try again.");
+      console.error("Detailed Google sign-in error:", error);
+      
+      if (error instanceof FirebaseError) {
+        switch (error.code) {
+          case 'auth/popup-closed-by-user':
+            toast.info('Sign-in cancelled. Please try again');
+            break;
+          case 'auth/popup-blocked':
+            toast.error('Popup was blocked. Please allow popups for this website and try again');
+            break;
+          case 'auth/cancelled-popup-request':
+            toast.info('Previous sign-in still in progress');
+            break;
+          case 'auth/network-request-failed':
+            toast.error('Network error. Please check your internet connection');
+            break;
+          default:
+            toast.error(`Authentication error: ${error.code}`);
+        }
+      } else {
+        toast.error('Failed to sign in with Google. Please try again later.');
+      }
     } finally {
       setIsLoading(false);
     }
@@ -74,16 +130,35 @@ const SignIn = () => {
     try {
       setIsLoading(true);
       const { email, password } = data;
-      const auth = getAuth();
       const userCredential = await signInWithEmailAndPassword(auth, email, password);
+      
+      // Store user info
+      if (userCredential.user) {
+        localStorage.setItem('userDisplayName', userCredential.user.displayName || '');
+        localStorage.setItem('userPhotoURL', userCredential.user.photoURL || '');
+        localStorage.setItem('userEmail', userCredential.user.email || '');
+      }
+      
       reset();
       showWelcomeBack(userCredential.user);
       setTimeout(() => {
-        router.push("/content");
+        router.push("/dashboard");
       }, 2000);
-    } catch (error) {
+    } catch (error: any) {
       console.error("Error signing in:", error);
-      toast.error("Failed to sign in. Please check your credentials.");
+      let errorMessage = "Failed to sign in. Please check your credentials.";
+      
+      if (error.code === 'auth/invalid-email') {
+        errorMessage = "Invalid email address.";
+      } else if (error.code === 'auth/user-disabled') {
+        errorMessage = "This account has been disabled.";
+      } else if (error.code === 'auth/user-not-found') {
+        errorMessage = "No account found with this email.";
+      } else if (error.code === 'auth/wrong-password') {
+        errorMessage = "Incorrect password.";
+      }
+      
+      toast.error(errorMessage);
     } finally {
       setIsLoading(false);
     }
@@ -92,11 +167,17 @@ const SignIn = () => {
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, (user) => {
       if (user) {
-        // Persist the authentication state in localStorage
+        // Update localStorage whenever auth state changes
         localStorage.setItem('userDisplayName', user.displayName || '');
         localStorage.setItem('userPhotoURL', user.photoURL || '');
+        localStorage.setItem('userEmail', user.email || '');
+        console.log('User is signed in:', user.email);
       } else {
-        console.log("No user is signed in.");
+        // Clear localStorage when user signs out
+        localStorage.removeItem('userDisplayName');
+        localStorage.removeItem('userPhotoURL');
+        localStorage.removeItem('userEmail');
+        console.log('No user signed in');
       }
     });
     return () => unsubscribe();
@@ -137,11 +218,19 @@ const SignIn = () => {
                     className="w-[24rem] h-[2.5rem] text-slate-500 bg-slate-800 rounded-3xl px-6 text-[12px]"
                     type="email"
                     placeholder="Enter your email"
-                    {...register("email", { required: true })}
+                    {...register("email", { 
+                      required: true,
+                      pattern: {
+                        value: /^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}$/i,
+                        message: "Invalid email address"
+                      }
+                    })}
                   />
-                  {errors.email?.type === "required" && (
+                  {errors.email && (
                     <p className="text-red-500" role="alert">
-                      Email is required
+                      {errors.email.type === "required" 
+                        ? "Email is required" 
+                        : errors.email.message}
                     </p>
                   )}
                 </span>
@@ -154,12 +243,18 @@ const SignIn = () => {
                       className="w-[24rem] h-[2.5rem] text-slate-300 bg-slate-800 rounded-3xl px-6 text-[12px]"
                       type={showPassword ? "text" : "password"}
                       placeholder="Enter your password"
-                      {...register("password", { required: true })}
+                      {...register("password", { 
+                        required: "Password is required",
+                        minLength: {
+                          value: 6,
+                          message: "Password must be at least 6 characters"
+                        }
+                      })}
                     />
                     <button
                       type="button"
                       onClick={togglePasswordVisibility}
-                      className="absolute top-2 right-0 "
+                      className="absolute top-2 right-4"
                       aria-label={showPassword ? "Hide password" : "Show password"}
                     >
                       {showPassword ? (
@@ -169,9 +264,9 @@ const SignIn = () => {
                       )}
                     </button>
                   </div>
-                  {errors.password?.type === "required" && (
+                  {errors.password && (
                     <p className="text-red-500" role="alert">
-                      Password is required
+                      {errors.password.message}
                     </p>
                   )}
                 </span>
