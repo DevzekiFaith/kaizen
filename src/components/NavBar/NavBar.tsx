@@ -28,14 +28,26 @@ const NavBar: React.FC<NavBarProps> = ({ onToggleModal }) => {
   const [photoURL, setPhotoURL] = useState<string | null>(null);
 
   useEffect(() => {
+    // Try to get saved user data from localStorage
+    const savedDisplayName = localStorage.getItem('userDisplayName');
+    const savedPhotoURL = localStorage.getItem('userPhotoURL');
+    if (savedDisplayName) setDisplayName(savedDisplayName);
+    if (savedPhotoURL) setPhotoURL(savedPhotoURL);
+
     // Set up an auth state listener to update profile info
     const unsubscribe = auth.onAuthStateChanged((user) => {
       if (user) {
         setDisplayName(user.displayName);
         setPhotoURL(user.photoURL);
+        // Update localStorage
+        localStorage.setItem('userDisplayName', user.displayName || '');
+        localStorage.setItem('userPhotoURL', user.photoURL || '');
       } else {
         setDisplayName(null);
         setPhotoURL(null);
+        // Clear localStorage on logout
+        localStorage.removeItem('userDisplayName');
+        localStorage.removeItem('userPhotoURL');
       }
     });
 

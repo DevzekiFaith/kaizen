@@ -28,26 +28,31 @@ const SignIn = () => {
   const [showPassword, setShowPassword] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
 
+  const showWelcomeBack = (user: any) => {
+    const name = user.displayName || user.email?.split('@')[0] || 'User';
+    toast.success(`Welcome back, ${name}! 👋`, {
+      position: "top-center",
+      autoClose: 3000,
+      hideProgressBar: false,
+      closeOnClick: true,
+      pauseOnHover: true,
+      draggable: true,
+      theme: "dark",
+      transition: Zoom,
+    });
+  };
+
   const HandleGoogle = async () => {
     if (isLoading) return;
     
     try {
       setIsLoading(true);
       const provider = new GoogleAuthProvider();
-      await signInWithPopup(auth, provider);
-      toast.success("Successfully signed in with Google!", {
-        position: "top-center",
-        autoClose: 2000,
-        hideProgressBar: false,
-        closeOnClick: true,
-        pauseOnHover: true,
-        draggable: true,
-        theme: "dark",
-        transition: Zoom,
-      });
+      const result = await signInWithPopup(auth, provider);
+      showWelcomeBack(result.user);
       setTimeout(() => {
         router.push("/content");
-      }, 1000);
+      }, 2000);
     } catch (error) {
       console.error("Error signing in with Google:", error);
       toast.error("Failed to sign in with Google. Please try again.");
@@ -70,21 +75,12 @@ const SignIn = () => {
       setIsLoading(true);
       const { email, password } = data;
       const auth = getAuth();
-      await signInWithEmailAndPassword(auth, email, password);
+      const userCredential = await signInWithEmailAndPassword(auth, email, password);
       reset();
-      toast.success("Successfully signed in!", {
-        position: "top-center",
-        autoClose: 2000,
-        hideProgressBar: false,
-        closeOnClick: true,
-        pauseOnHover: true,
-        draggable: true,
-        theme: "dark",
-        transition: Zoom,
-      });
+      showWelcomeBack(userCredential.user);
       setTimeout(() => {
         router.push("/content");
-      }, 1000);
+      }, 2000);
     } catch (error) {
       console.error("Error signing in:", error);
       toast.error("Failed to sign in. Please check your credentials.");
@@ -94,10 +90,11 @@ const SignIn = () => {
   };
 
   useEffect(() => {
-    const auth = getAuth();
     const unsubscribe = onAuthStateChanged(auth, (user) => {
       if (user) {
-        console.log("User is signed in:", user);
+        // Persist the authentication state in localStorage
+        localStorage.setItem('userDisplayName', user.displayName || '');
+        localStorage.setItem('userPhotoURL', user.photoURL || '');
       } else {
         console.log("No user is signed in.");
       }
