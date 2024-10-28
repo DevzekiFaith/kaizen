@@ -121,7 +121,7 @@ const SubscribePage = () => {
           <div className="px-6 py-8">
             <div className="flex justify-between items-center mb-8">
               <h2 className="text-2xl font-bold text-white">{selectedPlan.name}</h2>
-              <span className="text-3xl font-bold text-white">${selectedPlan.price}/mo</span>
+              <span className="text-3xl font-bold text-white">${selectedPlan.price}/yr</span>
             </div>
 
             <div className="space-y-6">

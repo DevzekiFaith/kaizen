@@ -1,0 +1,16 @@
+rules_version = '2';
+
+service cloud.firestore {
+  match /databases/{database}/documents {
+    // Allow anyone to write to the contactMessages collection
+    match /contactMessages/{document} {
+      allow read: if request.auth != null;  // Only authenticated users can read messages
+      allow create: if true;  // Anyone can create a contact message
+    }
+    
+    // Add other collection rules as needed
+    match /{document=**} {
+      allow read, write: if request.auth != null;
+    }
+  }
+}
