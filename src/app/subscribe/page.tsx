@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, Suspense } from 'react';
 import { useSearchParams, useRouter } from 'next/navigation';
 import { useAuth } from '@/firebase/auth';
 import Link from 'next/link';
@@ -44,7 +44,7 @@ const plans: Record<string, SubscriptionPlan> = {
   }
 };
 
-const SubscribePage = () => {
+const SubscribePageContent = () => {
   const searchParams = useSearchParams();
   const router = useRouter();
   const { user, loading } = useAuth();
@@ -185,6 +185,20 @@ const SubscribePage = () => {
         </div>
       </div>
     </div>
+  );
+};
+
+const SubscribePage = () => {
+  return (
+    <Suspense fallback={
+      <div className="min-h-screen bg-gradient-to-b from-gray-900 to-black flex items-center justify-center">
+        <div className="text-white text-center">
+          <p>Loading...</p>
+        </div>
+      </div>
+    }>
+      <SubscribePageContent />
+    </Suspense>
   );
 };
 
