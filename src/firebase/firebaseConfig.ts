@@ -1,14 +1,13 @@
 // Import the functions you need from the SDKs you need
-import { initializeApp, getApps } from "firebase/app";
+import { initializeApp, getApps, FirebaseApp } from "firebase/app";
 import { getAuth } from "firebase/auth";
 import { getFirestore } from "firebase/firestore";
 import { getStorage } from "firebase/storage";
 
 // Your web app's Firebase configuration for client-side
 
-
 // Initialize Firebase only if it hasn't been initialized already
-let app;
+let app: FirebaseApp;
 try {
   app = !getApps().length ? initializeApp() : getApps()[0];
 } catch (error) {
