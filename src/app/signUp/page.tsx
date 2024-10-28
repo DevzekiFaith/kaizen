@@ -90,7 +90,7 @@ export default function SignUp() {
             theme: "dark",
           });
           setTimeout(() => {
-            router.push('/dashboard');
+            router.push('/signIn');
           }, 1000);
         } else {
           throw new Error('Failed to create user profile');
@@ -167,7 +167,7 @@ export default function SignUp() {
         });
         reset();
         setTimeout(() => {
-          router.push('/dashboard');
+          router.push('/signIn');
         }, 1000);
       } else {
         throw new Error('Failed to create user profile');

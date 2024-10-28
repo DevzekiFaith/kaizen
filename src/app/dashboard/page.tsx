@@ -1,11 +1,10 @@
 "use client";
 
 import React, { useState } from "react";
-// import { useRouter } from "next/navigation";
 import NavBar from "@/components/NavBar/NavBar";
 import Dashboard from "@/components/Dashboard/Dashboard";
 import Modal from "@/components/Modal/Modal";
-// import { Bar, Line, Pie } from "react-chartjs-2";
+import PricingModal from "@/components/PricingModal/PricingModal";
 import Link from "next/link";
 import {
   Chart as ChartJS,
@@ -33,36 +32,39 @@ ChartJS.register(
   Legend
 );
 
-// interface Goal {
-//   id: string;
-//   title: string;
-//   description: string;
-//   targetDate: string;
-// }
-
 const DashboardPage: React.FC = () => {
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [isPricingModalOpen, setIsPricingModalOpen] = useState(false);
 
   const toggleModal = () => {
     setIsModalOpen(!isModalOpen);
   };
 
+  const togglePricingModal = () => {
+    setIsPricingModalOpen(!isPricingModalOpen);
+  };
+
   const toggleTheme = () => {
-    // Implement theme toggling logic here
     console.log("Theme toggled");
   };
 
   return (
     <div className="w-full">
       <NavBar onToggleModal={toggleModal} />
-      <div className="pt-[6rem] w-[18rem] ml-[1.8rem]">
+      <div className="pt-[6rem] w-full px-[1.8rem] flex justify-between items-center">
         <Link href="/content">
-        <div className="rounded-2xl border  bg-transparent w-[12rem] h-[3rem] p-2 shadow hover:translate-x-9 cursor-pointer">
-          <h1 className="text-orange-800 w-[12rem] font-bold ml-[.rem]">
-            Back to Daily Journal
-          </h1>
-        </div>
+          <div className="rounded-2xl border bg-transparent w-[12rem] h-[3rem] p-2 shadow hover:translate-x-9 cursor-pointer">
+            <h1 className="text-orange-800 w-[12rem] font-bold ml-[.rem]">
+              Back to Daily Journal
+            </h1>
+          </div>
         </Link>
+        <button
+          onClick={togglePricingModal}
+          className="rounded-2xl border border-orange-600 bg-transparent px-6 h-[3rem] shadow hover:bg-orange-600 hover:text-white transition-colors duration-300 text-orange-600 font-medium"
+        >
+          Upgrade to Pro
+        </button>
       </div>
       <div className="container mx-auto px-4 py-8 z-[-50] pt-[4rem]">
         <div>
@@ -77,7 +79,12 @@ const DashboardPage: React.FC = () => {
         onClose={toggleModal}
         toggleTheme={toggleTheme}
       />
+      <PricingModal
+        isOpen={isPricingModalOpen}
+        onClose={togglePricingModal}
+      />
     </div>
   );
 };
+
 export default DashboardPage;
