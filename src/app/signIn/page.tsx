@@ -4,7 +4,7 @@ import React, { useEffect, useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { useForm, SubmitHandler } from "react-hook-form";
-import { GoogleAuthProvider, signInWithPopup } from "firebase/auth";
+import { GoogleAuthProvider, signInWithPopup, User } from "firebase/auth";
 import {
   getAuth,
   signInWithEmailAndPassword,
@@ -28,9 +28,9 @@ const SignIn = () => {
   const [showPassword, setShowPassword] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
 
-  const showWelcomeBack = (user: any) => {
+  const showWelcomeBack = (user: User) => {
     const name = user.displayName || user.email?.split('@')[0] || 'User';
-    toast.success(`Welcome back, ${name}! 👋`, {
+    toast.success(`Welcome back!, ${name}! 👋`, {
       position: "top-center",
       autoClose: 3000,
       hideProgressBar: false,
