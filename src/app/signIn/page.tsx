@@ -14,7 +14,6 @@ import {
   AuthError 
 } from "firebase/auth";
 import {
-  getAuth,
   signInWithEmailAndPassword,
   onAuthStateChanged,
 } from "firebase/auth";
