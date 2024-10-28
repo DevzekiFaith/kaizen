@@ -10,10 +10,11 @@ import {
   User,
   browserPopupRedirectResolver,
   browserLocalPersistence,
-  setPersistence 
+  setPersistence,
+  AuthError 
 } from "firebase/auth";
 import {
-  // getAuth, // Removed unused import
+  getAuth,
   signInWithEmailAndPassword,
   onAuthStateChanged,
 } from "firebase/auth";
@@ -30,6 +31,10 @@ type FormValues = {
   email: string;
   password: string;
 };
+
+interface AuthErrorWithCode extends AuthError {
+  code: string;
+}
 
 const SignIn = () => {
   const router = useRouter();
@@ -144,21 +149,32 @@ const SignIn = () => {
       setTimeout(() => {
         router.push("/dashboard");
       }, 2000);
-    } catch (error: any) {
+    } catch (error) {
       console.error("Error signing in:", error);
-      let errorMessage = "Failed to sign in. Please check your credentials.";
       
-      if (error.code === 'auth/invalid-email') {
-        errorMessage = "Invalid email address.";
-      } else if (error.code === 'auth/user-disabled') {
-        errorMessage = "This account has been disabled.";
-      } else if (error.code === 'auth/user-not-found') {
-        errorMessage = "No account found with this email.";
-      } else if (error.code === 'auth/wrong-password') {
-        errorMessage = "Incorrect password.";
+      if (error instanceof FirebaseError) {
+        const authError = error as AuthErrorWithCode;
+        let errorMessage = "Failed to sign in. Please check your credentials.";
+        
+        switch (authError.code) {
+          case 'auth/invalid-email':
+            errorMessage = "Invalid email address.";
+            break;
+          case 'auth/user-disabled':
+            errorMessage = "This account has been disabled.";
+            break;
+          case 'auth/user-not-found':
+            errorMessage = "No account found with this email.";
+            break;
+          case 'auth/wrong-password':
+            errorMessage = "Incorrect password.";
+            break;
+        }
+        
+        toast.error(errorMessage);
+      } else {
+        toast.error('An unexpected error occurred. Please try again.');
       }
-      
-      toast.error(errorMessage);
     } finally {
       setIsLoading(false);
     }
