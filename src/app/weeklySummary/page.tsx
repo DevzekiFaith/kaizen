@@ -4,7 +4,8 @@ import React, { useState, useEffect } from "react";
 import NavBar from "@/components/NavBar/NavBar";
 import Modal from "@/components/Modal/Modal";
 import Image from "next/image";
-import Cover23 from "../../../Public/images/cover23.jpg"
+import Cover23 from "../../../Public/images/cover23.jpg";
+import { Footer } from "@/components/Footer/Footer";
 
 interface JournalEntry {
   date: string;
@@ -23,7 +24,9 @@ const WeeklySummaryPage: React.FC = () => {
     const entriesWithGoals = entries.filter(
       (entry: JournalEntry) => entry.goal === "true"
     ).length;
-    return totalEntries > 0 ? Math.round((entriesWithGoals / totalEntries) * 100) : 0;
+    return totalEntries > 0
+      ? Math.round((entriesWithGoals / totalEntries) * 100)
+      : 0;
   };
 
   useEffect(() => {
@@ -53,7 +56,7 @@ const WeeklySummaryPage: React.FC = () => {
   }, [journalEntries]);
 
   const handleToggleModal = () => {
-    setIsModalOpen(prevState => !prevState);
+    setIsModalOpen((prevState) => !prevState);
   };
 
   function toggleTheme(): void {
@@ -110,7 +113,8 @@ const WeeklySummaryPage: React.FC = () => {
                     <strong>Content:</strong> {entry.content}
                   </p>
                   <p className="text-gray-700">
-                    <strong>Goal:</strong> {entry.goal === "true" ? "Set" : "Not set"}
+                    <strong>Goal:</strong>{" "}
+                    {entry.goal === "true" ? "Set" : "Not set"}
                   </p>
                 </div>
               ))
@@ -121,6 +125,9 @@ const WeeklySummaryPage: React.FC = () => {
             )}
           </div>
         </div>
+      </div>
+      <div>
+        <Footer />
       </div>
     </div>
   );

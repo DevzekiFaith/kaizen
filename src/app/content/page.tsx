@@ -10,6 +10,7 @@ import Modal from "@/components/Modal/Modal";
 import Cover14 from "../../../Public/images/cover14.jpg";
 import Badge from "@/components/Badge/Badge";
 import Link from "next/link";
+import { Footer } from "@/components/Footer/Footer";
 
 interface FormValues {
   date: string;
@@ -251,7 +252,7 @@ const MainPage = () => {
         <form onSubmit={handleSubmit(onSubmit)}>
           <div>
             <span className="flex flex-col mb-[1.5rem]">
-              <label className="text-slate-500 text-[12px]">Date</label>
+              <label className="text-slate-500 text-[12px] mb-[2rem]">Date</label>
               <input
                 id="dateInput"
                 className="text-slate-800 text-[12px] p-[8px] rounded-2xl"
@@ -287,7 +288,7 @@ const MainPage = () => {
 
             <span className="flex flex-col mb-[1.5rem]">
               <label
-                className="text-slate-500 text-[12px]"
+                className="text-slate-500 text-[12px] mb-[1rem]"
                 htmlFor="titleInput"
               >
                 Title
@@ -371,7 +372,7 @@ const MainPage = () => {
               <label htmlFor="contentTextarea">Content</label>
               <textarea
                 id="contentTextarea"
-                className="text-slate-600 text-[12px] p-[8px] rounded-2xl h-[14rem]"
+                className="text-slate-600 text-[12px] p-[8px] rounded-2xl h-[14rem] mb-[2rem]"
                 placeholder="Enter your content here"
                 {...register("content", {
                   required: "Content is required",
@@ -450,6 +451,9 @@ const MainPage = () => {
         >
           View Weekly Summary
         </Link>
+      </div>
+      <div>
+        <Footer />
       </div>
     </main>
   );

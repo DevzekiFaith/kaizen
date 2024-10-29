@@ -8,6 +8,7 @@ import Image from "next/image";
 import ConfirmationModal from "@/components/ConfirmatioModal/ConfirmationModal";
 import jsPDF from "jspdf";
 import Cover26 from "../../../Public/images/cover26.jpg";
+import { Footer } from "@/components/Footer/Footer";
 
 const DynamicModal = dynamic(() => import("@/components/Modal/Modal"), {
   ssr: false,
@@ -302,6 +303,9 @@ const DailyJournal: React.FC = () => {
         onConfirm={confirmShareWeeklyJournal}
         message="Are you sure you want to share your weekly journal?"
       />
+      <div>
+        <Footer/>
+      </div>
     </div>
   );
 };

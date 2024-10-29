@@ -91,7 +91,7 @@ const SignIn = () => {
       showWelcomeBack(result.user);
       
       setTimeout(() => {
-        router.push("/dashboard");
+        router.push("/content");
       }, 2000);
     } catch (error) {
       console.error("Detailed Google sign-in error:", error);
@@ -146,7 +146,7 @@ const SignIn = () => {
       reset();
       showWelcomeBack(userCredential.user);
       setTimeout(() => {
-        router.push("/dashboard");
+        router.push("/content");
       }, 2000);
     } catch (error) {
       console.error("Error signing in:", error);

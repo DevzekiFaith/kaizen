@@ -18,6 +18,7 @@ import {
   Tooltip,
   Legend,
 } from "chart.js";
+import { Footer } from "@/components/Footer/Footer";
 
 // Register ChartJS components
 ChartJS.register(
@@ -79,10 +80,11 @@ const DashboardPage: React.FC = () => {
         onClose={toggleModal}
         toggleTheme={toggleTheme}
       />
-      <PricingModal
-        isOpen={isPricingModalOpen}
-        onClose={togglePricingModal}
-      />
+      <PricingModal isOpen={isPricingModalOpen} onClose={togglePricingModal} />
+
+      <div>
+        <Footer />
+      </div>
     </div>
   );
 };
