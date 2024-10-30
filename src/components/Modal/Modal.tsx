@@ -46,7 +46,7 @@ const Modal: React.FC<ModalProps> = ({ isOpen, onClose }) => {
         }`}
       >
         <div
-          className={`fixed top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 bg-transparent rounded-lg shadow-lg p-5 h-[23rem] text-slate-400 border-2 border-slate-700 w-[16rem] transition-transform ${
+          className={`fixed top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 bg-transparent rounded-lg shadow-lg p-5 h-[26rem] text-slate-400 border-2 border-slate-700 w-[16rem] transition-transform ${
             isOpen ? "scale-100" : "scale-95"
           }`}
         >
@@ -142,6 +142,17 @@ const Modal: React.FC<ModalProps> = ({ isOpen, onClose }) => {
                 onClick={onClose}
               >
                 Contact
+              </Link>
+            </li>
+            <li>
+              <Link
+                href="/community"
+                className={`block ${
+                  isActive("/dashboard") ? "text-orange-500" : "text-slate-400"
+                } hover:text-orange-500`}
+                onClick={onClose}
+              >
+                Community
               </Link>
             </li>
             <li>

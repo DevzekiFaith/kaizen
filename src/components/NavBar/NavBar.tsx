@@ -16,6 +16,7 @@ const navLinks = [
   { name: "weekly Summary", path: "/weeklySummary" },
   { name: "dashboard", path: "/dashboard" },
   { name: "contact", path: "/contact" },
+  { name: "community", path: "/community" }
 ];
 
 interface NavBarProps {

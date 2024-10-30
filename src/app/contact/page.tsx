@@ -189,7 +189,9 @@ const ContactPage = () => {
                 <textarea
                   className="w-full px-3 py-2 bg-gray-700 border border-gray-600 rounded-md text-white"
                   rows={4}
-                  {...register("message", { required: "Message is required" })}
+                  {...register("message", {
+                    required: "Message is required",
+                  })}
                 />
                 {errors.message && (
                   <p className="mt-1 text-sm text-red-500">

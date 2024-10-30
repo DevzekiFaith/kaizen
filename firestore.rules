@@ -9,6 +9,24 @@ service cloud.firestore {
       allow read: if true;
     }
 
+    // Rules for ratings collection
+    match /ratings/{ratingId} {
+      allow read: if true; // Anyone can read ratings
+      allow write: if request.auth != null; // Only authenticated users can rate
+    }
+
+    // Rules for communityStats
+    match /communityStats/{document} {
+      allow read: if true; // Anyone can read community stats
+      allow write: if request.auth != null; // Only authenticated users can update
+    }
+
+    // Rules for user profiles
+    match /users/{userId} {
+      allow read: if true; // Public profiles
+      allow write: if request.auth != null && request.auth.uid == userId; // Users can only edit their own profile
+    }
+
     // Default rule for other collections
     match /{document=**} {
       allow read, write: if request.auth != null;
