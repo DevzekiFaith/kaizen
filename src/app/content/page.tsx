@@ -420,7 +420,7 @@ const MainPage = () => {
             type="submit"
             className="flex justify-center gap-[1.5rem] items-center bg-transparent border border-slate-800 p-[3px] mt-[2rem] xl:w-[24rem] rounded-full h-[2.5rem] font-extrabold w-[16rem] text-orange-500 hover:translate-x-5"
           >
-            Lets Go!{" "}
+            Ride On!{" "}
             <FaArrowUpRightFromSquare className="text-slate-800 translate-x-3 cursor-pointer hover:translate-x-6" />
           </button>
           <div className="border-4 border-slate-700 border-l-slate-500w-[200px] mt-[2rem] rounded-2xl">
