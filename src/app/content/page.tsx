@@ -404,7 +404,7 @@ const MainPage = () => {
                   required: "Weekly summary is required",
                   minLength: {
                     value: 20,
-                    message: "Summary must be at least 20 characters",
+                    message: "Summary must be at least 20 characters of your expectation",
                   },
                 })}
               />

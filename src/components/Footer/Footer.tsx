@@ -1,4 +1,4 @@
-import { FaFacebook, FaTwitter, FaInstagram, FaLinkedin } from "react-icons/fa"; // Import social media icons
+// import { FaFacebook, FaTwitter, FaInstagram, FaLinkedin } from "react-icons/fa"; // Import social media icons
 
 export const Footer = () => {
   return (
@@ -25,7 +25,7 @@ export const Footer = () => {
       </div>
       <div className="mt-4">
         <h2 className="text-lg font-semibold">Follow Us</h2>
-        <div className="flex justify-center space-x-4 mt-2">
+        {/* <div className="flex justify-center space-x-4 mt-2">
           <a
             href="https://facebook.com"
             target="_blank"
@@ -58,7 +58,7 @@ export const Footer = () => {
           >
             <FaLinkedin className="text-orange-700 hover:text-blue-900" />
           </a>
-        </div>
+        </div> */}
         <div className="mt-4">
           <h2 className="text-lg font-semibold">Contact Us</h2>
           <div className="flex justify-center space-x-4 mt-2">
@@ -72,20 +72,6 @@ export const Footer = () => {
               WhatsApp Us
             </a>
           </div>
-        </div>
-      </div>
-      <div className="mt-4">
-        <h2 className="text-lg font-semibold">Quick Links</h2>
-        <div className="flex justify-center space-x-4 mt-2">
-          <a href="/about" className="text-orange-500 hover:underline">
-            Home
-          </a>
-          <a href="/privacy" className="text-orange-500 hover:underline">
-            Privacy Policy
-          </a>
-          <a href="/terms" className="text-orange-500 hover:underline">
-            Terms of Service
-          </a>
         </div>
       </div>
     </div>
