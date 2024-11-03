@@ -62,7 +62,7 @@ export default function CommunityPage() {
         <Modal isOpen={isModalOpen} onClose={toggleModal} toggleTheme={() => {}} />
       </div>
 
-      <div className="container mx-auto px-4 py-8 pt-[10rem]">
+      <div className="container mx-auto px-4 py-8 pt-[10rem] flex flex-col justify-center items-center w-[44rem]">
         <div className="wrapper mb-8">
           <div className="typing-demo text-slate-500 p-3 text-[14px]">
             Community Ratings & Feedback
@@ -71,7 +71,7 @@ export default function CommunityPage() {
         
         {/* Community Stats */}
         {stats && (
-          <div className="border-4 border-slate-700 rounded-xl p-[1rem] mb-8">
+          <div className="border-4 border-slate-700 rounded-xl p-[1rem] mb-8 w-full">
             <h2 className="text-xl font-semibold mb-4 text-slate-500">Community Statistics</h2>
             <div className="grid grid-cols-2 gap-4">
               <div>
@@ -92,7 +92,7 @@ export default function CommunityPage() {
 
         {/* Rating Form */}
         {auth.currentUser && (
-          <div className="border-4 border-slate-700 rounded-xl p-[1rem] mb-8">
+          <div className="border-4 border-slate-700 rounded-xl p-[1rem] mb-8 w-full">
             <h2 className="text-xl font-semibold mb-4 text-slate-500">Submit Your Rating</h2>
             <div className="space-y-4">
               <div>
@@ -142,7 +142,7 @@ export default function CommunityPage() {
         )}
 
         {/* Recent Ratings */}
-        <div className="border-4 border-slate-700 rounded-xl p-[1rem]">
+        <div className="border-4 border-slate-700 rounded-xl p-[1rem] w-full">
           <h2 className="text-xl font-semibold mb-4 text-slate-500">Recent Community Ratings</h2>
           <div className="space-y-4">
             {ratings.map((rating, index) => (
