@@ -80,7 +80,7 @@ export default function SignUp() {
         );
 
         if (success) {
-          toast.success('Successfully signed in with Google!', {
+          toast.success('Successfully signed up with Google!', {
             position: "top-center",
             autoClose: 2000,
             hideProgressBar: false,
