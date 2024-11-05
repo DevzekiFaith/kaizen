@@ -70,7 +70,7 @@ export default function CommunityPage() {
         />
       </div>
 
-      <div className="container mx-auto px-4 py-8 pt-[10rem] flex flex-col justify-center items-center w-[44rem]">
+      <div className="container mx-auto px-4 py-8 pt-[10rem] ">
         <div className="wrapper mb-8">
           <div className="typing-demo text-slate-500 p-3 text-[14px]">
             Community Ratings & Feedback

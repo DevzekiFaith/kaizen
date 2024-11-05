@@ -4,26 +4,23 @@ import React, { useEffect, useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { useForm, SubmitHandler } from "react-hook-form";
-import { 
-  GoogleAuthProvider, 
-  signInWithPopup, 
+import {
+  GoogleAuthProvider,
+  signInWithPopup,
   User,
   browserPopupRedirectResolver,
   browserLocalPersistence,
   setPersistence,
-  AuthError 
+  AuthError,
 } from "firebase/auth";
-import {
-  signInWithEmailAndPassword,
-  onAuthStateChanged,
-} from "firebase/auth";
+import { signInWithEmailAndPassword, onAuthStateChanged } from "firebase/auth";
 import { auth } from "@/firebase/firebaseConfig";
 import { useRouter } from "next/navigation";
 import { ToastContainer, Zoom, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import { Eye, EyeOff } from "lucide-react";
-import Cover10 from "../../../Public/images/cover10.jpg"
-import Framer from "../../../Public/images/Frame.png"
+import Cover10 from "../../../Public/images/cover10.jpg";
+import Framer from "../../../Public/images/Frame.png";
 import { FirebaseError } from "firebase/app";
 
 type FormValues = {
@@ -48,7 +45,7 @@ const SignIn = () => {
   }, []);
 
   const showWelcomeBack = (user: User) => {
-    const name = user.displayName || user.email?.split('@')[0] || 'User';
+    const name = user.displayName || user.email?.split("@")[0] || "User";
     toast.success(`Welcome back!, ${name}! 👋`, {
       position: "top-center",
       autoClose: 3000,
@@ -63,58 +60,64 @@ const SignIn = () => {
 
   const HandleGoogle = async () => {
     if (isLoading) return;
-    
+
     try {
       setIsLoading(true);
       console.log("Starting Google sign-in process...");
 
       const provider = new GoogleAuthProvider();
-      provider.addScope('email');
-      provider.addScope('profile');
-      
+      provider.addScope("email");
+      provider.addScope("profile");
+
       provider.setCustomParameters({
-        prompt: 'select_account'
+        prompt: "select_account",
       });
 
       console.log("Initialized Google provider with scopes");
 
-      const result = await signInWithPopup(auth, provider, browserPopupRedirectResolver);
+      const result = await signInWithPopup(
+        auth,
+        provider,
+        browserPopupRedirectResolver
+      );
       console.log("Sign-in successful:", result.user.email);
-      
+
       // Store the user info immediately after successful sign-in
       if (result.user) {
-        localStorage.setItem('userDisplayName', result.user.displayName || '');
-        localStorage.setItem('userPhotoURL', result.user.photoURL || '');
-        localStorage.setItem('userEmail', result.user.email || '');
+        localStorage.setItem("userDisplayName", result.user.displayName || "");
+        localStorage.setItem("userPhotoURL", result.user.photoURL || "");
+        localStorage.setItem("userEmail", result.user.email || "");
       }
-      
+
       showWelcomeBack(result.user);
-      
+
       setTimeout(() => {
         router.push("/content");
       }, 2000);
     } catch (error) {
       console.error("Detailed Google sign-in error:", error);
-      
+
       if (error instanceof FirebaseError) {
         switch (error.code) {
-          case 'auth/popup-closed-by-user':
-            toast.info('Sign-in cancelled. Please try again');
+          case "auth/popup-closed-by-user":
+            toast.info("Sign-in cancelled. Please try again");
             break;
-          case 'auth/popup-blocked':
-            toast.error('Popup was blocked. Please allow popups for this website and try again');
+          case "auth/popup-blocked":
+            toast.error(
+              "Popup was blocked. Please allow popups for this website and try again"
+            );
             break;
-          case 'auth/cancelled-popup-request':
-            toast.info('Previous sign-in still in progress');
+          case "auth/cancelled-popup-request":
+            toast.info("Previous sign-in still in progress");
             break;
-          case 'auth/network-request-failed':
-            toast.error('Network error. Please check your internet connection');
+          case "auth/network-request-failed":
+            toast.error("Network error. Please check your internet connection");
             break;
           default:
             toast.error(`Authentication error: ${error.code}`);
         }
       } else {
-        toast.error('Failed to sign in with Google. Please try again later.');
+        toast.error("Failed to sign in with Google. Please try again later.");
       }
     } finally {
       setIsLoading(false);
@@ -134,15 +137,25 @@ const SignIn = () => {
     try {
       setIsLoading(true);
       const { email, password } = data;
-      const userCredential = await signInWithEmailAndPassword(auth, email, password);
-      
+      const userCredential = await signInWithEmailAndPassword(
+        auth,
+        email,
+        password
+      );
+
       // Store user info
       if (userCredential.user) {
-        localStorage.setItem('userDisplayName', userCredential.user.displayName || '');
-        localStorage.setItem('userPhotoURL', userCredential.user.photoURL || '');
-        localStorage.setItem('userEmail', userCredential.user.email || '');
+        localStorage.setItem(
+          "userDisplayName",
+          userCredential.user.displayName || ""
+        );
+        localStorage.setItem(
+          "userPhotoURL",
+          userCredential.user.photoURL || ""
+        );
+        localStorage.setItem("userEmail", userCredential.user.email || "");
       }
-      
+
       reset();
       showWelcomeBack(userCredential.user);
       setTimeout(() => {
@@ -150,29 +163,29 @@ const SignIn = () => {
       }, 2000);
     } catch (error) {
       console.error("Error signing in:", error);
-      
+
       if (error instanceof FirebaseError) {
         const authError = error as AuthErrorWithCode;
         let errorMessage = "Failed to sign in. Please check your credentials.";
-        
+
         switch (authError.code) {
-          case 'auth/invalid-email':
+          case "auth/invalid-email":
             errorMessage = "Invalid email address.";
             break;
-          case 'auth/user-disabled':
+          case "auth/user-disabled":
             errorMessage = "This account has been disabled.";
             break;
-          case 'auth/user-not-found':
+          case "auth/user-not-found":
             errorMessage = "No account found with this email.";
             break;
-          case 'auth/wrong-password':
+          case "auth/wrong-password":
             errorMessage = "Incorrect password.";
             break;
         }
-        
+
         toast.error(errorMessage);
       } else {
-        toast.error('An unexpected error occurred. Please try again.');
+        toast.error("An unexpected error occurred. Please try again.");
       }
     } finally {
       setIsLoading(false);
@@ -183,16 +196,16 @@ const SignIn = () => {
     const unsubscribe = onAuthStateChanged(auth, (user) => {
       if (user) {
         // Update localStorage whenever auth state changes
-        localStorage.setItem('userDisplayName', user.displayName || '');
-        localStorage.setItem('userPhotoURL', user.photoURL || '');
-        localStorage.setItem('userEmail', user.email || '');
-        console.log('User is signed in:', user.email);
+        localStorage.setItem("userDisplayName", user.displayName || "");
+        localStorage.setItem("userPhotoURL", user.photoURL || "");
+        localStorage.setItem("userEmail", user.email || "");
+        console.log("User is signed in:", user.email);
       } else {
         // Clear localStorage when user signs out
-        localStorage.removeItem('userDisplayName');
-        localStorage.removeItem('userPhotoURL');
-        localStorage.removeItem('userEmail');
-        console.log('No user signed in');
+        localStorage.removeItem("userDisplayName");
+        localStorage.removeItem("userPhotoURL");
+        localStorage.removeItem("userEmail");
+        console.log("No user signed in");
       }
     });
     return () => unsubscribe();
@@ -233,18 +246,18 @@ const SignIn = () => {
                     className="w-[24rem] h-[2.5rem] text-slate-500 bg-slate-800 rounded-3xl px-6 text-[12px]"
                     type="email"
                     placeholder="Enter your email"
-                    {...register("email", { 
+                    {...register("email", {
                       required: true,
                       pattern: {
                         value: /^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}$/i,
-                        message: "Invalid email address"
-                      }
+                        message: "Invalid email address",
+                      },
                     })}
                   />
                   {errors.email && (
                     <p className="text-red-500" role="alert">
-                      {errors.email.type === "required" 
-                        ? "Email is required" 
+                      {errors.email.type === "required"
+                        ? "Email is required"
                         : errors.email.message}
                     </p>
                   )}
@@ -258,19 +271,21 @@ const SignIn = () => {
                       className="w-[24rem] h-[2.5rem] text-slate-300 bg-slate-800 rounded-3xl px-6 text-[12px]"
                       type={showPassword ? "text" : "password"}
                       placeholder="Enter your password"
-                      {...register("password", { 
+                      {...register("password", {
                         required: "Password is required",
                         minLength: {
                           value: 6,
-                          message: "Password must be at least 6 characters"
-                        }
+                          message: "Password must be at least 6 characters",
+                        },
                       })}
                     />
                     <button
                       type="button"
                       onClick={togglePasswordVisibility}
                       className="absolute top-2 right-4"
-                      aria-label={showPassword ? "Hide password" : "Show password"}
+                      aria-label={
+                        showPassword ? "Hide password" : "Show password"
+                      }
                     >
                       {showPassword ? (
                         <EyeOff className="h-6 w-6 text-slate-400" />
@@ -288,7 +303,7 @@ const SignIn = () => {
               </div>
               <span className="mt-[1rem]">
                 <h6 className="text-slate-400 text-[10px] text-center pt-[12px] ml-[3rem]">
-                  By signing up, you accept our{" "}
+                  By signing in, you accept our{" "}
                   <span className="text-green-700">Terms and Conditions</span>
                 </h6>
               </span>
