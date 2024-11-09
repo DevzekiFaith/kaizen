@@ -17,10 +17,6 @@ const app = !getApps().length ? initializeApp(firebaseConfig) : getApps()[0];
 const db = getFirestore(app);
 
 export async function POST(req: Request) {
-  if (req.method !== 'POST') {
-    return new Response('Method not allowed', { status: 405 });
-  }
-
   try {
     const data = await req.json();
     
@@ -63,7 +59,6 @@ export async function POST(req: Request) {
 
 
 
-
 export async function GET(
   request: Request,
   { params }: { params: { email: string } }
@@ -79,16 +74,16 @@ export async function GET(
 
 // import { prisma } from '@/lib/prisma';
 
-export async function POST(request: Request) {
-  const { email } = await request.json();
+// export async function POST(request: Request) {
+//   const { email } = await request.json();
 
-  const user = await prisma.user.update({
-    where: { email },
-    data: {
-      usedCoins: { increment: 1 }
-    }
-  });
+//   const user = await prisma.user.update({
+//     where: { email },
+//     data: {
+//       usedCoins: { increment: 1 }
+//     }
+//   });
 
-  return Response.json(user);
-}
+//   return Response.json(user);
+// }
 
