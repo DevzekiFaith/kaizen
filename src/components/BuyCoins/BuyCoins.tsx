@@ -65,10 +65,11 @@ const BuyCoins = () => {
         },
       };
 
-      const handler = window.PaystackPop.setup(config);
-      handler.openIframe();
+      const handler = window.PaystackPop?.setup(config);
+      handler?.openIframe();
     }, 500);
   };
+
 
   return (
     <>
@@ -111,7 +112,7 @@ const BuyCoins = () => {
 
       {isLoading && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-          <div className="bg-white p-6 rounded-lg shadow-xl flex flex-col items-center">
+          <div className="bg-black p-6 rounded-lg shadow-xl flex flex-col items-center">
             <Loader2 className="h-8 w-8 animate-spin text-orange-600 mb-4" />
             <p className="text-gray-700">Preparing your payment...</p>
           </div>
