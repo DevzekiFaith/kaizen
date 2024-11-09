@@ -18,8 +18,11 @@ declare global {
     };
   }}
 
+import { useRouter } from 'next/navigation';
+
 const BuyCoins = () => {
   const [isScriptLoaded, setIsScriptLoaded] = useState(false);
+  const router = useRouter();
 
   useEffect(() => {
     // Dynamically load the Paystack script
@@ -34,6 +37,10 @@ const BuyCoins = () => {
     };
   }, []);
 
+  const handlePaymentSuccess = () => {
+    router.push('/content');
+  }
+
   const handlePayment = () => {
     if (!isScriptLoaded || !window.PaystackPop) {
       console.error("Paystack script not loaded");
@@ -41,19 +48,22 @@ const BuyCoins = () => {
     }
 
     // Setup the payment handler with required options
-    const handler = window.PaystackPop.setup({
+    const config = {
       key: 'pk_test_8dcf1e666d54aa2f0d2787f8930cef9f0202d226', // Replace with your Paystack public key
       email: 'unovaconsultingfirstafrica@gmail.com', // User's email
       amount: 5000, // Amount in kobo (multiply naira by 100)
       callback: function (response: { reference: string }) {
         // Handle success
         alert('Payment complete! Reference: ' + response.reference);
-      },      onClose: function () {
+        handlePaymentSuccess();
+      },
+      onClose: function () {
         // Handle when the user closes the payment modal
         alert('Payment closed.');
       },
-    });
+    };
 
+    const handler = window.PaystackPop.setup(config);
     handler.openIframe(); // Open the Paystack payment modal
   };
 
@@ -73,7 +83,6 @@ const BuyCoins = () => {
       </button>
     </div>
   );
-  
 };
 
 export default BuyCoins;
