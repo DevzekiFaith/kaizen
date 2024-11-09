@@ -1,8 +1,7 @@
-import type { Metadata } from "next";
+// import { Metadata } from "next";
 import localFont from "next/font/local";
-import { ThemeProvider } from "@/components/Theme-Provider/Theme-Provider";
-import { FirebaseInitializer } from "@/components/Firebase/FirebaseInitializer";
 import "./globals.css";
+import ClientProviders from "@/components/ClientProvider/ClientProvider";
 
 const geistSans = localFont({
   src: "./fonts/GeistVF.woff",
@@ -16,11 +15,6 @@ const geistMono = localFont({
   weight: "100 900",
 });
 
-export const metadata: Metadata = {
-  title: "Reflectify",
-  description: "Your personal reflection and journaling app",
-};
-
 export default function RootLayout({
   children,
 }: {
@@ -33,16 +27,7 @@ export default function RootLayout({
         className={`${geistSans.variable} ${geistMono.variable} font-sans`}
         suppressHydrationWarning
       >
-        <ThemeProvider
-          attribute="class"
-          defaultTheme="system"
-          enableSystem
-          disableTransitionOnChange
-        >
-          <FirebaseInitializer>
-            {children}
-          </FirebaseInitializer>
-        </ThemeProvider>
+        <ClientProviders>{children}</ClientProviders>
       </body>
     </html>
   );

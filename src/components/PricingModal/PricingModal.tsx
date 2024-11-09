@@ -1,125 +1,104 @@
 "use client";
 
-import React from 'react';
-import { Check } from 'lucide-react';
-import Link from 'next/link';
-
-interface PlanFeature {
-  text: string;
-  available: boolean;
-}
-
-interface PricingPlan {
-  name: string;
-  price: string;
-  description: string;
-  features: PlanFeature[];
-  buttonText: string;
-  href: string;
-  highlighted?: boolean;
-}
+import React, { useState, useEffect } from 'react';
+import { useRouter } from 'next/navigation';
+import { toast } from 'react-hot-toast';
+import { getAuth } from 'firebase/auth';
 
 interface PricingModalProps {
-  isOpen: boolean;
   onClose: () => void;
 }
 
-const pricingPlans: PricingPlan[] = [
-  {
-    name: "Free",
-    price: "$0",
-    description: "Perfect for getting started with basic journaling",
-    features: [
-      { text: "Basic Daily Journal", available: true },
-      { text: "Simple Task Tracking", available: true },
-      { text: "Basic Analytics", available: true },
-      { text: "Community Access", available: true },
-    ],
-    buttonText: "Current Plan",
-    href: "#"
-  },
-  {
-    name: "Pro",
-    price: "$4",
-    description: "Enhanced features for serious self-improvement",
-    features: [
-      { text: "Everything in Free", available: true },
-      { text: "Advanced Analytics", available: true },
-      { text: "AI-Powered Insights", available: true },
-      { text: "Custom Templates", available: true },
-    ],
-    buttonText: "Upgrade Now",
-    href: "/subscribe?plan=pro",
-    highlighted: true
-  }
-];
+const PricingModal: React.FC<PricingModalProps> = ({ onClose }) => {
+  const auth = getAuth();
+  const user = auth.currentUser;
+  const [coins, setCoins] = useState(0);
+  const [usedCoins, setUsedCoins] = useState(0);
+  const router = useRouter();
 
-const PricingModal: React.FC<PricingModalProps> = ({ isOpen, onClose }) => {
-  if (!isOpen) return null;
+  useEffect(() => {
+    const fetchUserCoins = async () => {
+      if (user?.email) {
+        const response = await fetch(`/api/coins/${user.email}`);
+        const data = await response.json();
+        setCoins(data.totalCoins);
+        setUsedCoins(data.usedCoins);
+      }
+    };
+    fetchUserCoins();
+  }, [user]);
 
-  return (
-    <div className="fixed inset-0 bg-black bg-opacity-70 z-50 flex items-center justify-center pt-[5.5rem]">
-      <div className="bg-gray-900 rounded-lg p-6 max-w-4xl w-full mx-4 relative max-h-[90vh] overflow-y-auto">
-        <button
-          onClick={onClose}
-          className="absolute top-4 right-4 text-gray-400 hover:text-white"
-          aria-label="Close modal"
-        >
-          <svg className="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-          </svg>
-        </button>
+  const remainingCoins = coins - usedCoins;
 
-        <div className="text-center mb-8">
-          <h2 className="text-2xl font-bold text-white mb-2">Upgrade Your Experience</h2>
-          <p className="text-gray-400">Choose the plan that best fits your journey</p>
-        </div>
+  const useCoin = async () => {
+    if (remainingCoins > 0) {
+      try {
+        const response = await fetch('/api/coins/use', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            email: user?.email,
+          }),
+        });
 
-        <div className="grid md:grid-cols-2 gap-6">
-          {pricingPlans.map((plan) => (
-            <div
-              key={plan.name}
-              className={`rounded-lg p-6 ${
-                plan.highlighted
-                  ? 'border-2 border-orange-500 bg-gray-800'
-                  : 'border border-gray-700 bg-gray-800'
-              }`}
-            >
-              <h3 className="text-xl font-semibold text-white mb-2">{plan.name}</h3>
-              <p className="text-gray-400 mb-4">{plan.description}</p>
-              <div className="mb-4">
-                <span className="text-3xl font-bold text-white">{plan.price}</span>
-                {plan.price !== "₹0" && (
-                  <span className="text-gray-400">/month</span>
-                )}
-              </div>
-              
-              <ul className="space-y-3 mb-6">
-                {plan.features.map((feature, index) => (
-                  <li key={index} className="flex items-center text-gray-300">
-                    <Check className="h-5 w-5 text-orange-500 mr-2" />
-                    <span>{feature.text}</span>
-                  </li>
-                ))}
-              </ul>
+        if (response.ok) {
+          setUsedCoins(prev => prev + 1);
+          toast.success('Coin used successfully!');
+          onClose();
+          router.push('/content');
+        } else {
+          throw new Error('Failed to use coin');
+        }
+      } catch (error: unknown) {
+        toast.error('Failed to use coin. Please try again.');
+      }
+    } else {
+      toast.error('No coins available!');
+      const wantsToBuyMore = window.confirm(
+        "You've used all your coins. Would you like to purchase more coins to continue journaling?"
+      );
+      
+      if (wantsToBuyMore) {
+        router.push('/buycoins');
+      }
+      onClose();
+    }
+  };
 
-              <Link
-                href={plan.href}
-                className={`block w-full text-center py-2 px-4 rounded-md font-medium
-                  ${plan.highlighted
-                    ? 'bg-orange-600 hover:bg-orange-700 text-white'
-                    : 'bg-gray-700 text-gray-300 cursor-not-allowed'
-                  }`}
-              >
-                {plan.buttonText}
-              </Link>
+  return (    <div className="fixed inset-0 bg-black bg-opacity-70 z-50 flex items-center justify-center">
+      <div className="bg-gray-900 rounded-lg p-6 max-w-md w-full mx-4">
+        <div className="text-center mb-6">
+          <h2 className="text-2xl font-bold text-white mb-2">Your Coin Balance</h2>
+          
+          <div className="flex justify-center items-center space-x-4 mb-4">
+            <div className="text-center">
+              <span className="block text-3xl font-bold text-orange-500">{remainingCoins}</span>
+              <span className="text-gray-400 text-sm">Available</span>
             </div>
-          ))}
+            <div className="text-center">
+              <span className="block text-3xl font-bold text-gray-500">{usedCoins}</span>
+              <span className="text-gray-400 text-sm">Used</span>
+            </div>
+          </div>
         </div>
 
-        <div className="text-center mt-6 text-gray-400 text-sm">
-          <p>All plans include a 14-day money-back guarantee</p>
-        </div>
+        {remainingCoins > 0 ? (
+          <button
+            onClick={useCoin}
+            className="w-full bg-orange-600 hover:bg-orange-700 text-white font-semibold py-3 rounded-lg transition-colors duration-200"
+          >
+            Use 1 Coin to Continue
+          </button>
+        ) : (
+          <button
+            onClick={() => router.push('/buycoins')}
+            className="w-full bg-blue-600 hover:bg-blue-700 text-white font-semibold py-3 rounded-lg transition-colors duration-200"
+          >
+            Buy More Coins
+          </button>
+        )}
       </div>
     </div>
   );

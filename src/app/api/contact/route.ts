@@ -1,7 +1,7 @@
 import { NextResponse } from 'next/server';
 import { initializeApp, getApps } from "firebase/app";
 import { getFirestore, collection, addDoc, serverTimestamp } from 'firebase/firestore';
-
+import { prisma } from '@/lib/prisma';
 // Server-side Firebase config using environment variables
 const firebaseConfig = {
   apiKey: process.env.FIREBASE_API_KEY || process.env.NEXT_PUBLIC_FIREBASE_API_KEY,
@@ -59,3 +59,36 @@ export async function POST(req: Request) {
     );
   }
 }
+
+
+
+
+
+export async function GET(
+  request: Request,
+  { params }: { params: { email: string } }
+) {
+  const user = await prisma.user.findUnique({
+    where: { email: params.email },
+    select: { totalCoins: true, usedCoins: true }
+  });
+
+  return Response.json(user);
+}
+
+
+// import { prisma } from '@/lib/prisma';
+
+export async function POST(request: Request) {
+  const { email } = await request.json();
+
+  const user = await prisma.user.update({
+    where: { email },
+    data: {
+      usedCoins: { increment: 1 }
+    }
+  });
+
+  return Response.json(user);
+}
+

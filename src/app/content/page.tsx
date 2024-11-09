@@ -11,6 +11,8 @@ import Cover14 from "../../../Public/images/cover14.jpg";
 import Badge from "@/components/Badge/Badge";
 import Link from "next/link";
 import { Footer } from "@/components/Footer/Footer";
+import PricingModal from "@/components/PricingModal/PricingModal";
+
 
 interface FormValues {
   date: string;
@@ -29,6 +31,13 @@ const MainPage = () => {
   const [dailyShareImage, setDailyShareImage] = useState<string>("");
   const [weeklyShareImage, setWeeklyShareImage] = useState<string>("");
   const [imagesReady, setImagesReady] = useState(false);
+  const [showModal, setShowModal] = useState(true); // Show modal on first access
+
+
+  const handleCloseModal = () => {
+    setShowModal(false); // Close the modal
+  };
+
 
   const {
     register,
@@ -217,6 +226,9 @@ const MainPage = () => {
           toggleTheme={toggleTheme}
         />
       </div>
+      <div>
+        {showModal && <PricingModal onClose={handleCloseModal} />}
+      </div>
       <div className="flex justify-center items-center flex-col xl:flex-row gap-[4rem] pt-[10rem]">
         <div>
           <div className="wrapper">
@@ -225,7 +237,7 @@ const MainPage = () => {
             </div>
           </div>
           <div className="border-4 border-slate-700 rounded-xl p-[1rem]">
-            <h1 className="p-[4px] xl:w-[400px] dark:text-slate-800 text-slate-600 text-[12px]">
+            <h1 className="p-[4px] xl:w-[400px] dark:text-slate-600 text-slate-500 text-[12px]">
               Journaling your daily progress helps you see how far you have come
               and what you still need to work on. It allows you to break down
               big tasks into smaller, more manageable steps. By writing down
@@ -267,7 +279,7 @@ const MainPage = () => {
             </span>
 
             <span className="flex justify-start items-center mb-[1rem] gap-[1rem]">
-              <label className="text-slate-600 text-[12px]">Goal</label>
+              <label className="text-slate-700 text-[12px]">Goal</label>
               <input
                 id="goalCheckbox"
                 className="text-white text-[12px] p-[8px] rounded-full accent-orange-500"
@@ -288,14 +300,14 @@ const MainPage = () => {
 
             <span className="flex flex-col mb-[1.5rem]">
               <label
-                className="text-slate-500 text-[12px] mb-[1rem]"
+                className="text-slate-700 text-[12px] mb-[1rem]"
                 htmlFor="titleInput"
               >
                 Title
               </label>
               <input
                 id="titleInput"
-                className="text-slate-400 text-[12px] p-[8px] rounded-2xl"
+                className="text-slate-700 text-[12px] p-[8px] rounded-2xl"
                 type="text"
                 placeholder="Enter title of goal"
                 {...register("title", {
@@ -329,7 +341,7 @@ const MainPage = () => {
                       </div>
                       <select
                         id="activitySelect"
-                        className="bg-slate-500 text-[12px] p-[8px] rounded-2xl xl:w-[24rem] w-[18rem] h-[2.5rem]"
+                        className="bg-slate-500 text-[12px] p-[8px] rounded-2xl xl:w-[24rem] w-[18.8rem] h-[2.5rem]"
                         {...register("category", {
                           required: "Please select a category",
                         })}
@@ -398,7 +410,7 @@ const MainPage = () => {
               </label>
               <textarea
                 id="weeklySummaryTextarea"
-                className="text-slate-400 text-[12px] p-[8px] rounded-2xl h-[5rem]"
+                className="text-slate-700 text-[12px] p-[8px] rounded-2xl h-[5rem]"
                 placeholder="Summarize your week's goal"
                 {...register("weeklySummary", {
                   required: "Weekly summary is required",
@@ -452,6 +464,9 @@ const MainPage = () => {
           View Weekly Summary
         </Link>
       </div>
+      {/* <div>
+        <Whatsapp/>
+      </div> */}
       <div>
         <Footer />
       </div>

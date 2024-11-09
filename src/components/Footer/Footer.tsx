@@ -7,7 +7,7 @@ export const Footer = () => {
         <h1 className="text-xl font-bold">Welcome!</h1>
       </div>
       <div className="mt-4">
-        <p className="text-gray-700">
+        {/* <p className="text-gray-700">
           Contact us:{" "}
           <a
             href="mailto:contact@example.com"
@@ -18,7 +18,7 @@ export const Footer = () => {
         </p>
         <p className="text-gray-600">
           Phone: <span className="text-orange-400">+(234) 7014441418</span>
-        </p>
+        </p> */}
         <p className="text-gray-600">
           © {new Date().getFullYear()} Yonan Technologies. All rights reserved.
         </p>
@@ -59,7 +59,7 @@ export const Footer = () => {
             <FaLinkedin className="text-orange-700 hover:text-blue-900" />
           </a>
         </div> */}
-        <div className="mt-4">
+        {/* <div className="mt-4">
           <h2 className="text-lg font-semibold">Contact Us</h2>
           <div className="flex justify-center space-x-4 mt-2">
             <a
@@ -72,7 +72,7 @@ export const Footer = () => {
               WhatsApp Us
             </a>
           </div>
-        </div>
+        </div> */}
       </div>
     </div>
   );
