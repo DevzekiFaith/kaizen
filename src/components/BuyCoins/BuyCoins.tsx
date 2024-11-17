@@ -24,7 +24,7 @@ declare global {
 interface Coin {
   id: number;
   name: string;
-  price: number;
+  price: number; // Price in kobo
   coinCount: number;
 }
 
@@ -37,11 +37,11 @@ const BuyCoins: React.FC = () => {
 
   const coins: Coin[] = [
     { id: 0, name: "Free Coin", price: 0, coinCount: 2 },
-    { id: 1, name: "Gold Coin", price: 5000, coinCount: 5 },
-    { id: 2, name: "Silver Coin", price: 3000, coinCount: 3 },
-    { id: 3, name: "Bronze Coin", price: 2000, coinCount: 1 },
-    { id: 4, name: "Platinum Coin", price: 7000, coinCount: 7 },
-    { id: 5, name: "Diamond Coin", price: 10000, coinCount: 10 },
+    { id: 1, name: "Gold Coin", price: 500000, coinCount: 5 }, // Prices in kobo
+    { id: 2, name: "Silver Coin", price: 300000, coinCount: 3 },
+    { id: 3, name: "Bronze Coin", price: 200000, coinCount: 1 },
+    { id: 4, name: "Platinum Coin", price: 700000, coinCount: 7 },
+    { id: 5, name: "Diamond Coin", price: 1000000, coinCount: 10 },
   ];
 
   useEffect(() => {
@@ -62,7 +62,8 @@ const BuyCoins: React.FC = () => {
 
   const handleFreeAccess = () => {
     if (freeCoinUsage > 0) {
-      setFreeCoinUsage(freeCoinUsage - 1);
+      setFreeCoinUsage((prev) => prev - 1);
+      alert("Free access granted. Redirecting...");
       router.push("/content");
     } else {
       alert("Free coin limit reached. Please buy more coins to access content.");
@@ -71,16 +72,16 @@ const BuyCoins: React.FC = () => {
 
   const handlePayment = () => {
     if (!isScriptLoaded || !window.PaystackPop || !selectedCoin) {
-      console.error("Payment cannot proceed. Check Paystack script or selection.");
+      alert("Payment cannot proceed. Ensure a coin is selected and try again.");
       return;
     }
 
     setIsLoading(true);
 
     const config = {
-      key: "pk_test_8dcf1e666d54aa2f0d2787f8930cef9f0202d226",
+      key: "pk_test_8dcf1e666d54aa2f0d2787f8930cef9f0202d226", // Replace with your actual Paystack public key
       email: "unovaconsultingfirstafrica@gmail.com",
-      amount: selectedCoin.price * 100,
+      amount: selectedCoin.price, // Price in kobo
       callback: (response: { reference: string }) => {
         setIsLoading(false);
         alert("Payment complete! Reference: " + response.reference);
@@ -116,7 +117,7 @@ const BuyCoins: React.FC = () => {
             <h2 className="text-lg font-semibold text-slate-800">{coin.name}</h2>
             <p className="text-gray-500">{coin.coinCount} Coins</p>
             {coin.price > 0 ? (
-              <p className="text-gray-500">${(coin.price / 100).toFixed(2)}</p>
+              <p className="text-gray-500">₦{(coin.price / 100).toFixed(2)}</p>
             ) : (
               <p className="text-green-500 font-semibold">Free</p>
             )}
@@ -148,15 +149,6 @@ const BuyCoins: React.FC = () => {
             <span>Pay with Paystack</span>
           )}
         </button>
-      )}
-
-      {isLoading && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-          <div className="bg-white p-6 rounded-lg shadow-xl flex flex-col items-center">
-            <Loader2 className="h-8 w-8 animate-spin text-orange-600 mb-4" />
-            <p className="text-gray-700">Preparing your payment...</p>
-          </div>
-        </div>
       )}
     </div>
   );

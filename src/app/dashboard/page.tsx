@@ -4,7 +4,6 @@ import React, { useState } from "react";
 import NavBar from "@/components/NavBar/NavBar";
 import Dashboard from "@/components/Dashboard/Dashboard";
 import Modal from "@/components/Modal/Modal";
-// import PricingModal from "@/components/PricingModal/PricingModal";
 import Link from "next/link";
 import {
   Chart as ChartJS,
@@ -19,8 +18,7 @@ import {
   Legend,
 } from "chart.js";
 import { Footer } from "@/components/Footer/Footer";
-import BuyCoins from "@/components/BuyCoins/BuyCoins";
-// import PaymentButton from "@/components/PaymentButton/PaymentButton";
+
 
 // Register ChartJS components
 ChartJS.register(
@@ -37,15 +35,10 @@ ChartJS.register(
 
 const DashboardPage: React.FC = () => {
   const [isModalOpen, setIsModalOpen] = useState(false);
-  // const [isPricingModalOpen, setIsPricingModalOpen] = useState(false);
 
   const toggleModal = () => {
     setIsModalOpen(!isModalOpen);
   };
-
-  // const togglePricingModal = () => {
-  //   setIsPricingModalOpen(!isPricingModalOpen);
-  // };
 
   const toggleTheme = () => {
     console.log("Theme toggled");
@@ -62,18 +55,6 @@ const DashboardPage: React.FC = () => {
             </h1>
           </div>
         </Link>
-
-        {/* <PaymentButton email="" amount={0} onSuccess={() => {}} onClose={() => {}}/> */}
-        {/* <button
-          // onClick={togglePricingModal}
-          className="rounded-2xl border border-orange-600 bg-transparent px-6 h-[3rem] shadow hover:bg-orange-600 hover:text-white transition-colors duration-300 text-orange-600 font-medium"
-        >
-          Upgrade to Pro
-        </button> */}
-
-        <div className="">
-          <BuyCoins/>
-        </div>
       </div>
       <div className="container mx-auto px-4 py-8 z-[-50] pt-[4rem]">
         <div>
@@ -88,7 +69,6 @@ const DashboardPage: React.FC = () => {
         onClose={toggleModal}
         toggleTheme={toggleTheme}
       />
-      {/* <PricingModal isOpen={isPricingModalOpen} onClose={togglePricingModal} /> */}
 
       <div>
         <Footer />

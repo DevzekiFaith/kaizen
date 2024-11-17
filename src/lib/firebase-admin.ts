@@ -1,6 +1,7 @@
 // src/lib/firebase-admin.ts
 import admin from 'firebase-admin';
 
+
 if (!admin.apps.length) {
   try {
     // Initialize the Firebase app with service account credentials

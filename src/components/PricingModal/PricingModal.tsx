@@ -31,21 +31,27 @@ const PricingModal: React.FC<PricingModalProps> = ({ onClose }) => {
 
   useEffect(() => {
     const fetchUserCoins = async () => {
-      if (user) {
-        try {
-          const response = await fetch('/api/coins/balance', {
-            credentials: 'include',
-          });
+      if (!user) return;
 
-          if (!response.ok) throw new Error('Failed to fetch coins');
+      try {
+        const authToken = await getAuth().currentUser?.getIdToken();
 
-          const data = await response.json();
-          setAvailableCoins(data.availableCoins);
-          setUsedCoins(data.usedCoins);
-        } catch (error) {
-          toast.error('Failed to load coin balance');
-          console.error('Error fetching coins:', error);
-        }
+        const response = await fetch('/api/coins/balance', {
+          method: 'GET',
+          headers: {
+            'Content-Type': 'application/json',
+            Authorization: `Bearer ${authToken}`,
+          },
+        });
+
+        if (!response.ok) throw new Error('Failed to fetch coins');
+
+        const data = await response.json();
+        setAvailableCoins(data.availableCoins);
+        setUsedCoins(data.usedCoins);
+      } catch (error) {
+        toast.error('Failed to load coin balance.');
+        console.error('Error fetching coins:', error);
       }
     };
 
@@ -53,28 +59,7 @@ const PricingModal: React.FC<PricingModalProps> = ({ onClose }) => {
   }, [user]);
 
   const useCoin = async () => {
-    if (availableCoins > 0) {
-      try {
-        const response = await fetch('/api/coins/use', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          credentials: 'include',
-        });
-
-        if (!response.ok) throw new Error('Failed to use coin');
-
-        const data = await response.json();
-        setAvailableCoins(data.availableCoins);
-        setUsedCoins(data.usedCoins);
-
-        toast.success('Coin used successfully!');
-        onClose();
-        router.push('/content');
-      } catch (error) {
-        toast.error('Failed to use coin. Please try again.');
-        console.error('Error using coin:', error);
-      }
-    } else {
+    if (availableCoins <= 0) {
       toast.error('No coins available!');
       const wantsToBuyMore = window.confirm(
         "You've used all your coins. Would you like to purchase more coins to continue journaling?"
@@ -84,6 +69,32 @@ const PricingModal: React.FC<PricingModalProps> = ({ onClose }) => {
         router.push('/buycoins');
       }
       onClose();
+      return;
+    }
+
+    try {
+      const authToken = await getAuth().currentUser?.getIdToken();
+
+      const response = await fetch('/api/coins/use', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${authToken}`,
+        },
+      });
+
+      if (!response.ok) throw new Error('Failed to use coin');
+
+      const data = await response.json();
+      setAvailableCoins(data.availableCoins);
+      setUsedCoins(data.usedCoins);
+
+      toast.success('Coin used successfully!');
+      onClose();
+      router.push('/content');
+    } catch (error) {
+      toast.error('Failed to use coin.');
+      console.error('Error using coin:', error);
     }
   };
 
@@ -96,7 +107,7 @@ const PricingModal: React.FC<PricingModalProps> = ({ onClose }) => {
         >
           ✕
         </button>
-        
+
         <div className="text-center mb-8">
           <h2 className="text-2xl font-semibold text-white">Your Coin Balance</h2>
         </div>

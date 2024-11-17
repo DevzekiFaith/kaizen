@@ -25,11 +25,14 @@ const handler = NextAuth({
       return token;
     },
     async session({ session, token }) {
-      session.user.id = token.id;
-      session.user.email = token.email;
-      session.user.name = token.name;
+      if (session.user) {
+        session.user.id = token.id as string;
+        session.user.email = token.email;
+        session.user.name = token.name;
+      }
       return session;
     },
+
   },
   pages: {
     signIn: '/auth/signin', // Custom sign-in page (optional)
