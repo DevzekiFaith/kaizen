@@ -11,7 +11,7 @@ import Cover14 from "../../../Public/images/cover14.jpg";
 import Badge from "@/components/Badge/Badge";
 import Link from "next/link";
 import { Footer } from "@/components/Footer/Footer";
-import PricingModal from "@/components/PricingModal/PricingModal";
+
 
 
 interface FormValues {
@@ -31,12 +31,12 @@ const MainPage = () => {
   const [dailyShareImage, setDailyShareImage] = useState<string>("");
   const [weeklyShareImage, setWeeklyShareImage] = useState<string>("");
   const [imagesReady, setImagesReady] = useState(false);
-  const [showModal, setShowModal] = useState(true); // Show modal on first access
+  // const [showModal, setShowModal] = useState(true); // Show modal on first access
 
 
-  const handleCloseModal = () => {
-    setShowModal(false); // Close the modal
-  };
+  // const handleCloseModal = () => {
+  //   setShowModal(false); // Close the modal
+  // };
 
 
   const {
@@ -227,7 +227,7 @@ const MainPage = () => {
         />
       </div>
       <div>
-        {showModal && <PricingModal onClose={handleCloseModal} />}
+        {/* {showModal && <PricingModal onClose={handleCloseModal} />} */}
       </div>
       <div className="flex justify-center items-center flex-col xl:flex-row gap-[4rem] pt-[10rem]">
         <div>

@@ -1,4 +1,4 @@
-import { Metadata } from "next";
+// import { Metadata } from "next";
 import localFont from "next/font/local";
 import "./globals.css";
 import ClientProviders from "@/components/ClientProvider/ClientProvider";

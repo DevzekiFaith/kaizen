@@ -48,7 +48,8 @@ const PaymentButton: React.FC<PaymentButtonProps> = ({
         className: "bg-orange-600 hover:bg-orange-700 text-white font-bold py-2 px-4 rounded transition-colors duration-200"
     };
 
-    return <PaystackButton />;
+    return <PaystackButton {...config} />;
 };
+
 
 export default PaymentButton;
